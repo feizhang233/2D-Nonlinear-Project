@@ -1,0 +1,99 @@
+name: release-gates
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  backend:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: ["3.11", "3.12"]
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          path: nonlinear
+      - uses: actions/checkout@v4
+        with:
+          repository: feizhang233/2D-Continuum-Project
+          ref: 01468920c19e468d0719714cde8b6168e78d0cd8
+          path: dependencies/continuum
+      - uses: actions/checkout@v4
+        with:
+          repository: feizhang233/2D-Frame-Project
+          ref: b8276a1ced4fd5a2913efb23c981f4ec43e59f6e
+          path: dependencies/frame
+      - uses: actions/checkout@v4
+        with:
+          repository: feizhang233/2d-plate-analysis-api
+          ref: c30bee97a8efa7d1a0d9732bee84fef4f7383913
+          path: dependencies/plate
+      - uses: actions/checkout@v4
+        with:
+          repository: feizhang233/2D-Shell-Project
+          ref: 814f68c038f5e72f4c886f00baf064b2794e097a
+          path: dependencies/shell
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+          cache: pip
+          cache-dependency-path: nonlinear/pyproject.toml
+      - name: Install project and frozen core revisions
+        run: |
+          python -m pip install -e dependencies/continuum -e dependencies/frame -e dependencies/plate -e dependencies/shell
+          python -m pip install -e 'nonlinear[dev]'
+          python -m pip check
+      - name: Check release contracts and evidence
+        working-directory: nonlinear
+        run: |
+          python scripts/run_math_core_audit.py --check
+          python scripts/generate_release_evidence.py --check
+          python scripts/check_release.py
+      - name: Lint and test
+        working-directory: nonlinear
+        run: |
+          python -m ruff check src tests scripts
+          python -m pytest
+      - name: Build and smoke-test wheel
+        working-directory: nonlinear
+        run: |
+          python -m build --no-isolation
+          python -m venv /tmp/nonlinear-p15-wheel
+          /tmp/nonlinear-p15-wheel/bin/python -m pip install dist/nonlinear_core-0.1.0-py3-none-any.whl
+          /tmp/nonlinear-p15-wheel/bin/python -m pip check
+          /tmp/nonlinear-p15-wheel/bin/python scripts/isolated_release_smoke.py --project-root . --expected-prefix /tmp/nonlinear-p15-wheel --families frame
+          /tmp/nonlinear-p15-wheel/bin/python -m pip install ../dependencies/continuum ../dependencies/frame ../dependencies/plate ../dependencies/shell
+          /tmp/nonlinear-p15-wheel/bin/python -m pip check
+          /tmp/nonlinear-p15-wheel/bin/python scripts/isolated_release_smoke.py --project-root . --expected-prefix /tmp/nonlinear-p15-wheel --families frame continuum plate shell
+
+  frontend:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: frontend
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: npm
+          cache-dependency-path: frontend/package-lock.json
+      - run: npm ci
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+          cache-dependency-path: pyproject.toml
+      - run: python -m pip install -e ..
+      - run: npm test -- --run
+      - run: npm run typecheck
+      - run: npm run build
+      - name: Real HTTP frontend/API smoke
+        run: |
+          python -m nonlinear_api.main >/tmp/nonlinear-api.log 2>&1 &
+          API_PID=$!
+          npm run dev -- --host 127.0.0.1 >/tmp/nonlinear-vite.log 2>&1 &
+          VITE_PID=$!
+          trap 'kill "$API_PID" "$VITE_PID"' EXIT
+          python ../scripts/http_stack_smoke.py --project-root .. --frontend-url http://127.0.0.1:5173

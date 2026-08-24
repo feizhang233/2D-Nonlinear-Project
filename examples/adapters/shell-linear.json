@@ -1,0 +1,30 @@
+{
+  "schema_version": "1.0.0",
+  "model_id": "p2-shell-reference",
+  "name": "P2 flat shell cantilever reference",
+  "model_family": "shell",
+  "units": {"length": "m", "force": "N", "stress": "Pa", "angle": "rad", "system_label": "SI"},
+  "nodes": [
+    {"id": "N1", "coordinates": [-1.0, -1.0, 0.0]},
+    {"id": "N2", "coordinates": [1.0, -1.0, 0.0]},
+    {"id": "N3", "coordinates": [1.0, 1.0, 0.0]},
+    {"id": "N4", "coordinates": [-1.0, 1.0, 0.0]}
+  ],
+  "elements": [
+    {"id": "E1", "formulation": "Q4-FLAT-SHELL-RM", "node_ids": ["N1", "N2", "N3", "N4"], "material_id": "M1", "properties": {"thickness": 0.02, "shear_correction_factor": 0.8333333333333334}}
+  ],
+  "materials": [
+    {"id": "M1", "model": "linear-elastic-isotropic", "parameters": {"young": 210000000000.0, "poisson": 0.3}}
+  ],
+  "loads": [
+    {"id": "L1", "kind": "surface", "element_id": "E1", "components": {"UZ": -1000.0}}
+  ],
+  "constraints": [
+    {"id": "C1", "node_id": "N1", "dof": "UX"}, {"id": "C2", "node_id": "N1", "dof": "UY"}, {"id": "C3", "node_id": "N1", "dof": "UZ"},
+    {"id": "C4", "node_id": "N1", "dof": "RX"}, {"id": "C5", "node_id": "N1", "dof": "RY"}, {"id": "C6", "node_id": "N1", "dof": "RZ"},
+    {"id": "C7", "node_id": "N4", "dof": "UX"}, {"id": "C8", "node_id": "N4", "dof": "UY"}, {"id": "C9", "node_id": "N4", "dof": "UZ"},
+    {"id": "C10", "node_id": "N4", "dof": "RX"}, {"id": "C11", "node_id": "N4", "dof": "RY"}, {"id": "C12", "node_id": "N4", "dof": "RZ"}
+  ],
+  "analysis": {"control_method": "load"},
+  "extensions": {"purpose": "P2 adapter/native reference"}
+}

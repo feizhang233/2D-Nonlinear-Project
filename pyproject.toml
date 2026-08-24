@@ -1,0 +1,60 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "nonlinear-core"
+version = "0.1.0"
+description = "Contract-first quasi-static nonlinear solution core for 2D finite-element models"
+readme = "README.md"
+requires-python = ">=3.11"
+dependencies = [
+    "fastapi>=0.115,<1",
+    "gmsh>=4.15,<4.16",
+    "numpy>=1.26,<3",
+    "pydantic>=2.9,<3",
+    "scipy>=1.13,<2",
+    "uvicorn>=0.30,<1",
+]
+
+[project.scripts]
+nonlinear-api = "nonlinear_api.main:run"
+
+[project.optional-dependencies]
+linear-cores = [
+    "continuum-math==0.7.0",
+    "frame2d==0.2.0",
+    "mindlin-plate-core==0.3.0",
+    "shell-core==1.0.0",
+]
+dev = [
+    "build>=1.2",
+    "httpx2>=2.12,<3",
+    "jsonschema>=4.22,<5",
+    "pytest>=8.0",
+    "ruff>=0.6",
+    "setuptools>=68",
+    "wheel",
+]
+
+[tool.setuptools]
+package-dir = {"" = "src"}
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.setuptools.package-data]
+"reused_cores.frame2d_linear" = ["PROVENANCE.md"]
+
+[tool.pytest.ini_options]
+addopts = "-q --strict-markers"
+testpaths = ["tests"]
+pythonpath = ["src"]
+
+[tool.ruff]
+line-length = 100
+target-version = "py311"
+src = ["src", "tests"]
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "UP", "B"]

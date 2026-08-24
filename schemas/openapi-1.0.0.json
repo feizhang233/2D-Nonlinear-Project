@@ -1,0 +1,2692 @@
+{
+  "components": {
+    "schemas": {
+      "AnalysisOptions": {
+        "additionalProperties": false,
+        "properties": {
+          "arc_length": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/ArcLengthOptions"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "control_method": {
+            "$ref": "#/components/schemas/ControlMethod",
+            "default": "load"
+          },
+          "displacement_control": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/DisplacementControlOptions"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "extensions": {
+            "additionalProperties": {
+              "$ref": "#/components/schemas/JsonValue"
+            },
+            "title": "Extensions",
+            "type": "object"
+          },
+          "line_search": {
+            "$ref": "#/components/schemas/LineSearchOptions"
+          },
+          "max_iterations": {
+            "default": 30,
+            "minimum": 1.0,
+            "title": "Max Iterations",
+            "type": "integer"
+          },
+          "newton_method": {
+            "$ref": "#/components/schemas/NewtonMethod",
+            "default": "full"
+          },
+          "step_control": {
+            "$ref": "#/components/schemas/StepControlOptions"
+          },
+          "tolerances": {
+            "$ref": "#/components/schemas/ToleranceOptions"
+          }
+        },
+        "title": "AnalysisOptions",
+        "type": "object"
+      },
+      "AnalysisProgress": {
+        "additionalProperties": false,
+        "properties": {
+          "accepted_steps": {
+            "default": 0,
+            "minimum": 0.0,
+            "title": "Accepted Steps",
+            "type": "integer"
+          },
+          "current_iteration": {
+            "anyOf": [
+              {
+                "minimum": 0.0,
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Current Iteration"
+          },
+          "current_step": {
+            "anyOf": [
+              {
+                "minimum": 0.0,
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Current Step"
+          },
+          "message": {
+            "default": "",
+            "title": "Message",
+            "type": "string"
+          }
+        },
+        "title": "AnalysisProgress",
+        "type": "object"
+      },
+      "AnalysisRecord": {
+        "additionalProperties": false,
+        "properties": {
+          "analysis_id": {
+            "format": "uuid",
+            "title": "Analysis Id",
+            "type": "string"
+          },
+          "completed_at": {
+            "anyOf": [
+              {
+                "format": "date-time",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Completed At"
+          },
+          "control_method": {
+            "title": "Control Method",
+            "type": "string"
+          },
+          "created_at": {
+            "format": "date-time",
+            "title": "Created At",
+            "type": "string"
+          },
+          "dof_count": {
+            "minimum": 1.0,
+            "title": "Dof Count",
+            "type": "integer"
+          },
+          "error": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/ApiErrorDetail"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "execution_mode": {
+            "$ref": "#/components/schemas/ExecutionMode"
+          },
+          "model_id": {
+            "title": "Model Id",
+            "type": "string"
+          },
+          "model_sha256": {
+            "pattern": "^[0-9a-f]{64}$",
+            "title": "Model Sha256",
+            "type": "string"
+          },
+          "progress": {
+            "$ref": "#/components/schemas/AnalysisProgress"
+          },
+          "result": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/SolveResult"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "started_at": {
+            "anyOf": [
+              {
+                "format": "date-time",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Started At"
+          },
+          "status": {
+            "$ref": "#/components/schemas/AnalysisStatus"
+          }
+        },
+        "required": [
+          "analysis_id",
+          "status",
+          "execution_mode",
+          "created_at",
+          "model_id",
+          "model_sha256",
+          "control_method",
+          "dof_count"
+        ],
+        "title": "AnalysisRecord",
+        "type": "object"
+      },
+      "AnalysisRequest": {
+        "additionalProperties": false,
+        "properties": {
+          "execution_mode": {
+            "$ref": "#/components/schemas/ExecutionMode",
+            "default": "synchronous"
+          },
+          "model": {
+            "additionalProperties": true,
+            "title": "Model",
+            "type": "object"
+          },
+          "number_of_steps": {
+            "anyOf": [
+              {
+                "minimum": 1.0,
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Number Of Steps"
+          },
+          "restart": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/AnalysisRestart"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "target_load_factor": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Target Load Factor"
+          }
+        },
+        "required": [
+          "model"
+        ],
+        "title": "AnalysisRequest",
+        "type": "object"
+      },
+      "AnalysisRestart": {
+        "additionalProperties": false,
+        "properties": {
+          "arc_length_increment": {
+            "anyOf": [
+              {
+                "additionalProperties": {
+                  "$ref": "#/components/schemas/JsonValue"
+                },
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Arc Length Increment"
+          },
+          "committed_state": {
+            "additionalProperties": {
+              "$ref": "#/components/schemas/JsonValue"
+            },
+            "title": "Committed State",
+            "type": "object"
+          },
+          "restart_schema_version": {
+            "default": "1.0.0",
+            "title": "Restart Schema Version",
+            "type": "string"
+          }
+        },
+        "required": [
+          "committed_state"
+        ],
+        "title": "AnalysisRestart",
+        "type": "object"
+      },
+      "AnalysisStatus": {
+        "enum": [
+          "queued",
+          "running",
+          "succeeded",
+          "failed",
+          "cancelled"
+        ],
+        "title": "AnalysisStatus",
+        "type": "string"
+      },
+      "ApiErrorCategory": {
+        "enum": [
+          "input",
+          "computation",
+          "auth",
+          "server"
+        ],
+        "title": "ApiErrorCategory",
+        "type": "string"
+      },
+      "ApiErrorDetail": {
+        "additionalProperties": false,
+        "properties": {
+          "category": {
+            "$ref": "#/components/schemas/ApiErrorCategory"
+          },
+          "code": {
+            "title": "Code",
+            "type": "string"
+          },
+          "details": {
+            "additionalProperties": {
+              "$ref": "#/components/schemas/JsonValue"
+            },
+            "title": "Details",
+            "type": "object"
+          },
+          "location": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Location"
+          },
+          "message": {
+            "title": "Message",
+            "type": "string"
+          }
+        },
+        "required": [
+          "category",
+          "code",
+          "message"
+        ],
+        "title": "ApiErrorDetail",
+        "type": "object"
+      },
+      "ApiErrorResponse": {
+        "additionalProperties": false,
+        "properties": {
+          "error": {
+            "$ref": "#/components/schemas/ApiErrorDetail"
+          }
+        },
+        "required": [
+          "error"
+        ],
+        "title": "ApiErrorResponse",
+        "type": "object"
+      },
+      "ApiLimits": {
+        "additionalProperties": false,
+        "properties": {
+          "max_dofs": {
+            "default": 10000,
+            "minimum": 1.0,
+            "title": "Max Dofs",
+            "type": "integer"
+          },
+          "max_request_bytes": {
+            "default": 1048576,
+            "minimum": 1024.0,
+            "title": "Max Request Bytes",
+            "type": "integer"
+          }
+        },
+        "title": "ApiLimits",
+        "type": "object"
+      },
+      "ArcLengthOptions": {
+        "additionalProperties": false,
+        "properties": {
+          "beta": {
+            "default": 1.0,
+            "exclusiveMinimum": 0.0,
+            "title": "Beta",
+            "type": "number"
+          },
+          "max_radius": {
+            "exclusiveMinimum": 0.0,
+            "title": "Max Radius",
+            "type": "number"
+          },
+          "min_radius": {
+            "exclusiveMinimum": 0.0,
+            "title": "Min Radius",
+            "type": "number"
+          },
+          "radius": {
+            "exclusiveMinimum": 0.0,
+            "title": "Radius",
+            "type": "number"
+          },
+          "root_selection": {
+            "$ref": "#/components/schemas/ArcLengthRootSelection",
+            "default": "direction_continuity"
+          }
+        },
+        "required": [
+          "radius",
+          "min_radius",
+          "max_radius"
+        ],
+        "title": "ArcLengthOptions",
+        "type": "object"
+      },
+      "ArcLengthRootSelection": {
+        "enum": [
+          "direction_continuity"
+        ],
+        "title": "ArcLengthRootSelection",
+        "type": "string"
+      },
+      "AuthUser": {
+        "additionalProperties": false,
+        "properties": {
+          "created_at": {
+            "format": "date-time",
+            "title": "Created At",
+            "type": "string"
+          },
+          "display_name": {
+            "title": "Display Name",
+            "type": "string"
+          },
+          "email": {
+            "title": "Email",
+            "type": "string"
+          },
+          "id": {
+            "title": "Id",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "email",
+          "display_name",
+          "created_at"
+        ],
+        "title": "AuthUser",
+        "type": "object"
+      },
+      "ConstraintInput": {
+        "additionalProperties": false,
+        "properties": {
+          "dof": {
+            "$ref": "#/components/schemas/Dof"
+          },
+          "extensions": {
+            "additionalProperties": {
+              "$ref": "#/components/schemas/JsonValue"
+            },
+            "title": "Extensions",
+            "type": "object"
+          },
+          "id": {
+            "maxLength": 128,
+            "minLength": 1,
+            "title": "Id",
+            "type": "string"
+          },
+          "node_id": {
+            "maxLength": 128,
+            "minLength": 1,
+            "title": "Node Id",
+            "type": "string"
+          },
+          "value": {
+            "default": 0.0,
+            "title": "Value",
+            "type": "number"
+          }
+        },
+        "required": [
+          "id",
+          "node_id",
+          "dof"
+        ],
+        "title": "ConstraintInput",
+        "type": "object"
+      },
+      "ContractIssue": {
+        "additionalProperties": false,
+        "properties": {
+          "code": {
+            "title": "Code",
+            "type": "string"
+          },
+          "json_path": {
+            "title": "Json Path",
+            "type": "string"
+          },
+          "message": {
+            "title": "Message",
+            "type": "string"
+          }
+        },
+        "required": [
+          "code",
+          "json_path",
+          "message"
+        ],
+        "title": "ContractIssue",
+        "type": "object"
+      },
+      "ControlMethod": {
+        "enum": [
+          "load",
+          "displacement",
+          "arc_length"
+        ],
+        "title": "ControlMethod",
+        "type": "string"
+      },
+      "CoordinateSystem": {
+        "enum": [
+          "global",
+          "local"
+        ],
+        "title": "CoordinateSystem",
+        "type": "string"
+      },
+      "DisplacementControlOptions": {
+        "additionalProperties": false,
+        "properties": {
+          "increment": {
+            "title": "Increment",
+            "type": "number"
+          },
+          "target": {
+            "$ref": "#/components/schemas/DofRef"
+          }
+        },
+        "required": [
+          "target",
+          "increment"
+        ],
+        "title": "DisplacementControlOptions",
+        "type": "object"
+      },
+      "Dof": {
+        "enum": [
+          "UX",
+          "UY",
+          "UZ",
+          "RX",
+          "RY",
+          "RZ"
+        ],
+        "title": "Dof",
+        "type": "string"
+      },
+      "DofRef": {
+        "additionalProperties": false,
+        "properties": {
+          "dof": {
+            "$ref": "#/components/schemas/Dof"
+          },
+          "node_id": {
+            "maxLength": 128,
+            "minLength": 1,
+            "title": "Node Id",
+            "type": "string"
+          }
+        },
+        "required": [
+          "node_id",
+          "dof"
+        ],
+        "title": "DofRef",
+        "type": "object"
+      },
+      "ElementInput": {
+        "additionalProperties": false,
+        "properties": {
+          "extensions": {
+            "additionalProperties": {
+              "$ref": "#/components/schemas/JsonValue"
+            },
+            "title": "Extensions",
+            "type": "object"
+          },
+          "formulation": {
+            "maxLength": 256,
+            "minLength": 1,
+            "title": "Formulation",
+            "type": "string"
+          },
+          "id": {
+            "maxLength": 128,
+            "minLength": 1,
+            "title": "Id",
+            "type": "string"
+          },
+          "material_id": {
+            "maxLength": 128,
+            "minLength": 1,
+            "title": "Material Id",
+            "type": "string"
+          },
+          "node_ids": {
+            "items": {
+              "maxLength": 128,
+              "minLength": 1,
+              "type": "string"
+            },
+            "minItems": 2,
+            "title": "Node Ids",
+            "type": "array"
+          },
+          "properties": {
+            "additionalProperties": {
+              "$ref": "#/components/schemas/JsonValue"
+            },
+            "title": "Properties",
+            "type": "object"
+          }
+        },
+        "required": [
+          "id",
+          "formulation",
+          "node_ids",
+          "material_id"
+        ],
+        "title": "ElementInput",
+        "type": "object"
+      },
+      "ExecutionMode": {
+        "enum": [
+          "synchronous",
+          "asynchronous"
+        ],
+        "title": "ExecutionMode",
+        "type": "string"
+      },
+      "FailureCode": {
+        "enum": [
+          "MODEL_ERROR",
+          "CONTROL_ERROR",
+          "TANGENT_ERROR",
+          "STATE_ERROR",
+          "LINEAR_SOLVE_ERROR",
+          "LOCAL_MATERIAL_ERROR",
+          "NONCONVERGENCE"
+        ],
+        "title": "FailureCode",
+        "type": "string"
+      },
+      "FailureRecord": {
+        "additionalProperties": false,
+        "properties": {
+          "code": {
+            "$ref": "#/components/schemas/FailureCode"
+          },
+          "details": {
+            "additionalProperties": {
+              "$ref": "#/components/schemas/JsonValue"
+            },
+            "title": "Details",
+            "type": "object"
+          },
+          "iteration_index": {
+            "anyOf": [
+              {
+                "minimum": 0.0,
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Iteration Index"
+          },
+          "json_path": {
+            "anyOf": [
+              {
+                "maxLength": 256,
+                "minLength": 1,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Json Path"
+          },
+          "message": {
+            "maxLength": 256,
+            "minLength": 1,
+            "title": "Message",
+            "type": "string"
+          },
+          "step_index": {
+            "anyOf": [
+              {
+                "minimum": 0.0,
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Step Index"
+          }
+        },
+        "required": [
+          "code",
+          "message"
+        ],
+        "title": "FailureRecord",
+        "type": "object"
+      },
+      "HealthResponse": {
+        "additionalProperties": false,
+        "properties": {
+          "api_version": {
+            "default": "1.0.0",
+            "title": "Api Version",
+            "type": "string"
+          },
+          "core_version": {
+            "title": "Core Version",
+            "type": "string"
+          },
+          "execution_mode": {
+            "$ref": "#/components/schemas/ExecutionMode",
+            "default": "synchronous"
+          },
+          "limits": {
+            "$ref": "#/components/schemas/ApiLimits"
+          },
+          "service": {
+            "default": "nonlinear-api",
+            "title": "Service",
+            "type": "string"
+          },
+          "status": {
+            "default": "ok",
+            "title": "Status",
+            "type": "string"
+          },
+          "supported_execution_modes": {
+            "default": [
+              "synchronous",
+              "asynchronous"
+            ],
+            "items": {
+              "$ref": "#/components/schemas/ExecutionMode"
+            },
+            "title": "Supported Execution Modes",
+            "type": "array"
+          }
+        },
+        "required": [
+          "core_version",
+          "limits"
+        ],
+        "title": "HealthResponse",
+        "type": "object"
+      },
+      "IterationRecord": {
+        "additionalProperties": false,
+        "properties": {
+          "accepted_alpha": {
+            "default": 1.0,
+            "exclusiveMinimum": 0.0,
+            "maximum": 1.0,
+            "title": "Accepted Alpha",
+            "type": "number"
+          },
+          "diagnostics": {
+            "additionalProperties": {
+              "$ref": "#/components/schemas/JsonValue"
+            },
+            "title": "Diagnostics",
+            "type": "object"
+          },
+          "displacement_correction_norm": {
+            "minimum": 0.0,
+            "title": "Displacement Correction Norm",
+            "type": "number"
+          },
+          "energy_norm": {
+            "minimum": 0.0,
+            "title": "Energy Norm",
+            "type": "number"
+          },
+          "iteration_index": {
+            "minimum": 0.0,
+            "title": "Iteration Index",
+            "type": "integer"
+          },
+          "linear_residual_norm": {
+            "minimum": 0.0,
+            "title": "Linear Residual Norm",
+            "type": "number"
+          },
+          "load_factor": {
+            "title": "Load Factor",
+            "type": "number"
+          },
+          "residual_norm": {
+            "minimum": 0.0,
+            "title": "Residual Norm",
+            "type": "number"
+          },
+          "status": {
+            "$ref": "#/components/schemas/IterationStatus"
+          },
+          "step_index": {
+            "minimum": 0.0,
+            "title": "Step Index",
+            "type": "integer"
+          },
+          "tangent_reassembled": {
+            "title": "Tangent Reassembled",
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "step_index",
+          "iteration_index",
+          "load_factor",
+          "residual_norm",
+          "displacement_correction_norm",
+          "energy_norm",
+          "linear_residual_norm",
+          "tangent_reassembled",
+          "status"
+        ],
+        "title": "IterationRecord",
+        "type": "object"
+      },
+      "IterationStatus": {
+        "enum": [
+          "continue",
+          "converged",
+          "rejected"
+        ],
+        "title": "IterationStatus",
+        "type": "string"
+      },
+      "JsonValue": {},
+      "LineSearchMethod": {
+        "enum": [
+          "backtracking",
+          "orthogonality"
+        ],
+        "title": "LineSearchMethod",
+        "type": "string"
+      },
+      "LineSearchOptions": {
+        "additionalProperties": false,
+        "properties": {
+          "enabled": {
+            "default": false,
+            "title": "Enabled",
+            "type": "boolean"
+          },
+          "max_iterations": {
+            "default": 8,
+            "minimum": 1.0,
+            "title": "Max Iterations",
+            "type": "integer"
+          },
+          "method": {
+            "$ref": "#/components/schemas/LineSearchMethod",
+            "default": "backtracking"
+          },
+          "min_alpha": {
+            "default": 0.001,
+            "exclusiveMaximum": 1.0,
+            "exclusiveMinimum": 0.0,
+            "title": "Min Alpha",
+            "type": "number"
+          },
+          "reduction_factor": {
+            "default": 0.5,
+            "exclusiveMaximum": 1.0,
+            "exclusiveMinimum": 0.0,
+            "title": "Reduction Factor",
+            "type": "number"
+          }
+        },
+        "title": "LineSearchOptions",
+        "type": "object"
+      },
+      "LoadInput": {
+        "additionalProperties": false,
+        "properties": {
+          "components": {
+            "additionalProperties": {
+              "type": "number"
+            },
+            "minProperties": 1,
+            "propertyNames": {
+              "maxLength": 256,
+              "minLength": 1
+            },
+            "title": "Components",
+            "type": "object"
+          },
+          "coordinate_system": {
+            "$ref": "#/components/schemas/CoordinateSystem",
+            "default": "global"
+          },
+          "element_id": {
+            "anyOf": [
+              {
+                "maxLength": 128,
+                "minLength": 1,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Element Id"
+          },
+          "extensions": {
+            "additionalProperties": {
+              "$ref": "#/components/schemas/JsonValue"
+            },
+            "title": "Extensions",
+            "type": "object"
+          },
+          "id": {
+            "maxLength": 128,
+            "minLength": 1,
+            "title": "Id",
+            "type": "string"
+          },
+          "kind": {
+            "$ref": "#/components/schemas/LoadKind"
+          },
+          "node_id": {
+            "anyOf": [
+              {
+                "maxLength": 128,
+                "minLength": 1,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Node Id"
+          },
+          "pattern": {
+            "default": "default",
+            "maxLength": 128,
+            "minLength": 1,
+            "title": "Pattern",
+            "type": "string"
+          },
+          "scale": {
+            "default": 1.0,
+            "title": "Scale",
+            "type": "number"
+          }
+        },
+        "required": [
+          "id",
+          "kind",
+          "components"
+        ],
+        "title": "LoadInput",
+        "type": "object"
+      },
+      "LoadKind": {
+        "enum": [
+          "nodal",
+          "element",
+          "body",
+          "edge",
+          "surface"
+        ],
+        "title": "LoadKind",
+        "type": "string"
+      },
+      "LoginRequest": {
+        "additionalProperties": false,
+        "properties": {
+          "email": {
+            "maxLength": 320,
+            "minLength": 3,
+            "title": "Email",
+            "type": "string"
+          },
+          "password": {
+            "maxLength": 128,
+            "minLength": 1,
+            "title": "Password",
+            "type": "string"
+          }
+        },
+        "required": [
+          "email",
+          "password"
+        ],
+        "title": "LoginRequest",
+        "type": "object"
+      },
+      "MaterialInput": {
+        "additionalProperties": false,
+        "properties": {
+          "extensions": {
+            "additionalProperties": {
+              "$ref": "#/components/schemas/JsonValue"
+            },
+            "title": "Extensions",
+            "type": "object"
+          },
+          "id": {
+            "maxLength": 128,
+            "minLength": 1,
+            "title": "Id",
+            "type": "string"
+          },
+          "model": {
+            "maxLength": 256,
+            "minLength": 1,
+            "title": "Model",
+            "type": "string"
+          },
+          "parameters": {
+            "additionalProperties": {
+              "$ref": "#/components/schemas/JsonValue"
+            },
+            "title": "Parameters",
+            "type": "object"
+          }
+        },
+        "required": [
+          "id",
+          "model"
+        ],
+        "title": "MaterialInput",
+        "type": "object"
+      },
+      "MeshBoundary": {
+        "additionalProperties": false,
+        "properties": {
+          "id": {
+            "title": "Id",
+            "type": "string"
+          },
+          "label": {
+            "title": "Label",
+            "type": "string"
+          },
+          "length": {
+            "exclusiveMinimum": 0.0,
+            "title": "Length",
+            "type": "number"
+          },
+          "node_ids": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Node Ids",
+            "type": "array"
+          },
+          "segments": {
+            "items": {
+              "$ref": "#/components/schemas/MeshBoundarySegment"
+            },
+            "title": "Segments",
+            "type": "array"
+          }
+        },
+        "required": [
+          "id",
+          "label",
+          "node_ids",
+          "segments",
+          "length"
+        ],
+        "title": "MeshBoundary",
+        "type": "object"
+      },
+      "MeshBoundarySegment": {
+        "additionalProperties": false,
+        "properties": {
+          "element_id": {
+            "title": "Element Id",
+            "type": "string"
+          },
+          "local_edge": {
+            "maximum": 3.0,
+            "minimum": 0.0,
+            "title": "Local Edge",
+            "type": "integer"
+          },
+          "node_ids": {
+            "maxItems": 2,
+            "minItems": 2,
+            "prefixItems": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "string"
+              }
+            ],
+            "title": "Node Ids",
+            "type": "array"
+          }
+        },
+        "required": [
+          "element_id",
+          "local_edge",
+          "node_ids"
+        ],
+        "title": "MeshBoundarySegment",
+        "type": "object"
+      },
+      "ModelFamily": {
+        "enum": [
+          "continuum",
+          "frame",
+          "plate",
+          "shell"
+        ],
+        "title": "ModelFamily",
+        "type": "string"
+      },
+      "ModelInput": {
+        "additionalProperties": false,
+        "properties": {
+          "analysis": {
+            "$ref": "#/components/schemas/AnalysisOptions"
+          },
+          "constraints": {
+            "default": [],
+            "items": {
+              "$ref": "#/components/schemas/ConstraintInput"
+            },
+            "title": "Constraints",
+            "type": "array"
+          },
+          "elements": {
+            "items": {
+              "$ref": "#/components/schemas/ElementInput"
+            },
+            "minItems": 1,
+            "title": "Elements",
+            "type": "array"
+          },
+          "extensions": {
+            "additionalProperties": {
+              "$ref": "#/components/schemas/JsonValue"
+            },
+            "title": "Extensions",
+            "type": "object"
+          },
+          "loads": {
+            "default": [],
+            "items": {
+              "$ref": "#/components/schemas/LoadInput"
+            },
+            "title": "Loads",
+            "type": "array"
+          },
+          "materials": {
+            "items": {
+              "$ref": "#/components/schemas/MaterialInput"
+            },
+            "minItems": 1,
+            "title": "Materials",
+            "type": "array"
+          },
+          "model_family": {
+            "$ref": "#/components/schemas/ModelFamily"
+          },
+          "model_id": {
+            "maxLength": 128,
+            "minLength": 1,
+            "title": "Model Id",
+            "type": "string"
+          },
+          "name": {
+            "maxLength": 256,
+            "minLength": 1,
+            "title": "Name",
+            "type": "string"
+          },
+          "nodes": {
+            "items": {
+              "$ref": "#/components/schemas/NodeInput"
+            },
+            "minItems": 1,
+            "title": "Nodes",
+            "type": "array"
+          },
+          "schema_version": {
+            "const": "1.0.0",
+            "title": "Schema Version",
+            "type": "string"
+          },
+          "units": {
+            "$ref": "#/components/schemas/UnitMetadata"
+          }
+        },
+        "required": [
+          "schema_version",
+          "model_id",
+          "name",
+          "model_family",
+          "units",
+          "nodes",
+          "elements",
+          "materials",
+          "analysis"
+        ],
+        "title": "ModelInput",
+        "type": "object"
+      },
+      "ModelValidationResponse": {
+        "additionalProperties": false,
+        "properties": {
+          "dof_count": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Dof Count"
+          },
+          "errors": {
+            "default": [],
+            "items": {
+              "$ref": "#/components/schemas/ContractIssue"
+            },
+            "title": "Errors",
+            "type": "array"
+          },
+          "execution_eligible": {
+            "title": "Execution Eligible",
+            "type": "boolean"
+          },
+          "limit_error": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/ApiErrorDetail"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "model": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/ModelInput"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "valid": {
+            "title": "Valid",
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "valid",
+          "execution_eligible"
+        ],
+        "title": "ModelValidationResponse",
+        "type": "object"
+      },
+      "NewtonMethod": {
+        "enum": [
+          "full",
+          "modified"
+        ],
+        "title": "NewtonMethod",
+        "type": "string"
+      },
+      "NodeInput": {
+        "additionalProperties": false,
+        "properties": {
+          "coordinates": {
+            "items": {
+              "type": "number"
+            },
+            "maxItems": 3,
+            "minItems": 2,
+            "title": "Coordinates",
+            "type": "array"
+          },
+          "extensions": {
+            "additionalProperties": {
+              "$ref": "#/components/schemas/JsonValue"
+            },
+            "title": "Extensions",
+            "type": "object"
+          },
+          "id": {
+            "maxLength": 128,
+            "minLength": 1,
+            "title": "Id",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "coordinates"
+        ],
+        "title": "NodeInput",
+        "type": "object"
+      },
+      "PostResult": {
+        "additionalProperties": false,
+        "properties": {
+          "derived_fields": {
+            "default": [],
+            "items": {
+              "$ref": "#/components/schemas/ResultField"
+            },
+            "title": "Derived Fields",
+            "type": "array"
+          },
+          "metadata": {
+            "additionalProperties": {
+              "$ref": "#/components/schemas/JsonValue"
+            },
+            "title": "Metadata",
+            "type": "object"
+          },
+          "raw_fields": {
+            "default": [],
+            "items": {
+              "$ref": "#/components/schemas/ResultField"
+            },
+            "title": "Raw Fields",
+            "type": "array"
+          }
+        },
+        "title": "PostResult",
+        "type": "object"
+      },
+      "RegisterRequest": {
+        "additionalProperties": false,
+        "properties": {
+          "display_name": {
+            "maxLength": 120,
+            "minLength": 2,
+            "title": "Display Name",
+            "type": "string"
+          },
+          "email": {
+            "maxLength": 320,
+            "minLength": 3,
+            "title": "Email",
+            "type": "string"
+          },
+          "password": {
+            "maxLength": 128,
+            "minLength": 8,
+            "title": "Password",
+            "type": "string"
+          }
+        },
+        "required": [
+          "email",
+          "display_name",
+          "password"
+        ],
+        "title": "RegisterRequest",
+        "type": "object"
+      },
+      "ResultField": {
+        "additionalProperties": false,
+        "properties": {
+          "basis": {
+            "anyOf": [
+              {
+                "maxLength": 256,
+                "minLength": 1,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Basis"
+          },
+          "is_derived": {
+            "default": false,
+            "title": "Is Derived",
+            "type": "boolean"
+          },
+          "location": {
+            "$ref": "#/components/schemas/ResultLocation"
+          },
+          "name": {
+            "maxLength": 256,
+            "minLength": 1,
+            "title": "Name",
+            "type": "string"
+          },
+          "records": {
+            "items": {
+              "additionalProperties": {
+                "$ref": "#/components/schemas/JsonValue"
+              },
+              "type": "object"
+            },
+            "title": "Records",
+            "type": "array"
+          },
+          "source": {
+            "anyOf": [
+              {
+                "maxLength": 256,
+                "minLength": 1,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Source"
+          }
+        },
+        "required": [
+          "name",
+          "location",
+          "records"
+        ],
+        "title": "ResultField",
+        "type": "object"
+      },
+      "ResultLocation": {
+        "enum": [
+          "global",
+          "node",
+          "element",
+          "gauss_point"
+        ],
+        "title": "ResultLocation",
+        "type": "string"
+      },
+      "SavedModel": {
+        "additionalProperties": false,
+        "properties": {
+          "id": {
+            "title": "Id",
+            "type": "string"
+          },
+          "model": {
+            "$ref": "#/components/schemas/ModelInput"
+          },
+          "model_family": {
+            "$ref": "#/components/schemas/ModelFamily"
+          },
+          "name": {
+            "title": "Name",
+            "type": "string"
+          },
+          "saved_at": {
+            "format": "date-time",
+            "title": "Saved At",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "name",
+          "model_family",
+          "saved_at",
+          "model"
+        ],
+        "title": "SavedModel",
+        "type": "object"
+      },
+      "SavedModelCreate": {
+        "additionalProperties": false,
+        "properties": {
+          "model": {
+            "$ref": "#/components/schemas/ModelInput"
+          },
+          "name": {
+            "maxLength": 160,
+            "minLength": 1,
+            "title": "Name",
+            "type": "string"
+          }
+        },
+        "required": [
+          "name",
+          "model"
+        ],
+        "title": "SavedModelCreate",
+        "type": "object"
+      },
+      "SessionResponse": {
+        "additionalProperties": false,
+        "properties": {
+          "authenticated": {
+            "title": "Authenticated",
+            "type": "boolean"
+          },
+          "user": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/AuthUser"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        },
+        "required": [
+          "authenticated"
+        ],
+        "title": "SessionResponse",
+        "type": "object"
+      },
+      "SolveResult": {
+        "additionalProperties": false,
+        "properties": {
+          "failures": {
+            "default": [],
+            "items": {
+              "$ref": "#/components/schemas/FailureRecord"
+            },
+            "title": "Failures",
+            "type": "array"
+          },
+          "metadata": {
+            "additionalProperties": {
+              "$ref": "#/components/schemas/JsonValue"
+            },
+            "title": "Metadata",
+            "type": "object"
+          },
+          "model_id": {
+            "maxLength": 128,
+            "minLength": 1,
+            "title": "Model Id",
+            "type": "string"
+          },
+          "model_sha256": {
+            "pattern": "^[0-9a-f]{64}$",
+            "title": "Model Sha256",
+            "type": "string"
+          },
+          "post_result": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/PostResult"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "schema_version": {
+            "const": "1.0.0",
+            "default": "1.0.0",
+            "title": "Schema Version",
+            "type": "string"
+          },
+          "solver_version": {
+            "maxLength": 256,
+            "minLength": 1,
+            "title": "Solver Version",
+            "type": "string"
+          },
+          "status": {
+            "$ref": "#/components/schemas/SolveStatus"
+          },
+          "steps": {
+            "default": [],
+            "items": {
+              "$ref": "#/components/schemas/StepResult"
+            },
+            "title": "Steps",
+            "type": "array"
+          }
+        },
+        "required": [
+          "model_id",
+          "model_sha256",
+          "solver_version",
+          "status"
+        ],
+        "title": "SolveResult",
+        "type": "object"
+      },
+      "SolveStatus": {
+        "enum": [
+          "succeeded",
+          "failed"
+        ],
+        "title": "SolveStatus",
+        "type": "string"
+      },
+      "StepControlOptions": {
+        "additionalProperties": false,
+        "properties": {
+          "cutback_factor": {
+            "default": 0.5,
+            "exclusiveMaximum": 1.0,
+            "exclusiveMinimum": 0.0,
+            "title": "Cutback Factor",
+            "type": "number"
+          },
+          "growth_factor": {
+            "default": 1.5,
+            "minimum": 1.0,
+            "title": "Growth Factor",
+            "type": "number"
+          },
+          "initial_step": {
+            "default": 0.1,
+            "exclusiveMinimum": 0.0,
+            "title": "Initial Step",
+            "type": "number"
+          },
+          "max_retries": {
+            "default": 8,
+            "minimum": 0.0,
+            "title": "Max Retries",
+            "type": "integer"
+          },
+          "max_step": {
+            "default": 0.25,
+            "exclusiveMinimum": 0.0,
+            "title": "Max Step",
+            "type": "number"
+          },
+          "max_steps": {
+            "default": 100,
+            "minimum": 1.0,
+            "title": "Max Steps",
+            "type": "integer"
+          },
+          "min_step": {
+            "default": 0.0001,
+            "exclusiveMinimum": 0.0,
+            "title": "Min Step",
+            "type": "number"
+          },
+          "target_iterations": {
+            "default": 6,
+            "minimum": 1.0,
+            "title": "Target Iterations",
+            "type": "integer"
+          }
+        },
+        "title": "StepControlOptions",
+        "type": "object"
+      },
+      "StepResult": {
+        "additionalProperties": false,
+        "properties": {
+          "accepted_step_size": {
+            "anyOf": [
+              {
+                "exclusiveMinimum": 0.0,
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Accepted Step Size"
+          },
+          "control_method": {
+            "$ref": "#/components/schemas/ControlMethod"
+          },
+          "failure": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/FailureRecord"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "iterations": {
+            "default": [],
+            "items": {
+              "$ref": "#/components/schemas/IterationRecord"
+            },
+            "title": "Iterations",
+            "type": "array"
+          },
+          "load_factor": {
+            "title": "Load Factor",
+            "type": "number"
+          },
+          "requested_step_size": {
+            "exclusiveMinimum": 0.0,
+            "title": "Requested Step Size",
+            "type": "number"
+          },
+          "response": {
+            "additionalProperties": {
+              "$ref": "#/components/schemas/JsonValue"
+            },
+            "title": "Response",
+            "type": "object"
+          },
+          "state_id": {
+            "anyOf": [
+              {
+                "maxLength": 256,
+                "minLength": 1,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "State Id"
+          },
+          "status": {
+            "$ref": "#/components/schemas/StepStatus"
+          },
+          "step_index": {
+            "minimum": 0.0,
+            "title": "Step Index",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "step_index",
+          "status",
+          "control_method",
+          "load_factor",
+          "requested_step_size"
+        ],
+        "title": "StepResult",
+        "type": "object"
+      },
+      "StepStatus": {
+        "enum": [
+          "accepted",
+          "rejected"
+        ],
+        "title": "StepStatus",
+        "type": "string"
+      },
+      "SurfaceMeshRequest": {
+        "additionalProperties": false,
+        "properties": {
+          "mesh_size": {
+            "exclusiveMinimum": 0.0,
+            "title": "Mesh Size",
+            "type": "number"
+          },
+          "model": {
+            "$ref": "#/components/schemas/ModelInput"
+          }
+        },
+        "required": [
+          "model",
+          "mesh_size"
+        ],
+        "title": "SurfaceMeshRequest",
+        "type": "object"
+      },
+      "SurfaceMeshResponse": {
+        "additionalProperties": false,
+        "properties": {
+          "boundaries": {
+            "items": {
+              "$ref": "#/components/schemas/MeshBoundary"
+            },
+            "title": "Boundaries",
+            "type": "array"
+          },
+          "elements": {
+            "items": {
+              "$ref": "#/components/schemas/ElementInput"
+            },
+            "title": "Elements",
+            "type": "array"
+          },
+          "engine": {
+            "default": "Gmsh",
+            "title": "Engine",
+            "type": "string"
+          },
+          "engine_version": {
+            "title": "Engine Version",
+            "type": "string"
+          },
+          "formulation": {
+            "title": "Formulation",
+            "type": "string"
+          },
+          "mesh_size": {
+            "exclusiveMinimum": 0.0,
+            "title": "Mesh Size",
+            "type": "number"
+          },
+          "model_family": {
+            "$ref": "#/components/schemas/ModelFamily"
+          },
+          "nodes": {
+            "items": {
+              "$ref": "#/components/schemas/NodeInput"
+            },
+            "title": "Nodes",
+            "type": "array"
+          }
+        },
+        "required": [
+          "engine_version",
+          "model_family",
+          "formulation",
+          "mesh_size",
+          "nodes",
+          "elements",
+          "boundaries"
+        ],
+        "title": "SurfaceMeshResponse",
+        "type": "object"
+      },
+      "ToleranceOptions": {
+        "additionalProperties": false,
+        "properties": {
+          "displacement": {
+            "default": 1e-08,
+            "exclusiveMinimum": 0.0,
+            "title": "Displacement",
+            "type": "number"
+          },
+          "displacement_floor": {
+            "default": 1e-12,
+            "exclusiveMinimum": 0.0,
+            "title": "Displacement Floor",
+            "type": "number"
+          },
+          "energy": {
+            "default": 1e-10,
+            "exclusiveMinimum": 0.0,
+            "title": "Energy",
+            "type": "number"
+          },
+          "energy_floor": {
+            "default": 1e-16,
+            "exclusiveMinimum": 0.0,
+            "title": "Energy Floor",
+            "type": "number"
+          },
+          "force_floor": {
+            "default": 1e-12,
+            "exclusiveMinimum": 0.0,
+            "title": "Force Floor",
+            "type": "number"
+          },
+          "linear_solver": {
+            "default": 1e-10,
+            "exclusiveMinimum": 0.0,
+            "title": "Linear Solver",
+            "type": "number"
+          },
+          "residual": {
+            "default": 1e-08,
+            "exclusiveMinimum": 0.0,
+            "title": "Residual",
+            "type": "number"
+          }
+        },
+        "title": "ToleranceOptions",
+        "type": "object"
+      },
+      "UnitMetadata": {
+        "additionalProperties": false,
+        "description": "Declared units; values are never converted by the contract layer.",
+        "properties": {
+          "angle": {
+            "default": "rad",
+            "maxLength": 256,
+            "minLength": 1,
+            "title": "Angle",
+            "type": "string"
+          },
+          "force": {
+            "maxLength": 256,
+            "minLength": 1,
+            "title": "Force",
+            "type": "string"
+          },
+          "length": {
+            "maxLength": 256,
+            "minLength": 1,
+            "title": "Length",
+            "type": "string"
+          },
+          "metadata": {
+            "additionalProperties": {
+              "$ref": "#/components/schemas/JsonValue"
+            },
+            "title": "Metadata",
+            "type": "object"
+          },
+          "stress": {
+            "maxLength": 256,
+            "minLength": 1,
+            "title": "Stress",
+            "type": "string"
+          },
+          "system_label": {
+            "anyOf": [
+              {
+                "maxLength": 256,
+                "minLength": 1,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "System Label"
+          },
+          "time": {
+            "anyOf": [
+              {
+                "maxLength": 256,
+                "minLength": 1,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Time"
+          }
+        },
+        "required": [
+          "length",
+          "force",
+          "stress"
+        ],
+        "title": "UnitMetadata",
+        "type": "object"
+      }
+    }
+  },
+  "info": {
+    "description": "Bounded local API for validated small-model quasi-static nonlinear analyses, with synchronous or in-process asynchronous execution. A converged path is not a stability or branch-switching claim.",
+    "title": "Nonlinear Studio API",
+    "version": "1.0.0"
+  },
+  "openapi": "3.1.0",
+  "paths": {
+    "/api/v1/analyses": {
+      "post": {
+        "operationId": "create_analysis_api_v1_analyses_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AnalysisRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AnalysisRecord"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "413": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorResponse"
+                }
+              }
+            },
+            "description": "Request Entity Too Large"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorResponse"
+                }
+              }
+            },
+            "description": "Unprocessable Entity"
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorResponse"
+                }
+              }
+            },
+            "description": "Internal Server Error"
+          }
+        },
+        "summary": "Create Analysis",
+        "tags": [
+          "analyses"
+        ]
+      }
+    },
+    "/api/v1/analyses/{analysis_id}": {
+      "delete": {
+        "operationId": "cancel_analysis_api_v1_analyses__analysis_id__delete",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "analysis_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Analysis Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AnalysisRecord"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorResponse"
+                }
+              }
+            },
+            "description": "Not Found"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorResponse"
+                }
+              }
+            },
+            "description": "Unprocessable Entity"
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorResponse"
+                }
+              }
+            },
+            "description": "Internal Server Error"
+          }
+        },
+        "summary": "Cancel Analysis",
+        "tags": [
+          "analyses"
+        ]
+      },
+      "get": {
+        "operationId": "get_analysis_api_v1_analyses__analysis_id__get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "analysis_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Analysis Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AnalysisRecord"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorResponse"
+                }
+              }
+            },
+            "description": "Not Found"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorResponse"
+                }
+              }
+            },
+            "description": "Unprocessable Entity"
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorResponse"
+                }
+              }
+            },
+            "description": "Internal Server Error"
+          }
+        },
+        "summary": "Get Analysis",
+        "tags": [
+          "analyses"
+        ]
+      }
+    },
+    "/api/v1/auth/login": {
+      "post": {
+        "operationId": "login_account_api_v1_auth_login_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/LoginRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SessionResponse"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorResponse"
+                }
+              }
+            },
+            "description": "Unauthorized"
+          },
+          "413": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorResponse"
+                }
+              }
+            },
+            "description": "Request Entity Too Large"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorResponse"
+                }
+              }
+            },
+            "description": "Unprocessable Entity"
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorResponse"
+                }
+              }
+            },
+            "description": "Internal Server Error"
+          }
+        },
+        "summary": "Login Account",
+        "tags": [
+          "iam"
+        ]
+      }
+    },
+    "/api/v1/auth/logout": {
+      "post": {
+        "operationId": "logout_account_api_v1_auth_logout_post",
+        "responses": {
+          "204": {
+            "description": "Successful Response"
+          }
+        },
+        "summary": "Logout Account",
+        "tags": [
+          "iam"
+        ]
+      }
+    },
+    "/api/v1/auth/register": {
+      "post": {
+        "operationId": "register_account_api_v1_auth_register_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RegisterRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SessionResponse"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorResponse"
+                }
+              }
+            },
+            "description": "Conflict"
+          },
+          "413": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorResponse"
+                }
+              }
+            },
+            "description": "Request Entity Too Large"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorResponse"
+                }
+              }
+            },
+            "description": "Unprocessable Entity"
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorResponse"
+                }
+              }
+            },
+            "description": "Internal Server Error"
+          }
+        },
+        "summary": "Register Account",
+        "tags": [
+          "iam"
+        ]
+      }
+    },
+    "/api/v1/auth/session": {
+      "get": {
+        "operationId": "current_session_api_v1_auth_session_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SessionResponse"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "summary": "Current Session",
+        "tags": [
+          "iam"
+        ]
+      }
+    },
+    "/api/v1/meshes": {
+      "post": {
+        "operationId": "create_surface_mesh_api_v1_meshes_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SurfaceMeshRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SurfaceMeshResponse"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "413": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorResponse"
+                }
+              }
+            },
+            "description": "Request Entity Too Large"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorResponse"
+                }
+              }
+            },
+            "description": "Unprocessable Entity"
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorResponse"
+                }
+              }
+            },
+            "description": "Internal Server Error"
+          }
+        },
+        "summary": "Create Surface Mesh",
+        "tags": [
+          "models"
+        ]
+      }
+    },
+    "/api/v1/models": {
+      "get": {
+        "operationId": "list_saved_models_api_v1_models_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/SavedModel"
+                  },
+                  "title": "Response List Saved Models Api V1 Models Get",
+                  "type": "array"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorResponse"
+                }
+              }
+            },
+            "description": "Unauthorized"
+          },
+          "413": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorResponse"
+                }
+              }
+            },
+            "description": "Request Entity Too Large"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorResponse"
+                }
+              }
+            },
+            "description": "Unprocessable Entity"
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorResponse"
+                }
+              }
+            },
+            "description": "Internal Server Error"
+          }
+        },
+        "summary": "List Saved Models",
+        "tags": [
+          "model history"
+        ]
+      },
+      "post": {
+        "operationId": "save_model_api_v1_models_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SavedModelCreate"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SavedModel"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorResponse"
+                }
+              }
+            },
+            "description": "Unauthorized"
+          },
+          "413": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorResponse"
+                }
+              }
+            },
+            "description": "Request Entity Too Large"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorResponse"
+                }
+              }
+            },
+            "description": "Unprocessable Entity"
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorResponse"
+                }
+              }
+            },
+            "description": "Internal Server Error"
+          }
+        },
+        "summary": "Save Model",
+        "tags": [
+          "model history"
+        ]
+      }
+    },
+    "/api/v1/models/validate": {
+      "post": {
+        "operationId": "validate_model_api_v1_models_validate_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "additionalProperties": true,
+                "title": "Document",
+                "type": "object"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ModelValidationResponse"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "413": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorResponse"
+                }
+              }
+            },
+            "description": "Request Entity Too Large"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorResponse"
+                }
+              }
+            },
+            "description": "Unprocessable Entity"
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorResponse"
+                }
+              }
+            },
+            "description": "Internal Server Error"
+          }
+        },
+        "summary": "Validate Model",
+        "tags": [
+          "models"
+        ]
+      }
+    },
+    "/api/v1/models/{entry_id}": {
+      "delete": {
+        "operationId": "delete_saved_model_api_v1_models__entry_id__delete",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "entry_id",
+            "required": true,
+            "schema": {
+              "title": "Entry Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Successful Response"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorResponse"
+                }
+              }
+            },
+            "description": "Unauthorized"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorResponse"
+                }
+              }
+            },
+            "description": "Not Found"
+          },
+          "413": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorResponse"
+                }
+              }
+            },
+            "description": "Request Entity Too Large"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorResponse"
+                }
+              }
+            },
+            "description": "Unprocessable Entity"
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorResponse"
+                }
+              }
+            },
+            "description": "Internal Server Error"
+          }
+        },
+        "summary": "Delete Saved Model",
+        "tags": [
+          "model history"
+        ]
+      }
+    },
+    "/health": {
+      "get": {
+        "operationId": "health_health_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HealthResponse"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "summary": "Health",
+        "tags": [
+          "system"
+        ]
+      }
+    }
+  }
+}

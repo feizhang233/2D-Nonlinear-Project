@@ -1,0 +1,22 @@
+{
+  "schema_version": "1.0.0",
+  "model_id": "invalid-units",
+  "name": "Missing unit metadata",
+  "model_family": "frame",
+  "nodes": [
+    {"id": "N1", "coordinates": [0.0, 0.0]},
+    {"id": "N2", "coordinates": [1.0, 0.0]}
+  ],
+  "elements": [
+    {
+      "id": "E1",
+      "formulation": "frame2d-linear-baseline",
+      "node_ids": ["N1", "N2"],
+      "material_id": "M1"
+    }
+  ],
+  "materials": [
+    {"id": "M1", "model": "linear-elastic"}
+  ],
+  "analysis": {"control_method": "load"}
+}

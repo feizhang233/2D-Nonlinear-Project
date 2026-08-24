@@ -1,0 +1,38 @@
+{
+  "schema_version": "1.0.0",
+  "model_id": "invalid-reference",
+  "name": "Invalid cross-entity references",
+  "model_family": "frame",
+  "units": {
+    "length": "m",
+    "force": "N",
+    "stress": "Pa"
+  },
+  "nodes": [
+    {"id": "N1", "coordinates": [0.0, 0.0]},
+    {"id": "N2", "coordinates": [1.0, 0.0]}
+  ],
+  "elements": [
+    {
+      "id": "E1",
+      "formulation": "frame2d-linear-baseline",
+      "node_ids": ["N1", "N9"],
+      "material_id": "M9"
+    }
+  ],
+  "materials": [
+    {"id": "M1", "model": "linear-elastic"}
+  ],
+  "loads": [
+    {
+      "id": "L1",
+      "kind": "nodal",
+      "node_id": "N8",
+      "components": {"UY": -1.0}
+    }
+  ],
+  "constraints": [
+    {"id": "C1", "node_id": "N7", "dof": "UX"}
+  ],
+  "analysis": {"control_method": "load"}
+}

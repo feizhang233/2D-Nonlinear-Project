@@ -1,0 +1,766 @@
+{
+  "$comment": "Duplicate identifiers, cross-entity references, load targets, and model-family DOFs are semantic rules enforced by nonlinear_core.validate_model_input.",
+  "$defs": {
+    "AnalysisOptions": {
+      "additionalProperties": false,
+      "properties": {
+        "arc_length": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/ArcLengthOptions"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "control_method": {
+          "$ref": "#/$defs/ControlMethod",
+          "default": "load"
+        },
+        "displacement_control": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/DisplacementControlOptions"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "extensions": {
+          "additionalProperties": {
+            "$ref": "#/$defs/JsonValue"
+          },
+          "title": "Extensions",
+          "type": "object"
+        },
+        "line_search": {
+          "$ref": "#/$defs/LineSearchOptions"
+        },
+        "max_iterations": {
+          "default": 30,
+          "minimum": 1,
+          "title": "Max Iterations",
+          "type": "integer"
+        },
+        "newton_method": {
+          "$ref": "#/$defs/NewtonMethod",
+          "default": "full"
+        },
+        "step_control": {
+          "$ref": "#/$defs/StepControlOptions"
+        },
+        "tolerances": {
+          "$ref": "#/$defs/ToleranceOptions"
+        }
+      },
+      "title": "AnalysisOptions",
+      "type": "object"
+    },
+    "ArcLengthOptions": {
+      "additionalProperties": false,
+      "properties": {
+        "beta": {
+          "default": 1.0,
+          "exclusiveMinimum": 0.0,
+          "title": "Beta",
+          "type": "number"
+        },
+        "max_radius": {
+          "exclusiveMinimum": 0.0,
+          "title": "Max Radius",
+          "type": "number"
+        },
+        "min_radius": {
+          "exclusiveMinimum": 0.0,
+          "title": "Min Radius",
+          "type": "number"
+        },
+        "radius": {
+          "exclusiveMinimum": 0.0,
+          "title": "Radius",
+          "type": "number"
+        },
+        "root_selection": {
+          "$ref": "#/$defs/ArcLengthRootSelection",
+          "default": "direction_continuity"
+        }
+      },
+      "required": [
+        "radius",
+        "min_radius",
+        "max_radius"
+      ],
+      "title": "ArcLengthOptions",
+      "type": "object"
+    },
+    "ArcLengthRootSelection": {
+      "enum": [
+        "direction_continuity"
+      ],
+      "title": "ArcLengthRootSelection",
+      "type": "string"
+    },
+    "ConstraintInput": {
+      "additionalProperties": false,
+      "properties": {
+        "dof": {
+          "$ref": "#/$defs/Dof"
+        },
+        "extensions": {
+          "additionalProperties": {
+            "$ref": "#/$defs/JsonValue"
+          },
+          "title": "Extensions",
+          "type": "object"
+        },
+        "id": {
+          "maxLength": 128,
+          "minLength": 1,
+          "title": "Id",
+          "type": "string"
+        },
+        "node_id": {
+          "maxLength": 128,
+          "minLength": 1,
+          "title": "Node Id",
+          "type": "string"
+        },
+        "value": {
+          "default": 0.0,
+          "title": "Value",
+          "type": "number"
+        }
+      },
+      "required": [
+        "id",
+        "node_id",
+        "dof"
+      ],
+      "title": "ConstraintInput",
+      "type": "object"
+    },
+    "ControlMethod": {
+      "enum": [
+        "load",
+        "displacement",
+        "arc_length"
+      ],
+      "title": "ControlMethod",
+      "type": "string"
+    },
+    "CoordinateSystem": {
+      "enum": [
+        "global",
+        "local"
+      ],
+      "title": "CoordinateSystem",
+      "type": "string"
+    },
+    "DisplacementControlOptions": {
+      "additionalProperties": false,
+      "properties": {
+        "increment": {
+          "title": "Increment",
+          "type": "number"
+        },
+        "target": {
+          "$ref": "#/$defs/DofRef"
+        }
+      },
+      "required": [
+        "target",
+        "increment"
+      ],
+      "title": "DisplacementControlOptions",
+      "type": "object"
+    },
+    "Dof": {
+      "enum": [
+        "UX",
+        "UY",
+        "UZ",
+        "RX",
+        "RY",
+        "RZ"
+      ],
+      "title": "Dof",
+      "type": "string"
+    },
+    "DofRef": {
+      "additionalProperties": false,
+      "properties": {
+        "dof": {
+          "$ref": "#/$defs/Dof"
+        },
+        "node_id": {
+          "maxLength": 128,
+          "minLength": 1,
+          "title": "Node Id",
+          "type": "string"
+        }
+      },
+      "required": [
+        "node_id",
+        "dof"
+      ],
+      "title": "DofRef",
+      "type": "object"
+    },
+    "ElementInput": {
+      "additionalProperties": false,
+      "properties": {
+        "extensions": {
+          "additionalProperties": {
+            "$ref": "#/$defs/JsonValue"
+          },
+          "title": "Extensions",
+          "type": "object"
+        },
+        "formulation": {
+          "maxLength": 256,
+          "minLength": 1,
+          "title": "Formulation",
+          "type": "string"
+        },
+        "id": {
+          "maxLength": 128,
+          "minLength": 1,
+          "title": "Id",
+          "type": "string"
+        },
+        "material_id": {
+          "maxLength": 128,
+          "minLength": 1,
+          "title": "Material Id",
+          "type": "string"
+        },
+        "node_ids": {
+          "items": {
+            "maxLength": 128,
+            "minLength": 1,
+            "type": "string"
+          },
+          "minItems": 2,
+          "title": "Node Ids",
+          "type": "array"
+        },
+        "properties": {
+          "additionalProperties": {
+            "$ref": "#/$defs/JsonValue"
+          },
+          "title": "Properties",
+          "type": "object"
+        }
+      },
+      "required": [
+        "id",
+        "formulation",
+        "node_ids",
+        "material_id"
+      ],
+      "title": "ElementInput",
+      "type": "object"
+    },
+    "JsonValue": {},
+    "LineSearchMethod": {
+      "enum": [
+        "backtracking",
+        "orthogonality"
+      ],
+      "title": "LineSearchMethod",
+      "type": "string"
+    },
+    "LineSearchOptions": {
+      "additionalProperties": false,
+      "properties": {
+        "enabled": {
+          "default": false,
+          "title": "Enabled",
+          "type": "boolean"
+        },
+        "max_iterations": {
+          "default": 8,
+          "minimum": 1,
+          "title": "Max Iterations",
+          "type": "integer"
+        },
+        "method": {
+          "$ref": "#/$defs/LineSearchMethod",
+          "default": "backtracking"
+        },
+        "min_alpha": {
+          "default": 0.001,
+          "exclusiveMaximum": 1.0,
+          "exclusiveMinimum": 0.0,
+          "title": "Min Alpha",
+          "type": "number"
+        },
+        "reduction_factor": {
+          "default": 0.5,
+          "exclusiveMaximum": 1.0,
+          "exclusiveMinimum": 0.0,
+          "title": "Reduction Factor",
+          "type": "number"
+        }
+      },
+      "title": "LineSearchOptions",
+      "type": "object"
+    },
+    "LoadInput": {
+      "additionalProperties": false,
+      "properties": {
+        "components": {
+          "additionalProperties": {
+            "type": "number"
+          },
+          "minProperties": 1,
+          "propertyNames": {
+            "maxLength": 256,
+            "minLength": 1
+          },
+          "title": "Components",
+          "type": "object"
+        },
+        "coordinate_system": {
+          "$ref": "#/$defs/CoordinateSystem",
+          "default": "global"
+        },
+        "element_id": {
+          "anyOf": [
+            {
+              "maxLength": 128,
+              "minLength": 1,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Element Id"
+        },
+        "extensions": {
+          "additionalProperties": {
+            "$ref": "#/$defs/JsonValue"
+          },
+          "title": "Extensions",
+          "type": "object"
+        },
+        "id": {
+          "maxLength": 128,
+          "minLength": 1,
+          "title": "Id",
+          "type": "string"
+        },
+        "kind": {
+          "$ref": "#/$defs/LoadKind"
+        },
+        "node_id": {
+          "anyOf": [
+            {
+              "maxLength": 128,
+              "minLength": 1,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Node Id"
+        },
+        "pattern": {
+          "default": "default",
+          "maxLength": 128,
+          "minLength": 1,
+          "title": "Pattern",
+          "type": "string"
+        },
+        "scale": {
+          "default": 1.0,
+          "title": "Scale",
+          "type": "number"
+        }
+      },
+      "required": [
+        "id",
+        "kind",
+        "components"
+      ],
+      "title": "LoadInput",
+      "type": "object"
+    },
+    "LoadKind": {
+      "enum": [
+        "nodal",
+        "element",
+        "body",
+        "edge",
+        "surface"
+      ],
+      "title": "LoadKind",
+      "type": "string"
+    },
+    "MaterialInput": {
+      "additionalProperties": false,
+      "properties": {
+        "extensions": {
+          "additionalProperties": {
+            "$ref": "#/$defs/JsonValue"
+          },
+          "title": "Extensions",
+          "type": "object"
+        },
+        "id": {
+          "maxLength": 128,
+          "minLength": 1,
+          "title": "Id",
+          "type": "string"
+        },
+        "model": {
+          "maxLength": 256,
+          "minLength": 1,
+          "title": "Model",
+          "type": "string"
+        },
+        "parameters": {
+          "additionalProperties": {
+            "$ref": "#/$defs/JsonValue"
+          },
+          "title": "Parameters",
+          "type": "object"
+        }
+      },
+      "required": [
+        "id",
+        "model"
+      ],
+      "title": "MaterialInput",
+      "type": "object"
+    },
+    "ModelFamily": {
+      "enum": [
+        "continuum",
+        "frame",
+        "plate",
+        "shell"
+      ],
+      "title": "ModelFamily",
+      "type": "string"
+    },
+    "NewtonMethod": {
+      "enum": [
+        "full",
+        "modified"
+      ],
+      "title": "NewtonMethod",
+      "type": "string"
+    },
+    "NodeInput": {
+      "additionalProperties": false,
+      "properties": {
+        "coordinates": {
+          "items": {
+            "type": "number"
+          },
+          "maxItems": 3,
+          "minItems": 2,
+          "title": "Coordinates",
+          "type": "array"
+        },
+        "extensions": {
+          "additionalProperties": {
+            "$ref": "#/$defs/JsonValue"
+          },
+          "title": "Extensions",
+          "type": "object"
+        },
+        "id": {
+          "maxLength": 128,
+          "minLength": 1,
+          "title": "Id",
+          "type": "string"
+        }
+      },
+      "required": [
+        "id",
+        "coordinates"
+      ],
+      "title": "NodeInput",
+      "type": "object"
+    },
+    "StepControlOptions": {
+      "additionalProperties": false,
+      "properties": {
+        "cutback_factor": {
+          "default": 0.5,
+          "exclusiveMaximum": 1.0,
+          "exclusiveMinimum": 0.0,
+          "title": "Cutback Factor",
+          "type": "number"
+        },
+        "growth_factor": {
+          "default": 1.5,
+          "minimum": 1.0,
+          "title": "Growth Factor",
+          "type": "number"
+        },
+        "initial_step": {
+          "default": 0.1,
+          "exclusiveMinimum": 0.0,
+          "title": "Initial Step",
+          "type": "number"
+        },
+        "max_retries": {
+          "default": 8,
+          "minimum": 0,
+          "title": "Max Retries",
+          "type": "integer"
+        },
+        "max_step": {
+          "default": 0.25,
+          "exclusiveMinimum": 0.0,
+          "title": "Max Step",
+          "type": "number"
+        },
+        "max_steps": {
+          "default": 100,
+          "minimum": 1,
+          "title": "Max Steps",
+          "type": "integer"
+        },
+        "min_step": {
+          "default": 0.0001,
+          "exclusiveMinimum": 0.0,
+          "title": "Min Step",
+          "type": "number"
+        },
+        "target_iterations": {
+          "default": 6,
+          "minimum": 1,
+          "title": "Target Iterations",
+          "type": "integer"
+        }
+      },
+      "title": "StepControlOptions",
+      "type": "object"
+    },
+    "ToleranceOptions": {
+      "additionalProperties": false,
+      "properties": {
+        "displacement": {
+          "default": 1e-08,
+          "exclusiveMinimum": 0.0,
+          "title": "Displacement",
+          "type": "number"
+        },
+        "displacement_floor": {
+          "default": 1e-12,
+          "exclusiveMinimum": 0.0,
+          "title": "Displacement Floor",
+          "type": "number"
+        },
+        "energy": {
+          "default": 1e-10,
+          "exclusiveMinimum": 0.0,
+          "title": "Energy",
+          "type": "number"
+        },
+        "energy_floor": {
+          "default": 1e-16,
+          "exclusiveMinimum": 0.0,
+          "title": "Energy Floor",
+          "type": "number"
+        },
+        "force_floor": {
+          "default": 1e-12,
+          "exclusiveMinimum": 0.0,
+          "title": "Force Floor",
+          "type": "number"
+        },
+        "linear_solver": {
+          "default": 1e-10,
+          "exclusiveMinimum": 0.0,
+          "title": "Linear Solver",
+          "type": "number"
+        },
+        "residual": {
+          "default": 1e-08,
+          "exclusiveMinimum": 0.0,
+          "title": "Residual",
+          "type": "number"
+        }
+      },
+      "title": "ToleranceOptions",
+      "type": "object"
+    },
+    "UnitMetadata": {
+      "additionalProperties": false,
+      "description": "Declared units; values are never converted by the contract layer.",
+      "properties": {
+        "angle": {
+          "default": "rad",
+          "maxLength": 256,
+          "minLength": 1,
+          "title": "Angle",
+          "type": "string"
+        },
+        "force": {
+          "maxLength": 256,
+          "minLength": 1,
+          "title": "Force",
+          "type": "string"
+        },
+        "length": {
+          "maxLength": 256,
+          "minLength": 1,
+          "title": "Length",
+          "type": "string"
+        },
+        "metadata": {
+          "additionalProperties": {
+            "$ref": "#/$defs/JsonValue"
+          },
+          "title": "Metadata",
+          "type": "object"
+        },
+        "stress": {
+          "maxLength": 256,
+          "minLength": 1,
+          "title": "Stress",
+          "type": "string"
+        },
+        "system_label": {
+          "anyOf": [
+            {
+              "maxLength": 256,
+              "minLength": 1,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "System Label"
+        },
+        "time": {
+          "anyOf": [
+            {
+              "maxLength": 256,
+              "minLength": 1,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Time"
+        }
+      },
+      "required": [
+        "length",
+        "force",
+        "stress"
+      ],
+      "title": "UnitMetadata",
+      "type": "object"
+    }
+  },
+  "$id": "https://schemas.feizhang233.com/nonlinear-core/model-input-1.0.0.schema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "analysis": {
+      "$ref": "#/$defs/AnalysisOptions"
+    },
+    "constraints": {
+      "default": [],
+      "items": {
+        "$ref": "#/$defs/ConstraintInput"
+      },
+      "title": "Constraints",
+      "type": "array"
+    },
+    "elements": {
+      "items": {
+        "$ref": "#/$defs/ElementInput"
+      },
+      "minItems": 1,
+      "title": "Elements",
+      "type": "array"
+    },
+    "extensions": {
+      "additionalProperties": {
+        "$ref": "#/$defs/JsonValue"
+      },
+      "title": "Extensions",
+      "type": "object"
+    },
+    "loads": {
+      "default": [],
+      "items": {
+        "$ref": "#/$defs/LoadInput"
+      },
+      "title": "Loads",
+      "type": "array"
+    },
+    "materials": {
+      "items": {
+        "$ref": "#/$defs/MaterialInput"
+      },
+      "minItems": 1,
+      "title": "Materials",
+      "type": "array"
+    },
+    "model_family": {
+      "$ref": "#/$defs/ModelFamily"
+    },
+    "model_id": {
+      "maxLength": 128,
+      "minLength": 1,
+      "title": "Model Id",
+      "type": "string"
+    },
+    "name": {
+      "maxLength": 256,
+      "minLength": 1,
+      "title": "Name",
+      "type": "string"
+    },
+    "nodes": {
+      "items": {
+        "$ref": "#/$defs/NodeInput"
+      },
+      "minItems": 1,
+      "title": "Nodes",
+      "type": "array"
+    },
+    "schema_version": {
+      "const": "1.0.0",
+      "title": "Schema Version",
+      "type": "string"
+    },
+    "units": {
+      "$ref": "#/$defs/UnitMetadata"
+    }
+  },
+  "required": [
+    "schema_version",
+    "model_id",
+    "name",
+    "model_family",
+    "units",
+    "nodes",
+    "elements",
+    "materials",
+    "analysis"
+  ],
+  "title": "Nonlinear Core ModelInput 1.0.0",
+  "type": "object"
+}

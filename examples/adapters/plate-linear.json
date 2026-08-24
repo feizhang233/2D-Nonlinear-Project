@@ -1,0 +1,45 @@
+{
+  "schema_version": "1.0.0",
+  "model_id": "p2-plate-reference",
+  "name": "P2 clamped 2x2 plate reference",
+  "model_family": "plate",
+  "units": {"length": "m", "force": "N", "stress": "Pa", "angle": "rad", "system_label": "SI"},
+  "nodes": [
+    {"id": "N1", "coordinates": [0.0, 0.0]},
+    {"id": "N2", "coordinates": [1.0, 0.0]},
+    {"id": "N3", "coordinates": [2.0, 0.0]},
+    {"id": "N4", "coordinates": [0.0, 1.0]},
+    {"id": "N5", "coordinates": [1.0, 1.0]},
+    {"id": "N6", "coordinates": [2.0, 1.0]},
+    {"id": "N7", "coordinates": [0.0, 2.0]},
+    {"id": "N8", "coordinates": [1.0, 2.0]},
+    {"id": "N9", "coordinates": [2.0, 2.0]}
+  ],
+  "elements": [
+    {"id": "E1", "formulation": "Q4-MITC4", "node_ids": ["N1", "N2", "N5", "N4"], "material_id": "M1", "properties": {"thickness": 0.1, "plate_method": "M", "shear_scheme": "mitc4"}},
+    {"id": "E2", "formulation": "Q4-MITC4", "node_ids": ["N2", "N3", "N6", "N5"], "material_id": "M1", "properties": {"thickness": 0.1, "plate_method": "M", "shear_scheme": "mitc4"}},
+    {"id": "E3", "formulation": "Q4-MITC4", "node_ids": ["N4", "N5", "N8", "N7"], "material_id": "M1", "properties": {"thickness": 0.1, "plate_method": "M", "shear_scheme": "mitc4"}},
+    {"id": "E4", "formulation": "Q4-MITC4", "node_ids": ["N5", "N6", "N9", "N8"], "material_id": "M1", "properties": {"thickness": 0.1, "plate_method": "M", "shear_scheme": "mitc4"}}
+  ],
+  "materials": [
+    {"id": "M1", "model": "linear-elastic", "parameters": {"young": 30000000000.0, "poisson": 0.2}}
+  ],
+  "loads": [
+    {"id": "L1", "kind": "surface", "element_id": "E1", "components": {"UZ": -1000.0}},
+    {"id": "L2", "kind": "surface", "element_id": "E2", "components": {"UZ": -1000.0}},
+    {"id": "L3", "kind": "surface", "element_id": "E3", "components": {"UZ": -1000.0}},
+    {"id": "L4", "kind": "surface", "element_id": "E4", "components": {"UZ": -1000.0}}
+  ],
+  "constraints": [
+    {"id": "C1", "node_id": "N1", "dof": "UZ"}, {"id": "C2", "node_id": "N1", "dof": "RX"}, {"id": "C3", "node_id": "N1", "dof": "RY"},
+    {"id": "C4", "node_id": "N2", "dof": "UZ"}, {"id": "C5", "node_id": "N2", "dof": "RX"}, {"id": "C6", "node_id": "N2", "dof": "RY"},
+    {"id": "C7", "node_id": "N3", "dof": "UZ"}, {"id": "C8", "node_id": "N3", "dof": "RX"}, {"id": "C9", "node_id": "N3", "dof": "RY"},
+    {"id": "C10", "node_id": "N4", "dof": "UZ"}, {"id": "C11", "node_id": "N4", "dof": "RX"}, {"id": "C12", "node_id": "N4", "dof": "RY"},
+    {"id": "C13", "node_id": "N6", "dof": "UZ"}, {"id": "C14", "node_id": "N6", "dof": "RX"}, {"id": "C15", "node_id": "N6", "dof": "RY"},
+    {"id": "C16", "node_id": "N7", "dof": "UZ"}, {"id": "C17", "node_id": "N7", "dof": "RX"}, {"id": "C18", "node_id": "N7", "dof": "RY"},
+    {"id": "C19", "node_id": "N8", "dof": "UZ"}, {"id": "C20", "node_id": "N8", "dof": "RX"}, {"id": "C21", "node_id": "N8", "dof": "RY"},
+    {"id": "C22", "node_id": "N9", "dof": "UZ"}, {"id": "C23", "node_id": "N9", "dof": "RX"}, {"id": "C24", "node_id": "N9", "dof": "RY"}
+  ],
+  "analysis": {"control_method": "load"},
+  "extensions": {"purpose": "P2 adapter/native reference"}
+}

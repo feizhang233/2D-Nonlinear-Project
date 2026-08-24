@@ -1,0 +1,2309 @@
+{
+  "artifact_schema_version": "1.0.0",
+  "expected_status": "succeeded",
+  "package_version": "0.1.0",
+  "request": {
+    "model": {
+      "analysis": {
+        "control_method": "load",
+        "max_iterations": 30,
+        "newton_method": "full",
+        "step_control": {
+          "growth_factor": 1.0,
+          "initial_step": 0.2,
+          "max_step": 0.2,
+          "max_steps": 5,
+          "min_step": 0.2
+        },
+        "tolerances": {
+          "displacement": 1e-08,
+          "energy": 1e-08,
+          "linear_solver": 1e-10,
+          "residual": 1e-08
+        }
+      },
+      "constraints": [
+        {
+          "dof": "UX",
+          "id": "C1",
+          "node_id": "N1"
+        },
+        {
+          "dof": "UY",
+          "id": "C2",
+          "node_id": "N1"
+        },
+        {
+          "dof": "UX",
+          "id": "C3",
+          "node_id": "N3"
+        }
+      ],
+      "elements": [
+        {
+          "formulation": "frame2d-corotational",
+          "id": "E1",
+          "material_id": "M1",
+          "node_ids": [
+            "N1",
+            "N2"
+          ],
+          "properties": {
+            "area": 0.001,
+            "second_moment": 1e-06
+          }
+        },
+        {
+          "formulation": "frame2d-corotational",
+          "id": "E2",
+          "material_id": "M1",
+          "node_ids": [
+            "N2",
+            "N3"
+          ],
+          "properties": {
+            "area": 0.001,
+            "second_moment": 1e-06
+          }
+        }
+      ],
+      "extensions": {
+        "purpose": "P9 full-Newton regression with an explicit 10 mm initial imperfection"
+      },
+      "loads": [
+        {
+          "components": {
+            "UY": -300000.0
+          },
+          "id": "P",
+          "kind": "nodal",
+          "node_id": "N3"
+        }
+      ],
+      "materials": [
+        {
+          "id": "M1",
+          "model": "linear-elastic",
+          "parameters": {
+            "young": 210000000000.0
+          }
+        }
+      ],
+      "model_family": "frame",
+      "model_id": "p9-imperfect-column",
+      "name": "P9 initially imperfect pin-ended column",
+      "nodes": [
+        {
+          "coordinates": [
+            0.0,
+            0.0
+          ],
+          "id": "N1"
+        },
+        {
+          "coordinates": [
+            0.01,
+            1.0
+          ],
+          "id": "N2"
+        },
+        {
+          "coordinates": [
+            0.0,
+            2.0
+          ],
+          "id": "N3"
+        }
+      ],
+      "schema_version": "1.0.0",
+      "units": {
+        "angle": "rad",
+        "force": "N",
+        "length": "m",
+        "stress": "Pa",
+        "system_label": "SI"
+      }
+    },
+    "target_load_factor": 1.0
+  },
+  "response": {
+    "analysis_record": {
+      "control_method": "load",
+      "dof_count": 9,
+      "error": null,
+      "execution_mode": "synchronous",
+      "model_id": "p9-imperfect-column",
+      "model_sha256": "c4192dd07933f973f5cdf888ea742a7fdff4ac22af95169b432ba5995debe483",
+      "progress": {
+        "accepted_steps": 5,
+        "current_iteration": 3,
+        "current_step": 5,
+        "message": "analysis completed"
+      },
+      "result": {
+        "failures": [],
+        "metadata": {
+          "accepted_steps": 5,
+          "adaptive_step_control": true,
+          "control_method": "load",
+          "cutbacks": 0,
+          "growths": 0,
+          "rejected_attempts": 0,
+          "restart": {
+            "arc_length_increment": null,
+            "committed_state": {
+              "adapter_id": "frame2d-corotational",
+              "core_package": "nonlinear-core-corotational-frame",
+              "core_state_id": "trial:7e686eccb139d5fd85423547b40fa9586ff47855e74fdc7588a02cff32266325",
+              "core_version": "0.1.0",
+              "displacement": [
+                0.0,
+                0.0,
+                -0.013599796973798832,
+                0.0090387639080393,
+                -0.0015598883623262189,
+                -1.3382609347740227e-19,
+                0.0,
+                -0.0031197767246524378,
+                0.013599796973798832
+              ],
+              "history": {
+                "configuration": "current",
+                "elements": {
+                  "E1": {
+                    "basic_deformation": [
+                      -0.0014283831928001423,
+                      -0.0045332656578480224,
+                      0.00906653131595081
+                    ],
+                    "current_angle": 1.5517301287922807,
+                    "current_length": 0.9986216155572623
+                  },
+                  "E2": {
+                    "basic_deformation": [
+                      -0.0014283831928001423,
+                      -0.009066531315950588,
+                      0.0045332656578482445
+                    ],
+                    "current_angle": 1.5898625247975124,
+                    "current_length": 0.9986216155572623
+                  }
+                },
+                "load_factor": 1.0,
+                "strain_energy": 480.22173782784296
+              },
+              "iteration_index": 3,
+              "load_factor": 1.0,
+              "model_family": "frame",
+              "model_id": "p9-imperfect-column",
+              "model_sha256": "c4192dd07933f973f5cdf888ea742a7fdff4ac22af95169b432ba5995debe483",
+              "parent_state_id": "36b40ce986dfe1a40c09ba2fdc3821dbb11f9f434edb30f17d8947005d1bbe6a",
+              "state_id": "f507c7ee01f8d4f6946b25cbc2c89edce9309dca20561c14cd712c91be3f0fba",
+              "state_schema_version": "1.0.0",
+              "state_type": "committed",
+              "step_index": 5
+            },
+            "restart_schema_version": "1.0.0"
+          },
+          "target_load_factor": 1.0
+        },
+        "model_id": "p9-imperfect-column",
+        "model_sha256": "c4192dd07933f973f5cdf888ea742a7fdff4ac22af95169b432ba5995debe483",
+        "post_result": {
+          "derived_fields": [],
+          "metadata": {
+            "adapter_id": "frame2d-corotational",
+            "current_configuration": "model.nodes + displacement",
+            "load_factor": 1.0,
+            "reference_configuration": "model.nodes",
+            "strain_energy": 480.22173782784296,
+            "units": {
+              "angle": "rad",
+              "force": "N",
+              "length": "m",
+              "metadata": {},
+              "stress": "Pa",
+              "system_label": "SI",
+              "time": null
+            }
+          },
+          "raw_fields": [
+            {
+              "basis": "global-dof-order",
+              "is_derived": false,
+              "location": "node",
+              "name": "displacement",
+              "records": [
+                {
+                  "dof": "UX",
+                  "dof_index": 0,
+                  "node_id": "N1",
+                  "value": 0.0
+                },
+                {
+                  "dof": "UY",
+                  "dof_index": 1,
+                  "node_id": "N1",
+                  "value": 0.0
+                },
+                {
+                  "dof": "RZ",
+                  "dof_index": 2,
+                  "node_id": "N1",
+                  "value": -0.013599796973798832
+                },
+                {
+                  "dof": "UX",
+                  "dof_index": 3,
+                  "node_id": "N2",
+                  "value": 0.0090387639080393
+                },
+                {
+                  "dof": "UY",
+                  "dof_index": 4,
+                  "node_id": "N2",
+                  "value": -0.0015598883623262189
+                },
+                {
+                  "dof": "RZ",
+                  "dof_index": 5,
+                  "node_id": "N2",
+                  "value": -1.3382609347740227e-19
+                },
+                {
+                  "dof": "UX",
+                  "dof_index": 6,
+                  "node_id": "N3",
+                  "value": 0.0
+                },
+                {
+                  "dof": "UY",
+                  "dof_index": 7,
+                  "node_id": "N3",
+                  "value": -0.0031197767246524378
+                },
+                {
+                  "dof": "RZ",
+                  "dof_index": 8,
+                  "node_id": "N3",
+                  "value": 0.013599796973798832
+                }
+              ],
+              "source": "adapter.recover"
+            },
+            {
+              "basis": "global-dof-order",
+              "is_derived": false,
+              "location": "node",
+              "name": "reaction",
+              "records": [
+                {
+                  "dof": "UX",
+                  "dof_index": 0,
+                  "node_id": "N1",
+                  "value": 1.6081279341513666e-05
+                },
+                {
+                  "dof": "UY",
+                  "dof_index": 1,
+                  "node_id": "N1",
+                  "value": 299999.9999230702
+                },
+                {
+                  "dof": "RZ",
+                  "dof_index": 2,
+                  "node_id": "N1",
+                  "value": 1.0699613994802348e-07
+                },
+                {
+                  "dof": "UX",
+                  "dof_index": 3,
+                  "node_id": "N2",
+                  "value": -3.216311872029752e-05
+                },
+                {
+                  "dof": "UY",
+                  "dof_index": 4,
+                  "node_id": "N2",
+                  "value": 0.0
+                },
+                {
+                  "dof": "RZ",
+                  "dof_index": 5,
+                  "node_id": "N2",
+                  "value": 2.801243681460619e-10
+                },
+                {
+                  "dof": "UX",
+                  "dof_index": 6,
+                  "node_id": "N3",
+                  "value": 1.6081839378783856e-05
+                },
+                {
+                  "dof": "UY",
+                  "dof_index": 7,
+                  "node_id": "N3",
+                  "value": 7.692980580031872e-05
+                },
+                {
+                  "dof": "RZ",
+                  "dof_index": 8,
+                  "node_id": "N3",
+                  "value": -1.0671647032722831e-07
+                }
+              ],
+              "source": "adapter.recover"
+            },
+            {
+              "basis": "element-local",
+              "is_derived": false,
+              "location": "element",
+              "name": "element_response",
+              "records": [
+                {
+                  "basic_deformation": [
+                    -0.0014283831928001423,
+                    -0.0045332656578480224,
+                    0.00906653131595081
+                  ],
+                  "basic_force": [
+                    -299945.4735892635,
+                    1.0699613994802348e-07,
+                    5711.629154783952
+                  ],
+                  "current_configuration": {
+                    "angle": 1.5517301287922807,
+                    "chord_rotation": -0.00906653131595081,
+                    "length": 0.9986216155572623
+                  },
+                  "element_id": "E1",
+                  "energy": 240.11086891392213,
+                  "formulation": "corotational-euler-bernoulli",
+                  "geometric_tangent_norm": 600937.3553982888,
+                  "kinematic_boundary": "large rotation, small elastic strain",
+                  "local_end_forces": [
+                    299945.4735892635,
+                    5719.512842412969,
+                    1.0699613994802348e-07,
+                    -299945.4735892635,
+                    -5719.512842412969,
+                    5711.629154783952
+                  ],
+                  "material_tangent_norm": 420026665.56106716,
+                  "reference_configuration": {
+                    "angle": 1.5607966601082315,
+                    "length": 1.0000499987500624
+                  }
+                },
+                {
+                  "basic_deformation": [
+                    -0.0014283831928001423,
+                    -0.009066531315950588,
+                    0.0045332656578482445
+                  ],
+                  "basic_force": [
+                    -299945.4735892635,
+                    -5711.629154783672,
+                    -1.0671647032722831e-07
+                  ],
+                  "current_configuration": {
+                    "angle": 1.5898625247975124,
+                    "chord_rotation": 0.009066531315950588,
+                    "length": 0.9986216155572623
+                  },
+                  "element_id": "E2",
+                  "energy": 240.11086891392085,
+                  "formulation": "corotational-euler-bernoulli",
+                  "geometric_tangent_norm": 600937.3553982888,
+                  "kinematic_boundary": "large rotation, small elastic strain",
+                  "local_end_forces": [
+                    299945.4735892635,
+                    -5719.512842412409,
+                    -5711.629154783672,
+                    -299945.4735892635,
+                    5719.512842412409,
+                    -1.0671647032722831e-07
+                  ],
+                  "material_tangent_norm": 420026665.56106716,
+                  "reference_configuration": {
+                    "angle": 1.5807959934815619,
+                    "length": 1.0000499987500624
+                  }
+                }
+              ],
+              "source": "adapter.recover"
+            }
+          ]
+        },
+        "schema_version": "1.0.0",
+        "solver_version": "0.1.0",
+        "status": "succeeded",
+        "steps": [
+          {
+            "accepted_step_size": 0.2,
+            "control_method": "load",
+            "failure": null,
+            "iterations": [
+              {
+                "accepted_alpha": 1.0,
+                "diagnostics": {
+                  "correction": [
+                    0.0,
+                    0.0,
+                    -0.0014286428553572316,
+                    0.0009495715702274409,
+                    -0.0002952242867737209,
+                    2.7670670740132953e-20,
+                    0.0,
+                    -0.0005904485735474416,
+                    0.0014286428553572316
+                  ],
+                  "displacement": [
+                    0.0,
+                    0.0,
+                    0.0,
+                    0.0,
+                    0.0,
+                    0.0,
+                    0.0,
+                    0.0,
+                    0.0
+                  ],
+                  "displacement_scale": 1e-12,
+                  "effective_tangent_diagonal": [
+                    2540366.96062717,
+                    209968755.87405175,
+                    839958.0031497376,
+                    5080733.92125434,
+                    419937511.7481035,
+                    1679916.0062994752,
+                    2540366.96062717,
+                    209968755.87405175,
+                    839958.0031497376
+                  ],
+                  "energy_scale": 35.42691441284649,
+                  "eta_E": 1.0,
+                  "eta_R": 1.0,
+                  "eta_u": 2327984939.989088,
+                  "force_scale": 60000.0,
+                  "line_search": {
+                    "enabled": false,
+                    "evaluations": 0,
+                    "failure_reason": null,
+                    "merit_function": "full_step",
+                    "method": null,
+                    "samples": []
+                  },
+                  "linear_relative_residual": 3.4572041392694975e-17,
+                  "raw_correction_norm": 0.002327984939989088,
+                  "raw_energy_work": 35.42691441284649,
+                  "raw_residual_norm": 60000.0,
+                  "residual": [
+                    0.0,
+                    0.0,
+                    0.0,
+                    0.0,
+                    0.0,
+                    0.0,
+                    0.0,
+                    -60000.0,
+                    0.0
+                  ],
+                  "tangent_assemblies": 1,
+                  "tangent_symmetry_error": 0.0,
+                  "termination_reason": "CONTINUE"
+                },
+                "displacement_correction_norm": 2327984939.989088,
+                "energy_norm": 1.0,
+                "iteration_index": 0,
+                "linear_residual_norm": 5.070092263888008e-11,
+                "load_factor": 0.2,
+                "residual_norm": 1.0,
+                "status": "continue",
+                "step_index": 1,
+                "tangent_reassembled": true
+              },
+              {
+                "accepted_alpha": 1.0,
+                "diagnostics": {
+                  "correction": [
+                    0.0,
+                    0.0,
+                    -0.0001498675271939645,
+                    9.960543556958418e-05,
+                    -1.5415614846057556e-06,
+                    4.36382898942752e-21,
+                    0.0,
+                    -3.083122969211512e-06,
+                    0.00014986752719396446
+                  ],
+                  "displacement": [
+                    0.0,
+                    0.0,
+                    -0.0014286428553572316,
+                    0.0009495715702274409,
+                    -0.0002952242867737209,
+                    2.7670670740132953e-20,
+                    0.0,
+                    -0.0005904485735474416,
+                    0.0014286428553572316
+                  ],
+                  "displacement_scale": 0.002327984940989088,
+                  "effective_tangent_diagonal": [
+                    2486024.03698112,
+                    209964621.01744002,
+                    839958.0031497376,
+                    4972048.07396224,
+                    419929242.03488004,
+                    1679916.0062994752,
+                    2486024.03698112,
+                    209964621.01744002,
+                    839958.0031497376
+                  ],
+                  "energy_scale": 0.18498737815269084,
+                  "eta_E": 0.06165434561012271,
+                  "eta_R": 0.001217045143867805,
+                  "eta_u": 0.10060572680607344,
+                  "force_scale": 119904.81500862751,
+                  "line_search": {
+                    "enabled": false,
+                    "evaluations": 0,
+                    "failure_reason": null,
+                    "merit_function": "full_step",
+                    "method": null,
+                    "samples": []
+                  },
+                  "linear_relative_residual": 1.348670669144347e-18,
+                  "raw_correction_norm": 0.00023420861698180117,
+                  "raw_energy_work": 0.011405275746136465,
+                  "raw_residual_norm": 145.92957283261762,
+                  "residual": [
+                    -55.262107991564356,
+                    -59904.71304814713,
+                    -0.3425748197390135,
+                    110.52421598312867,
+                    0.0,
+                    0.0,
+                    -55.262107991564314,
+                    -95.28695185286779,
+                    0.3425748197390135
+                  ],
+                  "tangent_assemblies": 2,
+                  "tangent_symmetry_error": 0.0,
+                  "termination_reason": "CONTINUE"
+                },
+                "displacement_correction_norm": 0.10060572680607344,
+                "energy_norm": 0.06165434561012271,
+                "iteration_index": 1,
+                "linear_residual_norm": 1.9898219746794964e-13,
+                "load_factor": 0.2,
+                "residual_norm": 0.001217045143867805,
+                "status": "continue",
+                "step_index": 1,
+                "tangent_reassembled": true
+              },
+              {
+                "accepted_alpha": 1.0,
+                "diagnostics": {
+                  "correction": [
+                    0.0,
+                    0.0,
+                    -2.4737292768894613e-08,
+                    1.6387534323621598e-08,
+                    -5.116116020051168e-09,
+                    -1.1103083590778504e-16,
+                    0.0,
+                    -1.0232232040072879e-08,
+                    2.473729254683294e-08
+                  ],
+                  "displacement": [
+                    0.0,
+                    0.0,
+                    -0.001578510382551196,
+                    0.001049177005797025,
+                    -0.00029676584825832664,
+                    3.203449972956047e-20,
+                    0.0,
+                    -0.0005935316965166531,
+                    0.001578510382551196
+                  ],
+                  "displacement_scale": 0.002554312489439791,
+                  "effective_tangent_diagonal": [
+                    2486386.1480850712,
+                    209964167.53095242,
+                    839958.0031497376,
+                    4972772.2961701425,
+                    419928335.06190485,
+                    1679916.0062994752,
+                    2486386.1480850712,
+                    209964167.53095242,
+                    839958.0031497376
+                  ],
+                  "energy_scale": 0.0006139339224044727,
+                  "eta_E": 1.7160764328870752e-05,
+                  "eta_R": 8.635848496194881e-06,
+                  "eta_u": 1.5773361965725452e-05,
+                  "force_scale": 119998.96371611347,
+                  "line_search": {
+                    "enabled": false,
+                    "evaluations": 0,
+                    "failure_reason": null,
+                    "merit_function": "full_step",
+                    "method": null,
+                    "samples": []
+                  },
+                  "linear_relative_residual": 1.7789445505864312e-17,
+                  "raw_correction_norm": 4.02900954695071e-08,
+                  "raw_energy_work": 1.053557535588238e-08,
+                  "raw_residual_norm": 1.0362928703527428,
+                  "residual": [
+                    0.0021571422371298977,
+                    -59998.96371611332,
+                    -5.616319236878553e-05,
+                    -0.004314283914624599,
+                    0.0,
+                    -2.7978330763289705e-10,
+                    0.002157141677494701,
+                    -1.036283886678575,
+                    5.61629125854779e-05
+                  ],
+                  "tangent_assemblies": 3,
+                  "tangent_symmetry_error": 0.0,
+                  "termination_reason": "CONTINUE"
+                },
+                "displacement_correction_norm": 1.5773361965725452e-05,
+                "energy_norm": 1.7160764328870752e-05,
+                "iteration_index": 2,
+                "linear_residual_norm": 4.515081113274318e-16,
+                "load_factor": 0.2,
+                "residual_norm": 8.635848496194881e-06,
+                "status": "continue",
+                "step_index": 1,
+                "tangent_reassembled": true
+              },
+              {
+                "accepted_alpha": 1.0,
+                "diagnostics": {
+                  "correction": [
+                    0.0,
+                    0.0,
+                    -4.46098442417127e-14,
+                    2.980573351036033e-14,
+                    -5.590413272391418e-16,
+                    1.110306444927022e-16,
+                    0.0,
+                    -1.118077461764969e-15,
+                    4.4831905530698103e-14
+                  ],
+                  "displacement": [
+                    0.0,
+                    0.0,
+                    -0.0015785351198439649,
+                    0.0010491933933313487,
+                    -0.0002967709643743467,
+                    -1.1099880140805548e-16,
+                    0.0,
+                    -0.0005935419287486931,
+                    0.0015785351198437428
+                  ],
+                  "displacement_scale": 0.002554352766819445,
+                  "effective_tangent_diagonal": [
+                    2486385.2115122317,
+                    209964167.4556385,
+                    839958.0031497376,
+                    4972770.4230244635,
+                    419928334.911277,
+                    1679916.0062994752,
+                    2486385.2115122317,
+                    209964167.4556385,
+                    839958.0031497376
+                  ],
+                  "energy_scale": 6.708474770589815e-11,
+                  "eta_E": 1.5439043357070396e-11,
+                  "eta_R": 4.880012503639846e-13,
+                  "eta_u": 2.7375929686952246e-11,
+                  "force_scale": 119999.99999995159,
+                  "line_search": {
+                    "enabled": false,
+                    "evaluations": 0,
+                    "merit_function": "full_step"
+                  },
+                  "linear_relative_residual": 1.1562620032297206e-18,
+                  "raw_correction_norm": 6.992778174012105e-14,
+                  "raw_energy_work": 1.0357243284294904e-21,
+                  "raw_residual_norm": 5.856015004365452e-08,
+                  "residual": [
+                    -1.675128570345617e-08,
+                    -59999.99999995158,
+                    1.439275365555659e-10,
+                    3.294293218758128e-08,
+                    -7.275957614183426e-12,
+                    2.7978330763289705e-10,
+                    -1.6191646484125112e-08,
+                    -4.8414221964776516e-08,
+                    1.3585577107733116e-10
+                  ],
+                  "tangent_assemblies": 4,
+                  "tangent_symmetry_error": 0.0,
+                  "termination_reason": "CONVERGED"
+                },
+                "displacement_correction_norm": 2.7375929686952246e-11,
+                "energy_norm": 1.5439043357070396e-11,
+                "iteration_index": 3,
+                "linear_residual_norm": 5.0934360141100496e-23,
+                "load_factor": 0.2,
+                "residual_norm": 4.880012503639846e-13,
+                "status": "converged",
+                "step_index": 1,
+                "tangent_reassembled": true
+              }
+            ],
+            "load_factor": 0.2,
+            "requested_step_size": 0.2,
+            "response": {
+              "adaptive_step_size": 0.2,
+              "adaptive_termination": null,
+              "attempt_index": 0,
+              "displacement": [
+                0.0,
+                0.0,
+                -0.0015785351198439649,
+                0.0010491933933313487,
+                -0.0002967709643743467,
+                -1.1099880140805548e-16,
+                0.0,
+                -0.0005935419287486931,
+                0.0015785351198437428
+              ],
+              "eta_E": 1.5439043357070396e-11,
+              "eta_R": 4.880012503639846e-13,
+              "eta_u": 2.7375929686952246e-11,
+              "external_force": [
+                0.0,
+                0.0,
+                0.0,
+                0.0,
+                0.0,
+                0.0,
+                0.0,
+                -60000.0,
+                0.0
+              ],
+              "internal_force": [
+                1.675128570345617e-08,
+                59999.99999995158,
+                -1.439275365555659e-10,
+                -3.294293218758128e-08,
+                7.275957614183426e-12,
+                -2.7978330763289705e-10,
+                1.6191646484125112e-08,
+                -59999.999999951586,
+                -1.3585577107733116e-10
+              ],
+              "load_increment": 0.2,
+              "next_step_size": 0.2,
+              "strain_energy": 17.83928188512224,
+              "tangent_assemblies": 4,
+              "termination_reason": "CONVERGED",
+              "will_retry": false
+            },
+            "state_id": "5b28f93c6a30428437c3bc4192e5024b0f202c65aa673dbba3f0700bd2b92e4c",
+            "status": "accepted",
+            "step_index": 1
+          },
+          {
+            "accepted_step_size": 0.2,
+            "control_method": "load",
+            "failure": null,
+            "iterations": [
+              {
+                "accepted_alpha": 1.0,
+                "diagnostics": {
+                  "correction": [
+                    0.0,
+                    0.0,
+                    -0.0017441528122479847,
+                    0.0011592658844188498,
+                    -0.0002985376544449788,
+                    1.1111155671800392e-16,
+                    0.0,
+                    -0.0005970753088899576,
+                    0.0017441528122482063
+                  ],
+                  "displacement": [
+                    0.0,
+                    0.0,
+                    -0.0015785351198439649,
+                    0.0010491933933313487,
+                    -0.0002967709643743467,
+                    -1.1099880140805548e-16,
+                    0.0,
+                    -0.0005935419287486931,
+                    0.0015785351198437428
+                  ],
+                  "displacement_scale": 0.002554352766819445,
+                  "effective_tangent_diagonal": [
+                    2486385.2115122317,
+                    209964167.4556385,
+                    839958.0031497376,
+                    4972770.4230244635,
+                    419928334.911277,
+                    1679916.0062994752,
+                    2486385.2115122317,
+                    209964167.4556385,
+                    839958.0031497376
+                  ],
+                  "energy_scale": 71.64903706679492,
+                  "eta_E": 0.5000000000009363,
+                  "eta_R": 0.333333333333692,
+                  "eta_u": 1.0985186363626396,
+                  "force_scale": 179999.99999995157,
+                  "line_search": {
+                    "enabled": false,
+                    "evaluations": 0,
+                    "failure_reason": null,
+                    "merit_function": "full_step",
+                    "method": null,
+                    "samples": []
+                  },
+                  "linear_relative_residual": 1.6536060619636218e-17,
+                  "raw_correction_norm": 0.002806004118195632,
+                  "raw_energy_work": 35.82451853346454,
+                  "raw_residual_norm": 60000.000000048414,
+                  "residual": [
+                    -1.675128570345617e-08,
+                    -59999.99999995158,
+                    1.439275365555659e-10,
+                    3.294293218758128e-08,
+                    -7.275957614183426e-12,
+                    2.7978330763289705e-10,
+                    -1.6191646484125112e-08,
+                    -60000.000000048414,
+                    1.3585577107733116e-10
+                  ],
+                  "tangent_assemblies": 1,
+                  "tangent_symmetry_error": 0.0,
+                  "termination_reason": "CONTINUE"
+                },
+                "displacement_correction_norm": 1.0985186363626396,
+                "energy_norm": 0.5000000000009363,
+                "iteration_index": 0,
+                "linear_residual_norm": 2.922975725052069e-11,
+                "load_factor": 0.4,
+                "residual_norm": 0.333333333333692,
+                "status": "continue",
+                "step_index": 2,
+                "tangent_reassembled": true
+              },
+              {
+                "accepted_alpha": 1.0,
+                "diagnostics": {
+                  "correction": [
+                    0.0,
+                    0.0,
+                    -0.000204384128405504,
+                    0.00013583511110348557,
+                    -2.330459574533986e-06,
+                    4.298355817328588e-20,
+                    0.0,
+                    -4.660919149067962e-06,
+                    0.00020438412840550436
+                  ],
+                  "displacement": [
+                    0.0,
+                    0.0,
+                    -0.0033226879320919496,
+                    0.0022084592777501986,
+                    -0.0005953086188193255,
+                    1.1275530994844196e-19,
+                    0.0,
+                    -0.0011906172376386507,
+                    0.003322687932091949
+                  ],
+                  "displacement_scale": 0.005360015330066023,
+                  "effective_tangent_diagonal": [
+                    2433526.300708939,
+                    209958562.58431828,
+                    839958.0031497376,
+                    4867052.601417878,
+                    419917125.16863656,
+                    1679916.0062994752,
+                    2433526.300708939,
+                    209958562.58431828,
+                    839958.0031497376
+                  ],
+                  "energy_scale": 0.5593102978881556,
+                  "eta_E": 0.034044886072045116,
+                  "eta_R": 0.0008139699264701826,
+                  "eta_u": 0.059591635432387706,
+                  "force_scale": 239858.1351170782,
+                  "line_search": {
+                    "enabled": false,
+                    "evaluations": 0,
+                    "failure_reason": null,
+                    "merit_function": "full_step",
+                    "method": null,
+                    "samples": []
+                  },
+                  "linear_relative_residual": 1.0446253002988505e-17,
+                  "raw_correction_norm": 0.00031941207946130373,
+                  "raw_energy_work": 0.019041655370523873,
+                  "raw_residual_norm": 195.23730860452326,
+                  "residual": [
+                    -67.02674123276248,
+                    -119858.06015057127,
+                    -0.4181232787627778,
+                    134.0534824655243,
+                    0.0,
+                    2.2737367544323206e-13,
+                    -67.02674123276182,
+                    -141.93984942873067,
+                    0.41812327876311883
+                  ],
+                  "tangent_assemblies": 2,
+                  "tangent_symmetry_error": 0.0,
+                  "termination_reason": "CONTINUE"
+                },
+                "displacement_correction_norm": 0.059591635432387706,
+                "energy_norm": 0.034044886072045116,
+                "iteration_index": 1,
+                "linear_residual_norm": 2.1018861412458666e-12,
+                "load_factor": 0.4,
+                "residual_norm": 0.0008139699264701826,
+                "status": "continue",
+                "step_index": 2,
+                "tangent_reassembled": true
+              },
+              {
+                "accepted_alpha": 1.0,
+                "diagnostics": {
+                  "correction": [
+                    0.0,
+                    0.0,
+                    -5.6171116547204735e-08,
+                    3.7221243039555434e-08,
+                    -9.643290723539294e-09,
+                    4.101647012494519e-24,
+                    0.0,
+                    -1.9286581447078586e-08,
+                    5.617111654720472e-08
+                  ],
+                  "displacement": [
+                    0.0,
+                    0.0,
+                    -0.0035270720604974534,
+                    0.0023442943888536843,
+                    -0.0005976390783938595,
+                    1.5573886812172784e-19,
+                    0.0,
+                    -0.0011952781567877186,
+                    0.0035270720604974534
+                  ],
+                  "displacement_scale": 0.005671159773181673,
+                  "effective_tangent_diagonal": [
+                    2434081.138934962,
+                    209957871.95312607,
+                    839958.0031497376,
+                    4868162.277869924,
+                    419915743.90625215,
+                    1679916.0062994752,
+                    2434081.138934962,
+                    209957871.95312607,
+                    839958.0031497376
+                  ],
+                  "energy_scale": 0.0023143897736495303,
+                  "eta_E": 1.5917898036877077e-05,
+                  "eta_R": 8.03534774980515e-06,
+                  "eta_u": 1.5929194534835214e-05,
+                  "force_scale": 239998.0715570643,
+                  "line_search": {
+                    "enabled": false,
+                    "evaluations": 0,
+                    "failure_reason": null,
+                    "merit_function": "full_step",
+                    "method": null,
+                    "samples": []
+                  },
+                  "linear_relative_residual": 1.3250149465551597e-17,
+                  "raw_correction_norm": 9.03370072651428e-08,
+                  "raw_energy_work": 3.684022043454424e-08,
+                  "raw_residual_norm": 1.928467964243632,
+                  "residual": [
+                    0.004911855662399239,
+                    -119998.07155706389,
+                    -0.00011393246825264214,
+                    -0.00982371132478279,
+                    0.0,
+                    0.0,
+                    0.0049118556623835505,
+                    -1.928442936114152,
+                    0.00011393246825264214
+                  ],
+                  "tangent_assemblies": 3,
+                  "tangent_symmetry_error": 0.0,
+                  "termination_reason": "CONTINUE"
+                },
+                "displacement_correction_norm": 1.5929194534835214e-05,
+                "energy_norm": 1.5917898036877077e-05,
+                "iteration_index": 2,
+                "linear_residual_norm": 7.540199397561001e-16,
+                "load_factor": 0.4,
+                "residual_norm": 8.03534774980515e-06,
+                "status": "continue",
+                "step_index": 2,
+                "tangent_reassembled": true
+              },
+              {
+                "accepted_alpha": 1.0,
+                "diagnostics": {
+                  "correction": [
+                    0.0,
+                    0.0,
+                    -2.112153562992202e-13,
+                    1.4027783313523685e-13,
+                    -2.320739003914682e-15,
+                    -1.1093978801237871e-16,
+                    0.0,
+                    -4.641583698513776e-15,
+                    2.1099320602671465e-13
+                  ],
+                  "displacement": [
+                    0.0,
+                    0.0,
+                    -0.0035271282316140006,
+                    0.002344331610096724,
+                    -0.0005976487216845831,
+                    1.5574296976874032e-19,
+                    0.0,
+                    -0.0011952974433691657,
+                    0.0035271282316140006
+                  ],
+                  "displacement_scale": 0.0056712501096843095,
+                  "effective_tangent_diagonal": [
+                    2434079.446016255,
+                    209957871.76198652,
+                    839958.0031497376,
+                    4868158.89203251,
+                    419915743.52397305,
+                    1679916.0062994752,
+                    2434079.446016255,
+                    209957871.76198652,
+                    839958.0031497376
+                  ],
+                  "energy_scale": 5.569901438216532e-10,
+                  "eta_E": 3.634787888080947e-11,
+                  "eta_R": 7.771522839916994e-13,
+                  "eta_u": 5.817082671909426e-11,
+                  "force_scale": 239999.99999987544,
+                  "line_search": {
+                    "enabled": false,
+                    "evaluations": 0,
+                    "merit_function": "full_step"
+                  },
+                  "linear_relative_residual": 6.23418812172646e-18,
+                  "raw_correction_norm": 3.299013074110903e-13,
+                  "raw_energy_work": 2.0245410285434098e-20,
+                  "raw_residual_norm": 1.8651654815791106e-07,
+                  "residual": [
+                    -6.912471287242668e-08,
+                    -119999.99999987545,
+                    -6.02540239924565e-10,
+                    1.3880908685701695e-07,
+                    2.9103830456733704e-11,
+                    -2.7966962079517543e-10,
+                    -6.968437398459027e-08,
+                    -1.2457894627004862e-07,
+                    3.227569322916679e-10
+                  ],
+                  "tangent_assemblies": 4,
+                  "tangent_symmetry_error": 2.4291190102396503e-18,
+                  "termination_reason": "CONVERGED"
+                },
+                "displacement_correction_norm": 5.817082671909426e-11,
+                "energy_norm": 3.634787888080947e-11,
+                "iteration_index": 3,
+                "linear_residual_norm": 1.2955682438656998e-21,
+                "load_factor": 0.4,
+                "residual_norm": 7.771522839916994e-13,
+                "status": "converged",
+                "step_index": 2,
+                "tangent_reassembled": true
+              }
+            ],
+            "load_factor": 0.4,
+            "requested_step_size": 0.2,
+            "response": {
+              "adaptive_step_size": 0.2,
+              "adaptive_termination": null,
+              "attempt_index": 0,
+              "displacement": [
+                0.0,
+                0.0,
+                -0.0035271282316140006,
+                0.002344331610096724,
+                -0.0005976487216845831,
+                1.5574296976874032e-19,
+                0.0,
+                -0.0011952974433691657,
+                0.0035271282316140006
+              ],
+              "eta_E": 3.634787888080947e-11,
+              "eta_R": 7.771522839916994e-13,
+              "eta_u": 5.817082671909426e-11,
+              "external_force": [
+                0.0,
+                0.0,
+                0.0,
+                0.0,
+                0.0,
+                0.0,
+                0.0,
+                -120000.0,
+                0.0
+              ],
+              "internal_force": [
+                6.912471287242668e-08,
+                119999.99999987545,
+                6.02540239924565e-10,
+                -1.3880908685701695e-07,
+                -2.9103830456733704e-11,
+                2.7966962079517543e-10,
+                6.968437398459027e-08,
+                -119999.99999987542,
+                -3.227569322916679e-10
+              ],
+              "load_increment": 0.2,
+              "next_step_size": 0.2,
+              "strain_energy": 72.04759978321098,
+              "tangent_assemblies": 4,
+              "termination_reason": "CONVERGED",
+              "will_retry": false
+            },
+            "state_id": "53769eda2667db44a13986ab1238a9ee6d24f48c74c040eed0787fe4b03c0847",
+            "status": "accepted",
+            "step_index": 2
+          },
+          {
+            "accepted_step_size": 0.2,
+            "control_method": "load",
+            "failure": null,
+            "iterations": [
+              {
+                "accepted_alpha": 1.0,
+                "diagnostics": {
+                  "correction": [
+                    0.0,
+                    0.0,
+                    -0.0021769943976029417,
+                    0.001446933640515408,
+                    -0.0003035904368183928,
+                    -1.1092520324268164e-16,
+                    0.0,
+                    -0.0006071808736367856,
+                    0.0021769943976027196
+                  ],
+                  "displacement": [
+                    0.0,
+                    0.0,
+                    -0.0035271282316140006,
+                    0.002344331610096724,
+                    -0.0005976487216845831,
+                    1.5574296976874032e-19,
+                    0.0,
+                    -0.0011952974433691657,
+                    0.0035271282316140006
+                  ],
+                  "displacement_scale": 0.0056712501096843095,
+                  "effective_tangent_diagonal": [
+                    2434079.446016255,
+                    209957871.76198652,
+                    839958.0031497376,
+                    4868158.89203251,
+                    419915743.52397305,
+                    1679916.0062994752,
+                    2434079.446016255,
+                    209957871.76198652,
+                    839958.0031497376
+                  ],
+                  "energy_scale": 109.29255725462141,
+                  "eta_E": 0.33333333333588155,
+                  "eta_R": 0.2000000000004984,
+                  "eta_u": 0.6116588663436238,
+                  "force_scale": 299999.99999987544,
+                  "line_search": {
+                    "enabled": false,
+                    "evaluations": 0,
+                    "failure_reason": null,
+                    "merit_function": "full_step",
+                    "method": null,
+                    "samples": []
+                  },
+                  "linear_relative_residual": 1.6141248584361676e-17,
+                  "raw_correction_norm": 0.003468870412840657,
+                  "raw_energy_work": 36.43085241848564,
+                  "raw_residual_norm": 60000.00000012461,
+                  "residual": [
+                    -6.912471287242668e-08,
+                    -119999.99999987545,
+                    -6.02540239924565e-10,
+                    1.3880908685701695e-07,
+                    2.9103830456733704e-11,
+                    -2.7966962079517543e-10,
+                    -6.968437398459027e-08,
+                    -60000.00000012461,
+                    3.227569322916679e-10
+                  ],
+                  "tangent_assemblies": 1,
+                  "tangent_symmetry_error": 2.4291190102396503e-18,
+                  "termination_reason": "CONTINUE"
+                },
+                "displacement_correction_norm": 0.6116588663436238,
+                "energy_norm": 0.33333333333588155,
+                "iteration_index": 0,
+                "linear_residual_norm": 3.527130727479482e-11,
+                "load_factor": 0.6000000000000001,
+                "residual_norm": 0.2000000000004984,
+                "status": "continue",
+                "step_index": 3,
+                "tangent_reassembled": true
+              },
+              {
+                "accepted_alpha": 1.0,
+                "diagnostics": {
+                  "correction": [
+                    0.0,
+                    0.0,
+                    -0.00028890557698552603,
+                    0.00019200213472865085,
+                    -3.6951460036116947e-06,
+                    -5.439843118618319e-19,
+                    0.0,
+                    -7.390292007223373e-06,
+                    0.00028890557698552603
+                  ],
+                  "displacement": [
+                    0.0,
+                    0.0,
+                    -0.005704122629216942,
+                    0.003791265250612132,
+                    -0.0009012391585029758,
+                    -1.107694602729129e-16,
+                    0.0,
+                    -0.0018024783170059512,
+                    0.00570412262921672
+                  ],
+                  "displacement_scale": 0.009138319444031191,
+                  "effective_tangent_diagonal": [
+                    2383524.6719061253,
+                    209950009.3413941,
+                    839958.0031497376,
+                    4767049.3438122505,
+                    419900018.6827882,
+                    1679916.0062994752,
+                    2383524.6719061253,
+                    209950009.3413941,
+                    839958.0031497376
+                  ],
+                  "energy_scale": 1.3302525613002074,
+                  "eta_E": 0.025356118899596602,
+                  "eta_R": 0.000767588315541103,
+                  "eta_u": 0.04940899470561876,
+                  "force_scale": 359779.0742111559,
+                  "line_search": {
+                    "enabled": false,
+                    "evaluations": 0,
+                    "failure_reason": null,
+                    "merit_function": "full_step",
+                    "method": null,
+                    "samples": []
+                  },
+                  "linear_relative_residual": 1.1980082056433058e-17,
+                  "raw_correction_norm": 0.0004515151770283901,
+                  "raw_energy_work": 0.03373004211082098,
+                  "raw_residual_norm": 276.16221354067864,
+                  "residual": [
+                    -82.7996285157537,
+                    -179778.9979407003,
+                    -0.5215570810619283,
+                    165.59925703150876,
+                    0.0,
+                    -9.094947017729282e-13,
+                    -82.79962851575506,
+                    -221.00205929973163,
+                    0.5215570810614736
+                  ],
+                  "tangent_assemblies": 2,
+                  "tangent_symmetry_error": 0.0,
+                  "termination_reason": "CONTINUE"
+                },
+                "displacement_correction_norm": 0.04940899470561876,
+                "energy_norm": 0.025356118899596602,
+                "iteration_index": 1,
+                "linear_residual_norm": 3.4073543314953046e-12,
+                "load_factor": 0.6000000000000001,
+                "residual_norm": 0.000767588315541103,
+                "status": "continue",
+                "step_index": 3,
+                "tangent_reassembled": true
+              },
+              {
+                "accepted_alpha": 1.0,
+                "diagnostics": {
+                  "correction": [
+                    0.0,
+                    0.0,
+                    -1.4010774529923713e-07,
+                    9.286532699869988e-08,
+                    -1.965960425062265e-08,
+                    1.1098484977006024e-16,
+                    0.0,
+                    -3.931920850114398e-08,
+                    1.4010774552120682e-07
+                  ],
+                  "displacement": [
+                    0.0,
+                    0.0,
+                    -0.005993028206202468,
+                    0.003983267385340783,
+                    -0.0009049343045065875,
+                    -1.1131344458477473e-16,
+                    0.0,
+                    -0.0018098686090131746,
+                    0.005993028206202246
+                  ],
+                  "displacement_scale": 0.009580904118104909,
+                  "effective_tangent_diagonal": [
+                    2384418.938571935,
+                    209948904.39833423,
+                    839958.0031497376,
+                    4768837.87714387,
+                    419897808.79666847,
+                    1679916.0062994752,
+                    2384418.938571935,
+                    209948904.39833423,
+                    839958.0031497376
+                  ],
+                  "energy_scale": 0.007077457530206018,
+                  "eta_E": 2.11063425643393e-05,
+                  "eta_R": 1.0709893988735777e-05,
+                  "eta_u": 2.3296010291155713e-05,
+                  "force_scale": 359996.1445579065,
+                  "line_search": {
+                    "enabled": false,
+                    "evaluations": 0,
+                    "failure_reason": null,
+                    "merit_function": "full_step",
+                    "method": null,
+                    "samples": []
+                  },
+                  "linear_relative_residual": 3.173390066246121e-17,
+                  "raw_correction_norm": 2.2319684093394812e-07,
+                  "raw_energy_work": 1.4937924311709096e-07,
+                  "raw_residual_norm": 3.8555205445687784,
+                  "residual": [
+                    0.012296284909359662,
+                    -179996.14455790474,
+                    -0.0002501951607882802,
+                    -0.02459257037850965,
+                    -2.9103830456733704e-11,
+                    2.7966962079517543e-10,
+                    0.012296285469149989,
+                    -3.855442095256876,
+                    0.000250195440457901
+                  ],
+                  "tangent_assemblies": 3,
+                  "tangent_symmetry_error": 2.4291676977925714e-18,
+                  "termination_reason": "CONTINUE"
+                },
+                "displacement_correction_norm": 2.3296010291155713e-05,
+                "energy_norm": 2.11063425643393e-05,
+                "iteration_index": 2,
+                "linear_residual_norm": 4.461645256570365e-15,
+                "load_factor": 0.6000000000000001,
+                "residual_norm": 1.0709893988735777e-05,
+                "status": "continue",
+                "step_index": 3,
+                "tangent_reassembled": true
+              },
+              {
+                "accepted_alpha": 1.0,
+                "diagnostics": {
+                  "correction": [
+                    0.0,
+                    0.0,
+                    -1.1929726714183795e-12,
+                    7.92773228066069e-13,
+                    -1.5303333683820514e-14,
+                    -1.1062488957175422e-16,
+                    0.0,
+                    -3.060663008365455e-14,
+                    1.1927503388533129e-12
+                  ],
+                  "displacement": [
+                    0.0,
+                    0.0,
+                    -0.005993168313947767,
+                    0.003983360250667782,
+                    -0.0009049539641108382,
+                    -3.285948147144869e-19,
+                    0.0,
+                    -0.0018099079282216757,
+                    0.005993168313947767
+                  ],
+                  "displacement_scale": 0.009581127291199976,
+                  "effective_tangent_diagonal": [
+                    2384415.7101711435,
+                    209948903.85805526,
+                    839958.0031497376,
+                    4768831.420342287,
+                    419897807.7161105,
+                    1679916.0062994752,
+                    2384415.7101711435,
+                    209948903.85805526,
+                    839958.0031497376
+                  ],
+                  "energy_scale": 5.50919351505782e-09,
+                  "eta_E": 1.0426094434676463e-10,
+                  "eta_R": 3.1183451882085848e-12,
+                  "eta_u": 1.9457716966615675e-10,
+                  "force_scale": 359999.9999991097,
+                  "line_search": {
+                    "enabled": false,
+                    "evaluations": 0,
+                    "merit_function": "full_step"
+                  },
+                  "linear_relative_residual": 1.1984192306476758e-18,
+                  "raw_correction_norm": 1.8642686305328626e-12,
+                  "raw_energy_work": 5.74393718469e-19,
+                  "raw_residual_norm": 1.1226042677523143e-06,
+                  "residual": [
+                    -3.415967067026192e-07,
+                    -179999.99999910968,
+                    -2.270098775625229e-09,
+                    6.837529023616086e-07,
+                    0.0,
+                    -2.7921487344428897e-10,
+                    -3.421561956589894e-07,
+                    -8.903443813323975e-07,
+                    1.9904291548300534e-09
+                  ],
+                  "tangent_assemblies": 4,
+                  "tangent_symmetry_error": 0.0,
+                  "termination_reason": "CONVERGED"
+                },
+                "displacement_correction_norm": 1.9457716966615675e-10,
+                "energy_norm": 1.0426094434676463e-10,
+                "iteration_index": 3,
+                "linear_residual_norm": 1.4073457175019046e-21,
+                "load_factor": 0.6000000000000001,
+                "residual_norm": 3.1183451882085848e-12,
+                "status": "converged",
+                "step_index": 3,
+                "tangent_reassembled": true
+              }
+            ],
+            "load_factor": 0.6000000000000001,
+            "requested_step_size": 0.2,
+            "response": {
+              "adaptive_step_size": 0.2,
+              "adaptive_termination": null,
+              "attempt_index": 0,
+              "displacement": [
+                0.0,
+                0.0,
+                -0.005993168313947767,
+                0.003983360250667782,
+                -0.0009049539641108382,
+                -3.285948147144869e-19,
+                0.0,
+                -0.0018099079282216757,
+                0.005993168313947767
+              ],
+              "eta_E": 1.0426094434676463e-10,
+              "eta_R": 3.1183451882085848e-12,
+              "eta_u": 1.9457716966615675e-10,
+              "external_force": [
+                0.0,
+                0.0,
+                0.0,
+                0.0,
+                0.0,
+                0.0,
+                0.0,
+                -180000.00000000003,
+                0.0
+              ],
+              "internal_force": [
+                3.415967067026192e-07,
+                179999.99999910968,
+                2.270098775625229e-09,
+                -6.837529023616086e-07,
+                0.0,
+                2.7921487344428897e-10,
+                3.421561956589894e-07,
+                -179999.99999910968,
+                -1.9904291548300534e-09
+              ],
+              "load_increment": 0.2,
+              "next_step_size": 0.2,
+              "strain_energy": 164.31976573840484,
+              "tangent_assemblies": 4,
+              "termination_reason": "CONVERGED",
+              "will_retry": false
+            },
+            "state_id": "9d14afd954c4edf4242d3c63851d56b859fe439c67613a42eb24bc504cd7505f",
+            "status": "accepted",
+            "step_index": 3
+          },
+          {
+            "accepted_step_size": 0.19999999999999996,
+            "control_method": "load",
+            "failure": null,
+            "iterations": [
+              {
+                "accepted_alpha": 1.0,
+                "diagnostics": {
+                  "correction": [
+                    0.0,
+                    0.0,
+                    -0.002793457617282685,
+                    0.0018566218091736115,
+                    -0.00031169155577293544,
+                    -1.1067381721543112e-16,
+                    0.0,
+                    -0.000623383111545871,
+                    0.0027934576172824626
+                  ],
+                  "displacement": [
+                    0.0,
+                    0.0,
+                    -0.005993168313947767,
+                    0.003983360250667782,
+                    -0.0009049539641108382,
+                    -3.285948147144869e-19,
+                    0.0,
+                    -0.0018099079282216757,
+                    0.005993168313947767
+                  ],
+                  "displacement_scale": 0.009581127291199976,
+                  "effective_tangent_diagonal": [
+                    2384415.7101711435,
+                    209948903.85805526,
+                    839958.0031497376,
+                    4768831.420342287,
+                    419897807.7161105,
+                    1679916.0062994752,
+                    2384415.7101711435,
+                    209948903.85805526,
+                    839958.0031497376
+                  ],
+                  "energy_scale": 149.61194677100903,
+                  "eta_E": 0.2500000000122743,
+                  "eta_R": 0.1428571428595655,
+                  "eta_u": 0.46136152658337737,
+                  "force_scale": 419999.99999910966,
+                  "line_search": {
+                    "enabled": false,
+                    "evaluations": 0,
+                    "failure_reason": null,
+                    "merit_function": "full_step",
+                    "method": null,
+                    "samples": []
+                  },
+                  "linear_relative_residual": 1.071610985000481e-17,
+                  "raw_correction_norm": 0.00442036351345768,
+                  "raw_energy_work": 37.40298669458864,
+                  "raw_residual_norm": 60000.000000890315,
+                  "residual": [
+                    -3.415967067026192e-07,
+                    -179999.99999910968,
+                    -2.270098775625229e-09,
+                    6.837529023616086e-07,
+                    0.0,
+                    -2.7921487344428897e-10,
+                    -3.421561956589894e-07,
+                    -60000.000000890315,
+                    1.9904291548300534e-09
+                  ],
+                  "tangent_assemblies": 1,
+                  "tangent_symmetry_error": 0.0,
+                  "termination_reason": "CONTINUE"
+                },
+                "displacement_correction_norm": 0.46136152658337737,
+                "energy_norm": 0.2500000000122743,
+                "iteration_index": 0,
+                "linear_residual_norm": 2.98386161063838e-11,
+                "load_factor": 0.8,
+                "residual_norm": 0.1428571428595655,
+                "status": "continue",
+                "step_index": 4,
+                "tangent_reassembled": true
+              },
+              {
+                "accepted_alpha": 1.0,
+                "diagnostics": {
+                  "correction": [
+                    0.0,
+                    0.0,
+                    -0.00042725694888583556,
+                    0.0002839343625683264,
+                    -6.221952888696374e-06,
+                    1.1080570887718389e-16,
+                    0.0,
+                    -1.2443905777392788e-05,
+                    0.0004272569488860594
+                  ],
+                  "displacement": [
+                    0.0,
+                    0.0,
+                    -0.008786625931230453,
+                    0.005839982059841393,
+                    -0.0012166455198837735,
+                    -1.1100241203014561e-16,
+                    0.0,
+                    -0.0024332910397675466,
+                    0.00878662593123023
+                  ],
+                  "displacement_scale": 0.013997003700909297,
+                  "effective_tangent_diagonal": [
+                    2337622.6279690294,
+                    209937390.22405213,
+                    839958.0031497376,
+                    4675245.255938059,
+                    419874780.44810426,
+                    1679916.0062994752,
+                    2337622.6279690294,
+                    209937390.22405213,
+                    839958.0031497376
+                  ],
+                  "energy_scale": 2.9865373865742693,
+                  "eta_E": 0.021562596034849172,
+                  "eta_R": 0.0008743645248485665,
+                  "eta_u": 0.04770766720552651,
+                  "force_scale": 479636.420695949,
+                  "line_search": {
+                    "enabled": false,
+                    "evaluations": 0,
+                    "failure_reason": null,
+                    "merit_function": "full_step",
+                    "method": null,
+                    "samples": []
+                  },
+                  "linear_relative_residual": 1.2072155869857836e-18,
+                  "raw_correction_norm": 0.0006677643944375037,
+                  "raw_energy_work": 0.06439749920967515,
+                  "raw_residual_norm": 419.3770710818806,
+                  "residual": [
+                    -104.42716772228019,
+                    -239636.32968091275,
+                    -0.6683301727039179,
+                    208.85433544399868,
+                    0.0,
+                    2.801243681460619e-10,
+                    -104.42716772171849,
+                    -363.6703190872504,
+                    0.6683301729849518
+                  ],
+                  "tangent_assemblies": 2,
+                  "tangent_symmetry_error": 0.0,
+                  "termination_reason": "CONTINUE"
+                },
+                "displacement_correction_norm": 0.04770766720552651,
+                "energy_norm": 0.021562596034849172,
+                "iteration_index": 1,
+                "linear_residual_norm": 5.077784969671451e-13,
+                "load_factor": 0.8,
+                "residual_norm": 0.0008743645248485665,
+                "status": "continue",
+                "step_index": 4,
+                "tangent_reassembled": true
+              },
+              {
+                "accepted_alpha": 1.0,
+                "diagnostics": {
+                  "correction": [
+                    0.0,
+                    0.0,
+                    -3.9333388812263773e-07,
+                    2.6077256666221297e-07,
+                    -4.438621527235656e-08,
+                    5.3771437943104814e-24,
+                    0.0,
+                    -8.877243054471312e-08,
+                    3.9333388812263773e-07
+                  ],
+                  "displacement": [
+                    0.0,
+                    0.0,
+                    -0.009213882880116289,
+                    0.006123916422409719,
+                    -0.00122286747277247,
+                    -1.967031529617149e-19,
+                    0.0,
+                    -0.0024457349455449394,
+                    0.009213882880116289
+                  ],
+                  "displacement_scale": 0.014655055513876235,
+                  "effective_tangent_diagonal": [
+                    2339159.4610663312,
+                    209935508.64829656,
+                    839958.0031497376,
+                    4678318.9221326625,
+                    419871017.2965931,
+                    1679916.0062994752,
+                    2339159.4610663312,
+                    209935508.64829656,
+                    839958.0031497376
+                  ],
+                  "energy_scale": 0.02130538333073125,
+                  "eta_E": 3.4327789624944585e-05,
+                  "eta_R": 1.7578142082561516e-05,
+                  "eta_u": 4.246419389255011e-05,
+                  "force_scale": 479991.56292535085,
+                  "line_search": {
+                    "enabled": false,
+                    "evaluations": 0,
+                    "failure_reason": null,
+                    "merit_function": "full_step",
+                    "method": null,
+                    "samples": []
+                  },
+                  "linear_relative_residual": 4.7953645434510406e-18,
+                  "raw_correction_norm": 6.223151188473261e-07,
+                  "raw_energy_work": 7.313667168561434e-07,
+                  "raw_residual_norm": 8.437359891532584,
+                  "residual": [
+                    0.03468572783582441,
+                    -239991.56292534084,
+                    -0.0006066922255740792,
+                    -0.06937145567169525,
+                    0.0,
+                    0.0,
+                    0.034685727835870844,
+                    -8.437074659159407,
+                    0.0006066922255740792
+                  ],
+                  "tangent_assemblies": 3,
+                  "tangent_symmetry_error": 0.0,
+                  "termination_reason": "CONTINUE"
+                },
+                "displacement_correction_norm": 4.246419389255011e-05,
+                "energy_norm": 3.4327789624944585e-05,
+                "iteration_index": 2,
+                "linear_residual_norm": 1.8797292090903574e-15,
+                "load_factor": 0.8,
+                "residual_norm": 1.7578142082561516e-05,
+                "status": "continue",
+                "step_index": 4,
+                "tangent_reassembled": true
+              },
+              {
+                "accepted_alpha": 1.0,
+                "diagnostics": {
+                  "correction": [
+                    0.0,
+                    0.0,
+                    -8.452137720542877e-12,
+                    5.616761261223792e-12,
+                    -1.247029442427889e-13,
+                    1.0992422409020713e-28,
+                    0.0,
+                    -2.494058884855778e-13,
+                    8.452137720542877e-12
+                  ],
+                  "displacement": [
+                    0.0,
+                    0.0,
+                    -0.009214276214004412,
+                    0.006124177194976381,
+                    -0.0012229118589877422,
+                    -1.966977758179206e-19,
+                    0.0,
+                    -0.002445823717975484,
+                    0.009214276214004412
+                  ],
+                  "displacement_scale": 0.014655677593171166,
+                  "effective_tangent_diagonal": [
+                    2339152.959435941,
+                    209935506.8986415,
+                    839958.0031497376,
+                    4678305.918871882,
+                    419871013.797283,
+                    1679916.0062994752,
+                    2339152.959435941,
+                    209935506.8986415,
+                    839958.0031497376
+                  ],
+                  "energy_scale": 5.985741333653868e-08,
+                  "eta_E": 4.2064382450608574e-10,
+                  "eta_R": 1.7285761917748477e-11,
+                  "eta_u": 9.013543889544831e-10,
+                  "force_scale": 479999.9999927997,
+                  "line_search": {
+                    "enabled": false,
+                    "evaluations": 0,
+                    "merit_function": "full_step"
+                  },
+                  "linear_relative_residual": 3.6678997598374355e-19,
+                  "raw_correction_norm": 1.3209959321706705e-11,
+                  "raw_energy_work": 2.517865127092321e-17,
+                  "raw_residual_norm": 8.297165720394806e-06,
+                  "residual": [
+                    -2.061485015807558e-06,
+                    -239999.99999279974,
+                    -1.3317730918060988e-08,
+                    4.122969932481888e-06,
+                    0.0,
+                    0.0,
+                    -2.06148491667433e-06,
+                    -7.2002585511654615e-06,
+                    1.3317730918060988e-08
+                  ],
+                  "tangent_assemblies": 4,
+                  "tangent_symmetry_error": 0.0,
+                  "termination_reason": "CONVERGED"
+                },
+                "displacement_correction_norm": 9.013543889544831e-10,
+                "energy_norm": 4.2064382450608574e-10,
+                "iteration_index": 3,
+                "linear_residual_norm": 3.051983953869204e-21,
+                "load_factor": 0.8,
+                "residual_norm": 1.7285761917748477e-11,
+                "status": "converged",
+                "step_index": 4,
+                "tangent_reassembled": true
+              }
+            ],
+            "load_factor": 0.8,
+            "requested_step_size": 0.19999999999999996,
+            "response": {
+              "adaptive_step_size": 0.2,
+              "adaptive_termination": null,
+              "attempt_index": 0,
+              "displacement": [
+                0.0,
+                0.0,
+                -0.009214276214004412,
+                0.006124177194976381,
+                -0.0012229118589877422,
+                -1.966977758179206e-19,
+                0.0,
+                -0.002445823717975484,
+                0.009214276214004412
+              ],
+              "eta_E": 4.2064382450608574e-10,
+              "eta_R": 1.7285761917748477e-11,
+              "eta_u": 9.013543889544831e-10,
+              "external_force": [
+                0.0,
+                0.0,
+                0.0,
+                0.0,
+                0.0,
+                0.0,
+                0.0,
+                -240000.0,
+                0.0
+              ],
+              "internal_force": [
+                2.061485015807558e-06,
+                239999.99999279974,
+                1.3317730918060988e-08,
+                -4.122969932481888e-06,
+                0.0,
+                0.0,
+                2.06148491667433e-06,
+                -239999.99999279974,
+                -1.3317730918060988e-08
+              ],
+              "load_increment": 0.19999999999999996,
+              "next_step_size": 0.2,
+              "strain_energy": 297.9995768068183,
+              "tangent_assemblies": 4,
+              "termination_reason": "CONVERGED",
+              "will_retry": false
+            },
+            "state_id": "36b40ce986dfe1a40c09ba2fdc3821dbb11f9f434edb30f17d8947005d1bbe6a",
+            "status": "accepted",
+            "step_index": 4
+          },
+          {
+            "accepted_step_size": 0.19999999999999996,
+            "control_method": "load",
+            "failure": null,
+            "iterations": [
+              {
+                "accepted_alpha": 1.0,
+                "diagnostics": {
+                  "correction": [
+                    0.0,
+                    0.0,
+                    -0.003714212616104902,
+                    0.0024685028011055873,
+                    -0.00032553419473814324,
+                    4.743798994075557e-20,
+                    0.0,
+                    -0.0006510683894762866,
+                    0.003714212616104902
+                  ],
+                  "displacement": [
+                    0.0,
+                    0.0,
+                    -0.009214276214004412,
+                    0.006124177194976381,
+                    -0.0012229118589877422,
+                    -1.966977758179206e-19,
+                    0.0,
+                    -0.002445823717975484,
+                    0.009214276214004412
+                  ],
+                  "displacement_scale": 0.014655677593171166,
+                  "effective_tangent_diagonal": [
+                    2339152.959435941,
+                    209935506.8986415,
+                    839958.0031497376,
+                    4678305.918871882,
+                    419871013.797283,
+                    1679916.0062994752,
+                    2339152.959435941,
+                    209935506.8986415,
+                    839958.0031497376
+                  ],
+                  "energy_scale": 195.32051684288598,
+                  "eta_E": 0.20000000007661434,
+                  "eta_R": 0.11111111112592646,
+                  "eta_u": 0.39911383314966853,
+                  "force_scale": 539999.9999927997,
+                  "line_search": {
+                    "enabled": false,
+                    "evaluations": 0,
+                    "failure_reason": null,
+                    "merit_function": "full_step",
+                    "method": null,
+                    "samples": []
+                  },
+                  "linear_relative_residual": 1.1062920572819571e-17,
+                  "raw_correction_norm": 0.0058492836616162525,
+                  "raw_energy_work": 39.06410338354155,
+                  "raw_residual_norm": 60000.00000720026,
+                  "residual": [
+                    -2.061485015807558e-06,
+                    -239999.99999279974,
+                    -1.3317730918060988e-08,
+                    4.122969932481888e-06,
+                    0.0,
+                    0.0,
+                    -2.06148491667433e-06,
+                    -60000.00000720026,
+                    1.3317730918060988e-08
+                  ],
+                  "tangent_assemblies": 1,
+                  "tangent_symmetry_error": 0.0,
+                  "termination_reason": "CONTINUE"
+                },
+                "displacement_correction_norm": 0.39911383314966853,
+                "energy_norm": 0.20000000007661434,
+                "iteration_index": 0,
+                "linear_residual_norm": 4.0760151048565725e-11,
+                "load_factor": 1.0,
+                "residual_norm": 0.11111111112592646,
+                "status": "continue",
+                "step_index": 5,
+                "tangent_reassembled": true
+              },
+              {
+                "accepted_alpha": 1.0,
+                "diagnostics": {
+                  "correction": [
+                    0.0,
+                    0.0,
+                    -0.0006700209019606351,
+                    0.00044523029767269483,
+                    -1.1327179421732959e-05,
+                    -1.1060970281177811e-16,
+                    0.0,
+                    -2.2654358843466142e-05,
+                    0.0006700209019604127
+                  ],
+                  "displacement": [
+                    0.0,
+                    0.0,
+                    -0.012928488830109313,
+                    0.00859267999608197,
+                    -0.0015484460537258855,
+                    -1.4925978587716503e-19,
+                    0.0,
+                    -0.0030968921074517705,
+                    0.012928488830109313
+                  ],
+                  "displacement_scale": 0.020496688081811643,
+                  "effective_tangent_diagonal": [
+                    2298915.550216358,
+                    209917684.6760069,
+                    839958.0031497376,
+                    4597831.100432716,
+                    419835369.3520138,
+                    1679916.0062994752,
+                    2298915.550216358,
+                    209917684.6760069,
+                    839958.0031497376
+                  ],
+                  "energy_scale": 6.796307653039842,
+                  "eta_E": 0.01995194698792169,
+                  "eta_R": 0.0011623164674173013,
+                  "eta_u": 0.05109350388346029,
+                  "force_scale": 599357.5938195522,
+                  "line_search": {
+                    "enabled": false,
+                    "evaluations": 0,
+                    "failure_reason": null,
+                    "merit_function": "full_step",
+                    "method": null,
+                    "samples": []
+                  },
+                  "linear_relative_residual": 1.975314935915159e-18,
+                  "raw_correction_norm": 0.0010472476121061174,
+                  "raw_energy_work": 0.1355995700070574,
+                  "raw_residual_norm": 696.6432011680756,
+                  "residual": [
+                    -134.6002844845084,
+                    -299357.4727761372,
+                    -0.8860009081076896,
+                    269.20056896957635,
+                    5.820766091346741e-11,
+                    -2.7921487344428897e-10,
+                    -134.60028448506793,
+                    -642.5272238628822,
+                    0.88600090782802
+                  ],
+                  "tangent_assemblies": 2,
+                  "tangent_symmetry_error": 2.4293252943144345e-18,
+                  "termination_reason": "CONTINUE"
+                },
+                "displacement_correction_norm": 0.05109350388346029,
+                "energy_norm": 0.01995194698792169,
+                "iteration_index": 1,
+                "linear_residual_norm": 1.3029291533327685e-12,
+                "load_factor": 1.0,
+                "residual_norm": 0.0011623164674173013,
+                "status": "continue",
+                "step_index": 5,
+                "tangent_reassembled": true
+              },
+              {
+                "accepted_alpha": 1.0,
+                "diagnostics": {
+                  "correction": [
+                    0.0,
+                    0.0,
+                    -1.2872417288846502e-06,
+                    8.536142846347902e-07,
+                    -1.1512917860041223e-07,
+                    1.1062513650417787e-16,
+                    0.0,
+                    -2.302583572008753e-07,
+                    1.2872417291069832e-06
+                  ],
+                  "displacement": [
+                    0.0,
+                    0.0,
+                    -0.013598509732069948,
+                    0.009037910293754664,
+                    -0.0015597732331476184,
+                    -1.1075896259765527e-16,
+                    0.0,
+                    -0.0031195464662952367,
+                    0.013598509732069726
+                  ],
+                  "displacement_scale": 0.021533397759797183,
+                  "effective_tangent_diagonal": [
+                    2301787.670807707,
+                    209914209.05360654,
+                    839958.0031497376,
+                    4603575.341615414,
+                    419828418.1072131,
+                    1679916.0062994752,
+                    2301787.670807707,
+                    209914209.05360654,
+                    839958.0031497376
+                  ],
+                  "energy_scale": 0.06907750716026269,
+                  "eta_E": 6.644207048655816e-05,
+                  "eta_R": 3.460456667066154e-05,
+                  "eta_u": 9.413495902981732e-05,
+                  "force_scale": 599979.2392352718,
+                  "line_search": {
+                    "enabled": false,
+                    "evaluations": 0,
+                    "failure_reason": null,
+                    "merit_function": "full_step",
+                    "method": null,
+                    "samples": []
+                  },
+                  "linear_relative_residual": 6.7125438528995805e-18,
+                  "raw_correction_norm": 2.027045515891268e-06,
+                  "raw_energy_work": 4.5896525997779e-06,
+                  "raw_residual_norm": 20.762021585129755,
+                  "residual": [
+                    0.11421362371552009,
+                    -299979.23923518485,
+                    -0.0016709218775758927,
+                    -0.22842724799083736,
+                    0.0,
+                    2.7921487344428897e-10,
+                    0.11421362427531727,
+                    -20.760764815146104,
+                    0.0016709221572455135
+                  ],
+                  "tangent_assemblies": 3,
+                  "tangent_symmetry_error": 2.429341271821961e-18,
+                  "termination_reason": "CONTINUE"
+                },
+                "displacement_correction_norm": 9.413495902981732e-05,
+                "energy_norm": 6.644207048655816e-05,
+                "iteration_index": 2,
+                "linear_residual_norm": 8.569985242137227e-15,
+                "load_factor": 1.0,
+                "residual_norm": 3.460456667066154e-05,
+                "status": "continue",
+                "step_index": 5,
+                "tangent_reassembled": true
+              },
+              {
+                "accepted_alpha": 1.0,
+                "diagnostics": {
+                  "correction": [
+                    0.0,
+                    0.0,
+                    -8.038176400635597e-11,
+                    5.3412571723443094e-11,
+                    -1.3819309863952875e-12,
+                    -1.1134697175085467e-16,
+                    0.0,
+                    -2.763861921877991e-12,
+                    8.038154239519841e-11
+                  ],
+                  "displacement": [
+                    0.0,
+                    0.0,
+                    -0.013599796973798832,
+                    0.0090387639080393,
+                    -0.0015598883623262189,
+                    -1.3382609347740227e-19,
+                    0.0,
+                    -0.0031197767246524378,
+                    0.013599796973798832
+                  ],
+                  "displacement_scale": 0.021535423538905484,
+                  "effective_tangent_diagonal": [
+                    2301774.121883254,
+                    209914202.2901334,
+                    839958.0031497376,
+                    4603548.243766508,
+                    419828404.5802668,
+                    1679916.0062994752,
+                    2301774.121883254,
+                    209914202.2901334,
+                    839958.0031497376
+                  ],
+                  "energy_scale": 8.291585766633973e-07,
+                  "eta_E": 2.3490281282866395e-09,
+                  "eta_R": 1.3897126066536076e-10,
+                  "eta_u": 5.834009236879196e-09,
+                  "force_scale": 599999.9999230702,
+                  "line_search": {
+                    "enabled": false,
+                    "evaluations": 0,
+                    "merit_function": "full_step"
+                  },
+                  "linear_relative_residual": 3.636255378177168e-18,
+                  "raw_correction_norm": 1.2563785984608025e-10,
+                  "raw_energy_work": 1.947716819392434e-15,
+                  "raw_residual_norm": 8.338275638852542e-05,
+                  "residual": [
+                    -1.6081279341513666e-05,
+                    -299999.9999230702,
+                    -1.0699613994802348e-07,
+                    3.216311872029752e-05,
+                    0.0,
+                    -2.801243681460619e-10,
+                    -1.6081839378783856e-05,
+                    -7.692980580031872e-05,
+                    1.0671647032722831e-07
+                  ],
+                  "tangent_assemblies": 4,
+                  "tangent_symmetry_error": 2.429341305283383e-18,
+                  "termination_reason": "CONVERGED"
+                },
+                "displacement_correction_norm": 5.834009236879196e-09,
+                "energy_norm": 2.3490281282866395e-09,
+                "iteration_index": 3,
+                "linear_residual_norm": 2.877427122924773e-19,
+                "load_factor": 1.0,
+                "residual_norm": 1.3897126066536076e-10,
+                "status": "converged",
+                "step_index": 5,
+                "tangent_reassembled": true
+              }
+            ],
+            "load_factor": 1.0,
+            "requested_step_size": 0.19999999999999996,
+            "response": {
+              "adaptive_step_size": 0.19999999999999996,
+              "adaptive_termination": null,
+              "attempt_index": 0,
+              "displacement": [
+                0.0,
+                0.0,
+                -0.013599796973798832,
+                0.0090387639080393,
+                -0.0015598883623262189,
+                -1.3382609347740227e-19,
+                0.0,
+                -0.0031197767246524378,
+                0.013599796973798832
+              ],
+              "eta_E": 2.3490281282866395e-09,
+              "eta_R": 1.3897126066536076e-10,
+              "eta_u": 5.834009236879196e-09,
+              "external_force": [
+                0.0,
+                0.0,
+                0.0,
+                0.0,
+                0.0,
+                0.0,
+                0.0,
+                -300000.0,
+                0.0
+              ],
+              "internal_force": [
+                1.6081279341513666e-05,
+                299999.9999230702,
+                1.0699613994802348e-07,
+                -3.216311872029752e-05,
+                0.0,
+                2.801243681460619e-10,
+                1.6081839378783856e-05,
+                -299999.9999230702,
+                -1.0671647032722831e-07
+              ],
+              "load_increment": 0.19999999999999996,
+              "next_step_size": 0.2,
+              "strain_energy": 480.22173782784296,
+              "tangent_assemblies": 4,
+              "termination_reason": "CONVERGED",
+              "will_retry": false
+            },
+            "state_id": "f507c7ee01f8d4f6946b25cbc2c89edce9309dca20561c14cd712c91be3f0fba",
+            "status": "accepted",
+            "step_index": 5
+          }
+        ]
+      },
+      "status": "succeeded"
+    },
+    "http_status": 201
+  },
+  "source_input": "examples/p9/imperfect-column.json"
+}

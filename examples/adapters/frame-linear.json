@@ -1,0 +1,33 @@
+{
+  "schema_version": "1.0.0",
+  "model_id": "p2-frame-reference",
+  "name": "P2 frame cantilever reference",
+  "model_family": "frame",
+  "units": {"length": "m", "force": "N", "stress": "Pa", "angle": "rad", "system_label": "SI"},
+  "nodes": [
+    {"id": "N1", "coordinates": [0.0, 0.0]},
+    {"id": "N2", "coordinates": [2.0, 0.0]}
+  ],
+  "elements": [
+    {
+      "id": "E1",
+      "formulation": "frame2d-linear",
+      "node_ids": ["N1", "N2"],
+      "material_id": "M1",
+      "properties": {"area": 0.003, "second_moment": 8e-06}
+    }
+  ],
+  "materials": [
+    {"id": "M1", "model": "linear-elastic", "parameters": {"young": 210000000000.0, "poisson": 0.3}}
+  ],
+  "loads": [
+    {"id": "L1", "kind": "nodal", "node_id": "N2", "components": {"UY": -1000.0}}
+  ],
+  "constraints": [
+    {"id": "C1", "node_id": "N1", "dof": "UX"},
+    {"id": "C2", "node_id": "N1", "dof": "UY"},
+    {"id": "C3", "node_id": "N1", "dof": "RZ"}
+  ],
+  "analysis": {"control_method": "load"},
+  "extensions": {"purpose": "P2 adapter/native reference"}
+}

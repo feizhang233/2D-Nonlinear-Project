@@ -1,0 +1,542 @@
+{
+  "artifact": "math-core-audit",
+  "artifact_version": "1.0.0",
+  "cases": [
+    {
+      "computed": {
+        "C": [
+          [
+            1.0,
+            7.437084071668725e-18
+          ],
+          [
+            7.437084071668725e-18,
+            1.0
+          ]
+        ],
+        "E": [
+          [
+            0.0,
+            3.718542035834363e-18
+          ],
+          [
+            3.718542035834363e-18,
+            0.0
+          ]
+        ],
+        "J": 1.0,
+        "project_internal_force_l2": 2.4831325658706557e-06,
+        "project_min_detF": 1.0,
+        "project_strain_energy": 1.4198657938451255e-22,
+        "rotation": [
+          [
+            0.8660254037844387,
+            -0.49999999999999994
+          ],
+          [
+            0.49999999999999994,
+            0.8660254037844387
+          ]
+        ]
+      },
+      "deviation": {
+        "abs_J_minus_1": 0.0,
+        "abs_project_min_detF_minus_1": 0.0,
+        "abs_project_strain_energy": 1.4198657938451255e-22,
+        "max_abs_C_minus_I": 7.437084071668725e-18,
+        "max_abs_analytic_E": 3.718542035834363e-18,
+        "max_abs_project_gauss_E": 5.551115123125783e-17,
+        "project_internal_force_l2": 2.4831325658706557e-06
+      },
+      "id": "V00",
+      "interpretation": "nonzero project force is constitutive-scale amplification of roundoff strain",
+      "name": "finite rigid-rotation objectivity",
+      "passed": true,
+      "reference": {
+        "C": [
+          [
+            1.0,
+            0.0
+          ],
+          [
+            0.0,
+            1.0
+          ]
+        ],
+        "E": [
+          [
+            0.0,
+            0.0
+          ],
+          [
+            0.0,
+            0.0
+          ]
+        ],
+        "J": 1.0
+      }
+    },
+    {
+      "computed": {
+        "displacement": [
+          0.09090909090909091,
+          0.6363636363636364
+        ],
+        "residual": [
+          0.0,
+          0.0
+        ],
+        "strain_energy": 0.6818181818181818,
+        "wrong_sign_residual": [
+          2.0,
+          4.0
+        ]
+      },
+      "deviation": {
+        "abs_energy": 0.0,
+        "max_abs_displacement": 0.0,
+        "residual_l2": 0.0,
+        "wrong_sign_residual_vs_2f": 0.0
+      },
+      "id": "V01",
+      "interpretation": "project convention K*du=r is consistent; K*du=-r doubles the residual",
+      "name": "linear one-correction recovery and sign",
+      "passed": true,
+      "reference": {
+        "displacement": [
+          0.09090909090909091,
+          0.6363636363636364
+        ],
+        "strain_energy": 0.6818181818181818,
+        "wrong_sign_residual": [
+          2.0,
+          4.0
+        ]
+      }
+    },
+    {
+      "computed": {
+        "analytic_best_h": 1e-05,
+        "analytic_relative_errors": [
+          8.801687676563698e-06,
+          8.801687328473419e-08,
+          8.806452333192731e-10,
+          1.0212088263534799e-11,
+          2.5806371180845416e-11,
+          4.086584512712008e-11,
+          3.5380167370524185e-09
+        ],
+        "internal_force": [
+          0.008000000000000007,
+          -1.0320000000000003
+        ],
+        "project_best_h": 1e-05,
+        "project_q4_relative_errors": [
+          3.6824349467937876e-05,
+          3.682435018638694e-07,
+          3.6828278225743436e-09,
+          5.025704461666397e-11,
+          5.504184397255675e-10,
+          1.7119241831215878e-09,
+          9.55638733715982e-09
+        ],
+        "step_sizes": [
+          0.01,
+          0.001,
+          0.0001,
+          1e-05,
+          1e-06,
+          1e-07,
+          1e-08
+        ],
+        "tangent": [
+          [
+            2.12,
+            1.0
+          ],
+          [
+            1.0,
+            3.24
+          ]
+        ],
+        "tangent_times_direction": [
+          2.072,
+          3.1920000000000006
+        ]
+      },
+      "deviation": {
+        "analytic_best_relative_error": 1.0212088263534799e-11,
+        "max_abs_directional_derivative": 4.440892098500626e-16,
+        "max_abs_internal_force": 2.220446049250313e-16,
+        "max_abs_tangent": 0.0,
+        "project_best_relative_error": 5.025704461666397e-11
+      },
+      "id": "V02",
+      "interpretation": "the error valley is truncation-error descent followed by floating-point growth",
+      "name": "consistent-tangent directional derivative",
+      "passed": true,
+      "reference": {
+        "internal_force": [
+          0.008,
+          -1.032
+        ],
+        "tangent": [
+          [
+            2.12,
+            1.0
+          ],
+          [
+            1.0,
+            3.24
+          ]
+        ],
+        "tangent_times_direction": [
+          2.072,
+          3.192
+        ]
+      }
+    },
+    {
+      "computed": {
+        "final_theta": 0.09856437752126986,
+        "project_r_fext_minus_fint": [
+          0.08999850000749998,
+          -0.0014553826457557317,
+          -8.671132953885774e-07,
+          -3.056443986793056e-13
+        ],
+        "reported_R_fint_minus_fext": [
+          -0.08999850000749998,
+          0.0014553826457557317,
+          8.671132953885774e-07,
+          3.056443986793056e-13
+        ],
+        "tangent": [
+          1.000449996250012,
+          1.0449248006411231,
+          1.043682569099543,
+          1.0436818332850883
+        ],
+        "theta": [
+          0.01,
+          0.09995801923618519,
+          0.09856520834217371,
+          0.09856437752126986
+        ],
+        "transverse_displacement": 0.984048639124881
+      },
+      "deviation": {
+        "abs_final_theta": 0.0,
+        "abs_transverse_vs_guide": 2.488109718257192e-11,
+        "max_abs_math_residual_history": 0.0,
+        "max_abs_tangent_history": 0.0,
+        "max_abs_theta_history": 0.0
+      },
+      "id": "V03",
+      "interpretation": "the guide's V03 R is the negative of the project's global residual r",
+      "name": "imperfect-column full Newton history",
+      "passed": true,
+      "reference": {
+        "R_fint_minus_fext": [
+          -0.08999850000749998,
+          0.0014553826457557317,
+          8.671132953885774e-07,
+          3.056443986793056e-13
+        ],
+        "guide_transverse_displacement": 0.9840486391,
+        "tangent": [
+          1.000449996250012,
+          1.0449248006411231,
+          1.043682569099543,
+          1.0436818332850883
+        ],
+        "theta": [
+          0.01,
+          0.09995801923618519,
+          0.09856520834217371,
+          0.09856437752126986
+        ]
+      }
+    },
+    {
+      "computed": {
+        "arc_length_last_force": 3.148918417079355,
+        "arc_length_last_v": 0.4395671352474684,
+        "arc_length_peak_force": 7.745909174448689,
+        "displacement_control_path": [
+          {
+            "force": 1.9848865542223637,
+            "v": 7.0
+          },
+          {
+            "force": 3.876275643042054,
+            "v": 6.0
+          },
+          {
+            "force": 5.565436469502735,
+            "v": 5.0
+          },
+          {
+            "force": 6.906926585840457,
+            "v": 4.0
+          },
+          {
+            "force": 7.679491924311228,
+            "v": 3.0
+          },
+          {
+            "force": 7.499999999999999,
+            "v": 2.0
+          }
+        ]
+      },
+      "deviation": {
+        "abs_force_vs_guide": 1.7106316363424412e-12,
+        "abs_theta_vs_guide": 4.408529097332803e-11,
+        "abs_v_vs_guide": 2.2147617073642323e-11,
+        "arc_peak_relative": 0.0008982032856757579
+      },
+      "id": "V04",
+      "interpretation": "load control loses a local parameter at the zero tangent; the expected failure is not a solver defect",
+      "name": "limit point and control boundary",
+      "passed": true,
+      "reference": {
+        "cos_theta": 0.8434326653017492,
+        "force": 7.75287283029829,
+        "theta": 0.5671552862559147,
+        "v": 2.6276509876778524
+      }
+    },
+    {
+      "computed": {
+        "controller_reaction": 0.275,
+        "du1": -0.025,
+        "du2": 0.1
+      },
+      "deviation": {
+        "abs_control_increment": 0.0,
+        "abs_controller_reaction": 0.0,
+        "abs_free_increment": 0.0,
+        "free_residual_l2": 0.0
+      },
+      "id": "V05",
+      "interpretation": "the constrained row is retained until controller reaction recovery",
+      "name": "displacement-control block solve and reaction",
+      "passed": true,
+      "reference": {
+        "controller_reaction": 0.275,
+        "du1": -0.025,
+        "du2": 0.1
+      }
+    },
+    {
+      "computed": {
+        "accepted_position": [
+          1.0,
+          1.0
+        ],
+        "alpha": 1.0,
+        "directional_project_residual": 0.0,
+        "phi_prime": 0.0,
+        "phi_second": 9.0
+      },
+      "deviation": {
+        "abs_alpha": 0.0,
+        "abs_directional_project_residual": 0.0,
+        "abs_phi_prime": 0.0,
+        "abs_phi_second_minus_9": 0.0
+      },
+      "id": "V06",
+      "interpretation": "the project residual has the opposite sign to the potential gradient, but both vanish at the accepted root",
+      "name": "line-search orthogonality",
+      "passed": true,
+      "reference": {
+        "alpha": 1.0,
+        "phi_prime": 0.0,
+        "phi_second": 9.0
+      }
+    },
+    {
+      "computed": {
+        "committed_q": 0.3,
+        "failed_trial": {
+          "force": 0.75,
+          "q": 0.5
+        },
+        "retry": {
+          "force": 0.39,
+          "q": 0.3
+        },
+        "rollback_q": 0.2
+      },
+      "deviation": {
+        "abs_committed_q": 0.0,
+        "abs_failed_force": 0.0,
+        "abs_failed_q": 0.0,
+        "abs_retry_force": 0.0,
+        "abs_retry_q": 0.0,
+        "abs_rollback_q": 0.0,
+        "retry_vs_direct_force": 0.0
+      },
+      "id": "V07",
+      "interpretation": "the failed q=0.5 trial never enters the immutable committed baseline",
+      "name": "trial, rollback, and commit isolation",
+      "passed": true,
+      "reference": {
+        "committed_q": 0.3,
+        "failed_trial": {
+          "force": 0.75,
+          "q": 0.5
+        },
+        "retry": {
+          "force": 0.39,
+          "q": 0.3
+        },
+        "rollback_q": 0.2
+      }
+    },
+    {
+      "computed": {
+        "arc_constraint_residual": 5.204170427930421e-18,
+        "equilibrium_residual": 1.83772268236293e-17,
+        "intersection_lambda": 0.0705323395621367,
+        "intersection_u": 0.07088856801975514,
+        "predictor_dlambda": 0.07071067811865475,
+        "predictor_du": 0.07071067811865475,
+        "root_candidates_first_iteration": 2
+      },
+      "deviation": {
+        "abs_arc_constraint": 5.204170427930421e-18,
+        "abs_equilibrium": 1.83772268236293e-17,
+        "abs_intersection_lambda_vs_guide": 3.786329583199688e-11,
+        "abs_intersection_u_vs_guide": 1.9755141966726342e-11,
+        "abs_limit_lambda_vs_guide": 4.024947042324811e-11,
+        "abs_limit_u_vs_guide": 1.0374145986702388e-11,
+        "abs_predictor_displacement": 0.0,
+        "abs_predictor_load": 0.0
+      },
+      "id": "V08",
+      "interpretation": "reported guide values are rounded; simultaneous equilibrium and arc residuals are near machine zero",
+      "name": "one-DOF spherical arc length",
+      "passed": true,
+      "reference": {
+        "intersection_lambda": 0.0705323396,
+        "intersection_u": 0.070888568,
+        "limit_lambda": 0.3849001794597505,
+        "limit_u": 0.5773502691896258,
+        "predictor_dlambda": 0.07071067811865475,
+        "predictor_du": 0.07071067811865475
+      }
+    },
+    {
+      "computed": {
+        "continuum_endpoints_by_mesh": {
+          "1": 0.1618288173269602,
+          "2": 0.16182881732696022,
+          "4": 0.16182881732696014
+        },
+        "continuum_endpoints_by_step": {
+          "0.125": 0.1618288173267003,
+          "0.25": 0.16182881732696022,
+          "0.5": 0.16182881732669946
+        },
+        "continuum_min_detF_by_mesh": {
+          "1": 1.0411842464138945,
+          "2": 1.0411842464138945,
+          "4": 1.0411842464138945
+        },
+        "frame_arc_length_descending": {
+          "accepted_steps": 20,
+          "last_lambda": 0.000919296459178924,
+          "max_lambda": 0.2955468892799883
+        },
+        "frame_limit_loads_by_displacement_step": {
+          "0.005": 296.2415884488126,
+          "0.01": 295.5252068178652,
+          "0.02": 295.288788589419
+        },
+        "frame_load_control_above_limit": {
+          "failure_code": "NONCONVERGENCE",
+          "last_committed_lambda": 0.25,
+          "requested_lambda": 0.31,
+          "succeeded": false
+        },
+        "plate_endpoints_by_mesh": {
+          "1": -0.04653643411714636,
+          "2": -0.038116969079207384,
+          "4": -0.038803211838751045
+        },
+        "plate_endpoints_by_step": {
+          "0.125": -0.038116969079207204,
+          "0.25": -0.038116969079207384,
+          "0.5": -0.038116969079207356
+        },
+        "shell_thickness_scaling": [
+          {
+            "bending_energy_ratio_thin_over_thick": 0.0009999999999999998,
+            "geometry": "regular",
+            "membrane_energy_ratio_thin_over_thick": 0.09999999999999999,
+            "min_detJ_thick": 0.5,
+            "min_detJ_thin": 0.5,
+            "shear_energy_ratio_thin_over_thick": null
+          },
+          {
+            "bending_energy_ratio_thin_over_thick": 0.0009999999999999998,
+            "geometry": "distorted",
+            "membrane_energy_ratio_thin_over_thick": 0.10000000000000002,
+            "min_detJ_thick": 0.6865294014958874,
+            "min_detJ_thin": 0.6865294014958874,
+            "shear_energy_ratio_thin_over_thick": 0.10000001876642328
+          }
+        ],
+        "stable_frame_controls": {
+          "arc_length": {
+            "apex_uy": -0.01480115361357994,
+            "lambda": 0.10000000000000424
+          },
+          "displacement": {
+            "apex_uy": -0.014801153613579941,
+            "lambda_from_reaction": 0.10000000000000027
+          },
+          "load": {
+            "apex_uy": -0.014801153613579941,
+            "lambda": 0.1
+          }
+        }
+      },
+      "deviation": {
+        "continuum_mesh_spread": 8.326672684688674e-17,
+        "continuum_step_spread": 2.6076363290883364e-13,
+        "frame_peak_spread": 0.9527998593935649,
+        "plate_refinement_last_change_ratio": 0.08150669388748341,
+        "plate_step_spread": 1.8041124150158794e-16,
+        "shell_max_bending_scaling_error": 2.168404344971009e-19,
+        "shell_max_membrane_scaling_error": 1.3877787807814457e-17,
+        "stable_load_vs_arc_displacement": 1.734723475976807e-18,
+        "stable_load_vs_arc_lambda": 4.232725281383409e-15,
+        "stable_load_vs_displacement_lambda": 2.636779683484747e-16
+      },
+      "id": "V09",
+      "interpretation": "step/mesh spreads measure discretization sensitivity; expected control failures are retained as evidence",
+      "name": "integrated two-dimensional model evidence",
+      "passed": true,
+      "reference": {
+        "continuum_endpoint": 0.1618288167,
+        "plate_two_by_two_endpoint": -0.03811696908,
+        "shell_thickness_scaling": {
+          "bending": 0.001,
+          "membrane": 0.1
+        },
+        "stable_frame_point": {
+          "apex_uy": -0.01480115361358,
+          "lambda": 0.1
+        }
+      }
+    }
+  ],
+  "failed_cases": [],
+  "oracle": "2D-Nonlinear-Project_Math-Core-Guide/03_验证题目与答案",
+  "residual_convention": "r = f_ext - f_int; K_t * du = r",
+  "solver_version": "0.1.0",
+  "status": "passed"
+}

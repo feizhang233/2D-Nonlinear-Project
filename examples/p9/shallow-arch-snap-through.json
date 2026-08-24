@@ -1,0 +1,68 @@
+{
+  "schema_version": "1.0.0",
+  "model_id": "p9-shallow-arch",
+  "name": "P9 symmetric shallow two-bar arch",
+  "model_family": "frame",
+  "units": {
+    "length": "m",
+    "force": "N",
+    "stress": "Pa",
+    "angle": "rad",
+    "system_label": "SI"
+  },
+  "nodes": [
+    {"id": "N1", "coordinates": [-1.0, 0.0]},
+    {"id": "N2", "coordinates": [0.0, 0.2]},
+    {"id": "N3", "coordinates": [1.0, 0.0]}
+  ],
+  "materials": [
+    {
+      "id": "M1",
+      "model": "linear-elastic",
+      "parameters": {"young": 10000000.0}
+    }
+  ],
+  "elements": [
+    {
+      "id": "E1",
+      "formulation": "frame2d-corotational",
+      "node_ids": ["N1", "N2"],
+      "material_id": "M1",
+      "properties": {"area": 0.01, "second_moment": 1e-8}
+    },
+    {
+      "id": "E2",
+      "formulation": "frame2d-corotational",
+      "node_ids": ["N2", "N3"],
+      "material_id": "M1",
+      "properties": {"area": 0.01, "second_moment": 1e-8}
+    }
+  ],
+  "loads": [
+    {
+      "id": "P",
+      "kind": "nodal",
+      "node_id": "N2",
+      "components": {"UY": -1000.0}
+    }
+  ],
+  "constraints": [
+    {"id": "C1", "node_id": "N1", "dof": "UX"},
+    {"id": "C2", "node_id": "N1", "dof": "UY"},
+    {"id": "C3", "node_id": "N1", "dof": "RZ"},
+    {"id": "C4", "node_id": "N2", "dof": "UX"},
+    {"id": "C5", "node_id": "N2", "dof": "RZ"},
+    {"id": "C6", "node_id": "N3", "dof": "UX"},
+    {"id": "C7", "node_id": "N3", "dof": "UY"},
+    {"id": "C8", "node_id": "N3", "dof": "RZ"}
+  ],
+  "analysis": {
+    "control_method": "load",
+    "newton_method": "full",
+    "max_iterations": 30
+  },
+  "extensions": {
+    "purpose": "P9 load/displacement/arc-length comparison and snap-through verification",
+    "expected_first_limit_load_factor": 0.296
+  }
+}
