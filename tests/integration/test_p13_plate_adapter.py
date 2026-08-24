@@ -17,7 +17,7 @@ from nonlinear_core import (
 )
 
 ROOT = Path(__file__).resolve().parents[2]
-EXAMPLE = ROOT / "examples" / "p13" / "von-karman-mitc4-plate.json"
+EXAMPLE = ROOT / "tests" / "fixtures" / "p13" / "von-karman-mitc4-plate.json"
 
 
 def _document() -> dict[str, object]:

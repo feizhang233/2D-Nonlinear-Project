@@ -9,7 +9,7 @@ from nonlinear_core import model_input_json_schema
 
 PROJECT_ROOT = Path(__file__).resolve().parents[2]
 SCHEMA_PATH = PROJECT_ROOT / "schemas" / "model-input-1.0.0.schema.json"
-VALID_EXAMPLE_PATH = PROJECT_ROOT / "examples" / "contracts" / "valid-minimal-frame.json"
+VALID_EXAMPLE_PATH = PROJECT_ROOT / "tests" / "fixtures" / "contracts" / "valid-minimal-frame.json"
 
 
 def test_checked_in_schema_is_valid_and_current() -> None:

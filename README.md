@@ -2,219 +2,258 @@
 
 # Nonlinear Studio / nonlinear-core
 
-**A contract-first foundation for quasi-static nonlinear analysis across 2D finite-element models.**
+**Model 2D Frame, Continuum, Plate, and Shell problems, then follow nonlinear equilibrium — in the browser.**
 
-Python 3.11+ numerical core · FastAPI service · React + Material UI workbench
+React workbench · FastAPI · Python nonlinear FE core · Gmsh surface meshing
 
 </div>
 
 ---
 
-## Project status
+## Quick start
 
-**P15 / `nonlinear-core 0.1.0` release gates complete:** V00-V08, all four V09 families, the four
-unchanged linear-core references, API execution, and the four-family Material UI flow are
-automated. Checked-in release evidence retains one successful five-step nonlinear solve and one
-expected limit-point failure with the complete input, result, iteration history, model hash,
-solver version, rejected step, and rollback boundary. Ruff, the complete backend and frontend test
-suites, TypeScript, production builds, deterministic Schema/OpenAPI checks, a clean wheel install,
-and a real HTTP frontend/API smoke are release gates. Supported claims remain bounded by family
-below.
+**Requirements:** Python `3.11+` · Node.js `22+` · npm
 
-Development is governed by the staged
-[`2D-Nonlinear-Project_逐步开发计划.md`](2D-Nonlinear-Project_逐步开发计划.md) and the
-canonical mathematics in
-[`核心算法与实现顺序.md`](2D-Nonlinear-Project_Math-Core-Guide/01_核心算法/核心算法与实现顺序.md).
+```bash
+# 1. Clone the repository
+git clone https://github.com/feizhang233/2D-Nonlinear-Project.git
+cd 2D-Nonlinear-Project
 
-For a concise, interview-oriented Chinese introduction, start with
-[`博士面试准备/README.md`](博士面试准备/README.md). It reorganizes the existing mathematics,
-verification evidence, and limitations into a short learning path without moving the engineering
-files.
+# 2. Install the Python core and API
+python3 -m venv .venv
+source .venv/bin/activate          # Windows: .venv\Scripts\Activate.ps1
+python -m pip install --upgrade pip
+python -m pip install -e ".[dev]"
 
-## Verified 0.1.0 support
+# 3. Install the frontend
+npm --prefix frontend ci
+```
 
-The release provides one shared quasi-static nonlinear solution layer for four existing
-finite-element families:
+Start the API:
 
-| Family | Verified nonlinear slice | Explicit boundary |
-|---|---|---|
-| Frame | 2-node corotational Euler-Bernoulli | Large rigid rotation, small strain; fixed nodal and reference-local distributed loads |
-| Continuum | Total Lagrangian plane-strain Q4 with Saint-Venant--Kirchhoff elasticity | Fixed nodal/edge loads; no plane stress, mixed formulation, plasticity, or contact |
-| Plate | Q4 von Karman membrane with MITC4 transverse response | Fixed nodal/surface/edge loads; moderate rotation/small strain |
-| Shell | 6-DOF corotational flat Q4 with QLLL shear and visible drilling | Fixed nodal/surface/edge loads; initially flat; no general curved shell |
+```bash
+nonlinear-api
+```
 
-The four sibling projects remain reusable linear baselines and their frozen reference results are
-regressed independently. The browser workbench loads, edits, validates, solves, and renders the
-verified Frame, Continuum, Plate, and Shell slices through the same P10 API. Surface families use
-a labeled Q4 engineering projection; it is not presented as a general-purpose 3D shell viewer.
-Their model inspector can regenerate the finite-element mesh with Gmsh from the current exterior
-boundary and preserve supported boundary constraints and loads by geometric rebinding.
-Users can rename model entities without changing solver-facing IDs. Guest mode keeps the complete
-modeling, meshing, solve, import, and export workflow available immediately; an optional account
-adds private, owner-isolated model history.
+Start the workbench in a second terminal:
 
-## Release capabilities
+```bash
+npm --prefix frontend run dev
+```
 
-- Full Newton-Raphson and optional modified Newton
-- Load control and displacement control
-- Line search, adaptive step sizing, cutback, and retry
-- Basic spherical arc-length path following
-- Trial, commit, rollback, and restart-safe state management
-- Iteration history, failure diagnostics, reactions, and load-displacement paths
-- Geometrically nonlinear Frame, Continuum, Plate, and flat-Shell examples
-- FastAPI analysis endpoints and a React/TypeScript workbench
-- Guest-first IAM with server-side sessions and private saved-model history (24 snapshots per user)
-- User-defined display names for models, materials, supports, loads, nodes, and elements
-- Synchronous calls plus local in-process asynchronous polling and cooperative cancellation
-- Versioned model/restart JSON import and export, including arc-length continuation direction
-- Live step/iteration progress and result provenance
-- Gmsh-backed all-Q4 remeshing for Continuum, Plate, and flat Shell models
-- Consistent distributed-load conversion for Frame members and Q4 edges/surfaces
+Open in the browser:
 
-## Mathematical contract
+| Service | URL |
+| --- | --- |
+| **Nonlinear Studio** | http://127.0.0.1:5173 |
+| Swagger UI | http://127.0.0.1:8000/docs |
+| Health | http://127.0.0.1:8000/health |
+
+> An account is not required for modeling, meshing, analysis, JSON import, or JSON export. Registration and login add a private, server-side model history. Guest models are not saved.
+
+> **What you see first:** Nonlinear Studio opens with a shallow-arch Frame verification model. Choose Frame, Continuum, Plate, or Shell from the model-family selector, then edit the model and run the analysis.
+
+---
+
+## Features
+
+| Area | What you get |
+| --- | --- |
+| Four model families | One workflow for nonlinear Frame, Continuum, Plate, and flat-Shell models |
+| Visual modeling | Editable nodes, elements, materials, supports, loads, names, and solver settings |
+| Nonlinear solution | Full or modified Newton, load/displacement control, line search, adaptive stepping, cutback, and spherical arc length |
+| State safety | Trial, commit, rollback, restart, rejected-step history, and model provenance |
+| Meshing | Gmsh-backed all-Q4 remeshing for Continuum, Plate, and flat-Shell boundaries |
+| Distributed loads | Consistent member, edge, and surface load conversion for supported formulations |
+| Results | Deformation, reactions, element response, convergence history, failures, and load-displacement paths |
+| Identity and models | HttpOnly sessions, user-isolated SQLite history, and a no-save guest mode |
+| API and scripting | Versioned validation, meshing, synchronous/asynchronous analysis, cancellation, and an importable Python core |
+
+---
+
+## Typical workflow
+
+1. **Geometry** — choose a family and edit nodes, boundaries, or elements
+2. **Material** — define the formulation-specific elastic properties
+3. **Supports** — restrain the active degrees of freedom
+4. **Loads** — add nodal, member, edge, or surface loading supported by the family
+5. **Mesh** — retain explicit Frame members or generate an all-Q4 surface mesh
+6. **Solve** — select the control method, target load factor, increments, tolerances, and globalization options
+7. **Review** — inspect convergence, rejected steps, reactions, recovered response, and provenance; then export or save
+
+Changing the model invalidates stale results. A trial state becomes committed only after global convergence; rejected steps roll back before the next attempt.
+
+---
+
+## Analysis scope
+
+| Family | Verified nonlinear formulation | Degrees of freedom | Current boundary |
+| --- | --- | --- | --- |
+| Frame | 2-node corotational Euler–Bernoulli | `UX`, `UY`, `RZ` | Large rigid rotation, small strain; no shear deformation or inelasticity |
+| Continuum | Total Lagrangian Q4 with Saint-Venant–Kirchhoff elasticity | `UX`, `UY` | Plane strain only; no mixed formulation, plasticity, or contact |
+| Plate | von Kármán Q4 membrane response with MITC4 transverse shear | `UX`, `UY`, `UZ`, `RX`, `RY` | Moderate rotation, small strain; no arbitrary finite rotation |
+| Shell | 6-DOF corotational flat Q4 with Reissner–Mindlin/QLLL response and drilling stabilization | `UX`, `UY`, `UZ`, `RX`, `RY`, `RZ` | Initially flat surfaces; no general curved-shell formulation |
+
+The project is intended for learning, prototyping, formula review, and independent verification. Check assumptions, units, mesh sensitivity, convergence behavior, and equilibrium before using results for engineering decisions.
+
+---
+
+## Solver contract
 
 The project uses one residual and Newton sign convention throughout:
 
 $$
-\mathbf r=\mathbf f_{ext}-\mathbf f_{int},
+\mathbf r = \mathbf f_{ext} - \mathbf f_{int},
 $$
 
 $$
-\mathbf K_t=
-\frac{\partial\mathbf f_{int}}{\partial\mathbf u}
--\frac{\partial\mathbf f_{ext}}{\partial\mathbf u},
+\mathbf K_t =
+\frac{\partial \mathbf f_{int}}{\partial \mathbf u}
+-
+\frac{\partial \mathbf f_{ext}}{\partial \mathbf u},
 \qquad
-\mathbf K_t\,\delta\mathbf u=\mathbf r.
+\mathbf K_t\,\delta\mathbf u = \mathbf r.
 $$
 
-The P2/P3 model-facing evaluation and correction contract is:
+Each model adapter evaluates the current trial displacement and load factor, then returns internal force, tangent, external force, trial state, and recoverable element response. The shared core owns increment selection, Newton iteration, convergence checks, cutback, commit, rollback, and restart state.
 
-```text
-evaluate(trial_u, load_factor, committed_state)
-    -> internal_force
-    -> tangent
-    -> external_force
-    -> trial_state
-    -> element responses and diagnostics
+Supported solution strategies include:
 
-residual = external_force - internal_force
-effective_tangent = tangent - external_tangent
-solve effective_tangent_ff * delta_u_f = constrained_rhs_f
+- full and modified Newton–Raphson;
+- load control and displacement control;
+- backtracking line search;
+- adaptive increment growth, cutback, and retry;
+- basic spherical arc-length continuation;
+- synchronous execution and local in-process asynchronous polling/cancellation.
+
+---
+
+## Architecture
+
+```mermaid
+flowchart LR
+    UI["React workbench"]
+    API["FastAPI"]
+    CORE["nonlinear-core"]
+    ADAPTERS["Frame / Continuum / Plate / Shell adapters"]
+    GMSH["Python + Gmsh"]
+    STORE[("SQLite model history")]
+
+    UI --> API
+    API --> CORE
+    CORE <--> ADAPTERS
+    API <--> GMSH
+    API --> UI
+    API <--> STORE
 ```
 
-Committed history must remain immutable during trial iterations. A state is committed only after
-global convergence, and every rejected step is rolled back.
+The browser communicates with the HTTP API. The nonlinear core remains solver-led: family adapters supply model-specific internal response and tangent information without importing the sibling applications. Gmsh supplies surface mesh topology; the nonlinear element formulations and solution controls remain in this repository.
 
-## Development setup
+---
 
-The backend baseline is Python 3.11 or newer. Pydantic freezes the public data contract, NumPy owns
-the unified response arrays, and jsonschema independently verifies the checked-in Draft 2020-12
-Schema. The four linear cores are declared in the `linear-cores` optional dependency group; in this
-multi-repository workspace they can be installed directly from the sibling directories.
+## Commands
 
-```bash
-python -m pip install -e '.[dev]'
-python -m pip install --no-deps -e ../2D-Continuum -e ../2D-Frame-Project \
-  -e ../2D-Plate-Project -e ../2D-Shell-Project
-python -m pytest
-python -m ruff check src tests scripts
-python scripts/generate_schema.py
-python scripts/generate_openapi.py
-python scripts/run_math_core_audit.py --check
-python scripts/generate_release_evidence.py --check
-python scripts/check_release.py
-python -m build --no-isolation
-```
+| Task | Command |
+| --- | --- |
+| Start the API | `nonlinear-api` |
+| Start the frontend | `npm --prefix frontend run dev` |
+| Run Python tests | `python -m pytest` |
+| Lint Python | `python -m ruff check src tests scripts` |
+| Run frontend tests | `npm --prefix frontend test` |
+| Check frontend types | `npm --prefix frontend run typecheck` |
+| Build the frontend | `npm --prefix frontend run build` |
+| Check generated contracts | `python scripts/generate_schema.py && python scripts/generate_openapi.py` |
+| Check numerical audit | `python scripts/run_math_core_audit.py --check` |
+| Check release evidence | `python scripts/generate_release_evidence.py --check && python scripts/check_release.py` |
 
-Start the P10 service and open its interactive API documentation:
+| Variable | Default | Purpose |
+| --- | --- | --- |
+| `NONLINEAR_DATA_DIR` | `frontend/.nonlinear-data` | SQLite accounts, sessions, and saved models |
+| `NONLINEAR_COOKIE_SECURE` | auto-detected | Set to `1` when HTTPS terminates outside the application |
+| `NONLINEAR_CORS_ORIGINS` | empty | Comma-separated allowed browser origins |
 
-```bash
-nonlinear-api
-# http://127.0.0.1:8000/docs
-```
+The default synchronous API limit is 1 MiB per request and 10,000 degrees of freedom. The Gmsh endpoint limits interactive surface meshes to 10,000 nodes.
 
-IAM uses an HttpOnly session cookie. Accounts and saved model snapshots are stored in SQLite at
-`frontend/.nonlinear-data/nonlinear-studio.sqlite3` by default; set `NONLINEAR_DATA_DIR` to choose
-a different persistent directory. Set `NONLINEAR_COOKIE_SECURE=1` when HTTPS is terminated outside
-the application process.
+---
 
-Start the P11 frontend in a second terminal:
+## API cheat sheet
 
-```bash
-cd frontend
-npm install
-npm run dev
-# http://127.0.0.1:5173
-```
+| Method | Path | Description |
+| --- | --- | --- |
+| `GET` | `/health` | Service, version, execution modes, and limits |
+| `POST` | `/api/v1/models/validate` | Validate a versioned model and report execution eligibility |
+| `POST` | `/api/v1/meshes` | Generate a named-boundary Q4 surface mesh with Gmsh |
+| `POST` | `/api/v1/analyses` | Run or queue an analysis |
+| `GET` | `/api/v1/analyses/{analysis_id}` | Read status, result, history, and diagnostics |
+| `DELETE` | `/api/v1/analyses/{analysis_id}` | Request cooperative cancellation |
+| `POST` | `/api/v1/auth/register` | Create an account and start a session |
+| `POST` | `/api/v1/auth/login` | Sign in and start a session |
+| `GET` | `/api/v1/auth/session` | Read the current session |
+| `POST` | `/api/v1/auth/logout` | Revoke the current session |
+| `GET` / `POST` | `/api/v1/models` | List or save user-owned models |
+| `DELETE` | `/api/v1/models/{entry_id}` | Delete one user-owned history entry |
 
-Validate the bundled minimal model:
+Validation, meshing, and analysis remain available to guests. Saved-model endpoints require a signed-in session and enforce ownership on every operation. Model history retains up to 24 snapshots per account.
 
-```python
-import json
-from pathlib import Path
+---
 
-from nonlinear_core import canonical_model_json, validate_model_input
+## Units and model data
 
-document = json.loads(Path("examples/contracts/valid-minimal-frame.json").read_text())
-validation = validate_model_input(document)
+Every model declares its length, force, stress, and angle units. The solver treats numerical values as one self-consistent unit system; the unit metadata does not silently rescale inconsistent input.
 
-if validation.valid and validation.model is not None:
-    print(canonical_model_json(validation.model))
-else:
-    for error in validation.errors:
-        print(error.code, error.json_path, error.message)
-```
+The public model contract is versioned as `1.0.0`. Unknown fields, duplicate IDs, invalid references, unsupported degrees of freedom, and incompatible load targets are rejected with structured JSON-path errors before execution.
 
-## Current layout
+Model and restart JSON preserve:
 
-```text
-2D-Nonlinear-Project/
-├── src/nonlinear_core/          # Contracts, solvers, state, adapters, and P9/P12-P14 elements
-├── src/nonlinear_api/           # P10 schemas, limits, status store, service, and ASGI app
-├── src/reused_cores/            # Isolated, provenance-tracked reusable linear Frame subset
-├── frontend/                    # P11 React/TypeScript/Material UI workbench
-├── tests/unit/                  # Contract, algebra, solver, state, and convergence tests
-├── tests/verification/          # V00-V09 numerical verification tests
-├── tests/integration/           # Cross-layer and adapter tests
-├── tests/regression/            # Frozen behavior and result baselines
-├── examples/contracts/          # Valid and intentionally invalid P1 fixtures
-├── examples/adapters/           # Four P2 models and frozen native references
-├── examples/p9/                 # Shallow-arch and imperfect-column nonlinear Frame models
-├── examples/p12/                # Plane-strain TL Q4 continuum example
-├── examples/p13/                # von Karman Q4/MITC4 Plate example
-├── examples/p14/                # corotational Q4/QLLL flat-Shell example
-├── examples/p15/                # self-contained success and expected-failure release evidence
-├── schemas/                     # Checked-in ModelInput JSON Schema
-├── scripts/                     # Contract generation, release evidence, and wheel smoke gates
-├── docs/                        # Project-facing technical documentation
-├── .github/workflows/           # Frozen-core backend and frontend CI gates
-├── 2D-Nonlinear-Project_Math-Core-Guide/
-└── 2D-Nonlinear-Project_逐步开发计划.md
-```
+- solver and schema versions;
+- model identity and SHA-256 provenance;
+- analysis controls and tolerances;
+- committed state and continuation direction;
+- iteration, step, failure, and recovery records.
+
+---
 
 ## Current limitations
 
-The 0.1.0 release does not contain:
+- no contact, friction, dynamics, buckling eigenanalysis, fracture, or localization regularization;
+- no production plasticity, damage, composite, or other history-dependent material library;
+- no follower/current-configuration distributed loading;
+- no general finite-strain plane stress or mixed near-incompressible continuum formulation;
+- no general curved nonlinear shells, arbitrary finite-rotation plates, or automatic branch switching;
+- no Gmsh domains with holes, multiple exterior loops, non-planar Shell geometry, or residual triangles after recombination;
+- no durable distributed task queue or persistent analysis-result store;
+- asynchronous analyses are local to one API process and cannot recover queued jobs after shutdown.
 
-- general curved-shell, arbitrary finite-local-rotation, finite-strain, follower-load, composite,
-  plastic, damage, or history-dependent Shell formulations;
-- arbitrary finite-rotation plates, finite membrane strain, follower Plate loading, or Plate
-  branch switching;
-- finite-strain plane stress, mixed/near-incompressible continuum, reduced integration, or
-  hourglass control;
-- shear-deformable, finite-strain, plastic, or damage-capable Frame elements;
-- follower or current-configuration distributed loading; all current distributed loads are fixed
-  to the reference geometry/direction;
-- Gmsh domains with holes, multiple exterior loops, non-planar Shell geometry, or residual
-  triangular cells after recombination;
-- a durable analysis task queue or a persistent analysis-result store (only account-owned model
-  snapshots are persisted);
-- multi-process analysis-record sharing or recovery of queued jobs after process shutdown.
+---
 
-The release also excludes contact and friction, dynamics, production plasticity/damage
-libraries, fracture and localization regularization, automatic branch switching, general curved
-nonlinear shells, multiparameter non-proportional loading, and industrial parallel solving.
+## Layout
 
-See
-[`算法局限与适用边界.md`](2D-Nonlinear-Project_Math-Core-Guide/02_算法局限/算法局限与适用边界.md)
-for the numerical boundaries that later implementations must preserve.
+```text
+frontend/                 React + TypeScript + Vite workbench
+src/nonlinear_core/       Contracts, nonlinear solvers, state, adapters, and elements
+src/nonlinear_api/        FastAPI schemas, IAM, meshing, analysis service, and ASGI app
+src/reused_cores/         Provenance-tracked reusable linear Frame subset
+tests/unit/               Contract, algebra, solver, state, and convergence tests
+tests/verification/       V00–V09 numerical verification
+tests/integration/        API, adapter, meshing, release, and cross-layer tests
+tests/fixtures/           Tracked model and release inputs required by automated gates
+schemas/                  Versioned ModelInput JSON Schema and OpenAPI contract
+scripts/                  Contract generation, audit, release, wheel, and HTTP smoke gates
+.github/workflows/        Frozen dependency revisions and backend/frontend CI
+```
+
+---
+
+## Contributing
+
+Issues and pull requests are welcome. Before submitting a change, run:
+
+```bash
+python -m ruff check src tests scripts
+python -m pytest
+npm --prefix frontend test
+npm --prefix frontend run typecheck
+npm --prefix frontend run build
+```
+
+Current package version: `nonlinear-core 0.1.0`.

@@ -14,7 +14,7 @@ from nonlinear_api import AnalysisService, ApiLimits, create_app
 from nonlinear_core import get_adapter, solve_load_control
 
 ROOT = Path(__file__).resolve().parents[2]
-ARCH = ROOT / "examples" / "p9" / "shallow-arch-snap-through.json"
+ARCH = ROOT / "tests" / "fixtures" / "p9" / "shallow-arch-snap-through.json"
 
 
 def _model() -> dict[str, object]:

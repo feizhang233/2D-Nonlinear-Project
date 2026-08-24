@@ -535,7 +535,7 @@
     }
   ],
   "failed_cases": [],
-  "oracle": "2D-Nonlinear-Project_Math-Core-Guide/03_验证题目与答案",
+  "oracle": "tests/verification",
   "residual_convention": "r = f_ext - f_int; K_t * du = r",
   "solver_version": "0.1.0",
   "status": "passed"

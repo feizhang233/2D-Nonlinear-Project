@@ -6,7 +6,7 @@ from pathlib import Path
 import pytest
 
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
-CONTRACT_EXAMPLES = PROJECT_ROOT / "examples" / "contracts"
+CONTRACT_EXAMPLES = PROJECT_ROOT / "tests" / "fixtures" / "contracts"
 
 
 def load_contract_example(name: str) -> dict[str, object]:

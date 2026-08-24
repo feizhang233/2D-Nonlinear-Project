@@ -2305,5 +2305,5 @@
     },
     "http_status": 201
   },
-  "source_input": "examples/p9/imperfect-column.json"
+  "source_input": "tests/fixtures/p9/imperfect-column.json"
 }

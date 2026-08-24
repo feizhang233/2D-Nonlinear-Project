@@ -1,8 +1,4 @@
 include README.md
-include 2D-Nonlinear-Project_逐步开发计划.md
-recursive-include 2D-Nonlinear-Project_Math-Core-Guide *.json *.md
-recursive-include docs *.md
-recursive-include examples *.json *.md
 recursive-include schemas *.json
 recursive-include scripts *.py
 recursive-include frontend *.html *.json *.md *.ts *.tsx

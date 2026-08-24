@@ -42,7 +42,7 @@ from nonlinear_core import (
 )
 
 ROOT = Path(__file__).resolve().parents[1]
-OUTPUT = ROOT / "examples" / "validation" / "math-core-audit.json"
+OUTPUT = ROOT / "tests" / "fixtures" / "validation" / "math-core-audit.json"
 
 
 def _load_verification_module(filename: str) -> ModuleType:
@@ -861,7 +861,7 @@ def build_audit() -> dict[str, Any]:
         "artifact_version": "1.0.0",
         "solver_version": __version__,
         "residual_convention": "r = f_ext - f_int; K_t * du = r",
-        "oracle": "2D-Nonlinear-Project_Math-Core-Guide/03_验证题目与答案",
+        "oracle": "tests/verification",
         "status": "passed" if not failed else "failed",
         "failed_cases": failed,
         "cases": cases,

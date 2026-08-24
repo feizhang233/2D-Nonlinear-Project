@@ -14,5 +14,10 @@ frontend/dist/
 tmp/
 frontend/.nonlinear-data/
 
-outputs/*
-!outputs/.gitkeep
+/博士面试准备/
+/output/
+/outputs/
+/docs/
+/examples/
+/2D-Nonlinear-Project_逐步开发计划.md
+/2D-Nonlinear-Project_Math-Core-Guide/

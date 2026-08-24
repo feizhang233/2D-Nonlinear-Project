@@ -10,10 +10,10 @@ import nonlinear_core
 from nonlinear_core import get_adapter, solve_adaptive_load_control, validate_model_json
 
 CASES = {
-    "frame": ("examples/p9/imperfect-column.json", 1.0),
-    "continuum": ("examples/p12/q4-plane-strain-tension.json", 0.25),
-    "plate": ("examples/p13/von-karman-mitc4-plate.json", 1.0),
-    "shell": ("examples/p14/corotational-flat-shell.json", 1.0),
+    "frame": ("tests/fixtures/p9/imperfect-column.json", 1.0),
+    "continuum": ("tests/fixtures/p12/q4-plane-strain-tension.json", 0.25),
+    "plate": ("tests/fixtures/p13/von-karman-mitc4-plate.json", 1.0),
+    "shell": ("tests/fixtures/p14/corotational-flat-shell.json", 1.0),
 }
 
 

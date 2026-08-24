@@ -28,7 +28,7 @@ from nonlinear_core import (
 )
 
 ROOT = Path(__file__).resolve().parents[2]
-FRAME = ROOT / "examples" / "adapters" / "frame-linear.json"
+FRAME = ROOT / "tests" / "fixtures" / "adapters" / "frame-linear.json"
 ACTIVE_DOF = 3
 
 

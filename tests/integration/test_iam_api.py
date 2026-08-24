@@ -12,7 +12,7 @@ from nonlinear_api import create_app
 from nonlinear_api.iam_store import MODEL_HISTORY_LIMIT, IdentityStore
 
 ROOT = Path(__file__).resolve().parents[2]
-MODEL_PATH = ROOT / "examples" / "p9" / "shallow-arch-snap-through.json"
+MODEL_PATH = ROOT / "tests" / "fixtures" / "p9" / "shallow-arch-snap-through.json"
 
 
 def _model() -> dict[str, object]:

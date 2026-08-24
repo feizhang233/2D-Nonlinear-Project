@@ -11,10 +11,10 @@ from urllib.error import URLError
 from urllib.request import Request, urlopen
 
 FAMILY_CASES = {
-    "frame": ("examples/p9/shallow-arch-snap-through.json", 0.1, 9),
-    "continuum": ("examples/p12/q4-plane-strain-tension.json", 1.0, 8),
-    "plate": ("examples/p13/von-karman-mitc4-plate.json", 1.0, 20),
-    "shell": ("examples/p14/corotational-flat-shell.json", 1.0, 24),
+    "frame": ("tests/fixtures/p9/shallow-arch-snap-through.json", 0.1, 9),
+    "continuum": ("tests/fixtures/p12/q4-plane-strain-tension.json", 1.0, 8),
+    "plate": ("tests/fixtures/p13/von-karman-mitc4-plate.json", 1.0, 20),
+    "shell": ("tests/fixtures/p14/corotational-flat-shell.json", 1.0, 24),
 }
 
 FAMILY_RECOVERY_KEYS = {

@@ -19,7 +19,7 @@ from nonlinear_core import (
 )
 
 ROOT = Path(__file__).resolve().parents[2]
-EXAMPLES = ROOT / "examples" / "adapters"
+EXAMPLES = ROOT / "tests" / "fixtures" / "adapters"
 REFERENCE = json.loads((EXAMPLES / "reference-results.json").read_text(encoding="utf-8"))
 
 CASES = (

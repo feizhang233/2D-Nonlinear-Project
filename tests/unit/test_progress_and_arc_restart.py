@@ -17,7 +17,7 @@ from nonlinear_core import (
 )
 
 ROOT = Path(__file__).resolve().parents[2]
-ARCH = ROOT / "examples" / "p9" / "shallow-arch-snap-through.json"
+ARCH = ROOT / "tests" / "fixtures" / "p9" / "shallow-arch-snap-through.json"
 
 
 def _model():

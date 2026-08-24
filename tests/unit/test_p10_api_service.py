@@ -20,7 +20,7 @@ from nonlinear_api.service import ApiProblem
 from nonlinear_core import get_adapter, solve_load_control
 
 ROOT = Path(__file__).resolve().parents[2]
-ARCH = ROOT / "examples" / "p9" / "shallow-arch-snap-through.json"
+ARCH = ROOT / "tests" / "fixtures" / "p9" / "shallow-arch-snap-through.json"
 
 
 def _document() -> dict[str, object]:

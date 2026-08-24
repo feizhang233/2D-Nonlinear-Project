@@ -8,7 +8,7 @@ import pytest
 
 from nonlinear_core import validate_model_input, validate_model_json
 
-CONTRACT_EXAMPLES = Path(__file__).resolve().parents[2] / "examples" / "contracts"
+CONTRACT_EXAMPLES = Path(__file__).resolve().parents[2] / "tests" / "fixtures" / "contracts"
 
 
 def load_contract_example(name: str) -> dict[str, object]:

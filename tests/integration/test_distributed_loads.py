@@ -70,7 +70,7 @@ def test_corotational_frame_uniform_member_load_uses_consistent_reference_vector
 
 
 def test_total_lagrangian_continuum_edge_line_load_preserves_resultant():
-    document = _document("examples/p12/q4-plane-strain-tension.json")
+    document = _document("tests/fixtures/p12/q4-plane-strain-tension.json")
     document["loads"] = [
         {
             "id": "Q",
@@ -92,8 +92,8 @@ def test_total_lagrangian_continuum_edge_line_load_preserves_resultant():
 @pytest.mark.parametrize(
     ("path", "family", "pressure"),
     (
-        ("examples/p13/von-karman-mitc4-plate.json", "plate", -100.0),
-        ("examples/p14/corotational-flat-shell.json", "shell", -2.0),
+        ("tests/fixtures/p13/von-karman-mitc4-plate.json", "plate", -100.0),
+        ("tests/fixtures/p14/corotational-flat-shell.json", "shell", -2.0),
     ),
 )
 def test_plate_and_shell_surface_loads_preserve_area_resultant(

@@ -16,9 +16,9 @@ ROOT = Path(__file__).resolve().parents[2]
 @pytest.mark.parametrize(
     "path",
     (
-        "examples/p12/q4-plane-strain-tension.json",
-        "examples/p13/von-karman-mitc4-plate.json",
-        "examples/p14/corotational-flat-shell.json",
+        "tests/fixtures/p12/q4-plane-strain-tension.json",
+        "tests/fixtures/p13/von-karman-mitc4-plate.json",
+        "tests/fixtures/p14/corotational-flat-shell.json",
     ),
 )
 def test_gmsh_endpoint_returns_q4_mesh_and_boundary_segment_ownership(path: str):

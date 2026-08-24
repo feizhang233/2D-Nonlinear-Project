@@ -4780,5 +4780,5 @@
     },
     "http_status": 201
   },
-  "source_input": "examples/p9/shallow-arch-snap-through.json"
+  "source_input": "tests/fixtures/p9/shallow-arch-snap-through.json"
 }

@@ -80,9 +80,11 @@ def check_release() -> dict[str, Any]:
     assert runtime_openapi["info"]["version"] == SCHEMA_VERSION
 
     evidence = [
-        _check_evidence(ROOT / "examples" / "p15" / "release-success.json", "succeeded"),
         _check_evidence(
-            ROOT / "examples" / "p15" / "release-expected-failure.json",
+            ROOT / "tests" / "fixtures" / "p15" / "release-success.json", "succeeded"
+        ),
+        _check_evidence(
+            ROOT / "tests" / "fixtures" / "p15" / "release-expected-failure.json",
             "failed",
         ),
     ]

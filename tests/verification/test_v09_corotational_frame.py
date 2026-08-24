@@ -28,7 +28,7 @@ from nonlinear_core import (
 )
 
 ROOT = Path(__file__).resolve().parents[2]
-P9 = ROOT / "examples" / "p9"
+P9 = ROOT / "tests" / "fixtures" / "p9"
 APEX_UY = 4
 
 

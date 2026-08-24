@@ -15,9 +15,9 @@ from nonlinear_api import create_app
 from nonlinear_core import SCHEMA_VERSION, __version__
 
 ROOT = Path(__file__).resolve().parents[1]
-OUTPUT_DIR = ROOT / "examples" / "p15"
-SUCCESS_SOURCE = ROOT / "examples" / "p9" / "imperfect-column.json"
-FAILURE_SOURCE = ROOT / "examples" / "p9" / "shallow-arch-snap-through.json"
+OUTPUT_DIR = ROOT / "tests" / "fixtures" / "p15"
+SUCCESS_SOURCE = ROOT / "tests" / "fixtures" / "p9" / "imperfect-column.json"
+FAILURE_SOURCE = ROOT / "tests" / "fixtures" / "p9" / "shallow-arch-snap-through.json"
 
 
 def _load(path: Path) -> dict[str, Any]:
