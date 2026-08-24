@@ -46,10 +46,75 @@ def _gmsh_runtime() -> Iterator[None]:
                 gmsh.finalize()
 
 
+def _loop_points(
+    vertex_lookup: dict[str, np.ndarray],
+    vertex_ids: list[str],
+) -> list[tuple[str, np.ndarray]]:
+    points = []
+    for vertex_id in vertex_ids:
+        coordinates = vertex_lookup.get(vertex_id)
+        if coordinates is None:
+            raise SurfaceMeshError(f"geometry vertex {vertex_id!r} is missing coordinates")
+        points.append((vertex_id, coordinates))
+    if len(points) < 3:
+        raise SurfaceMeshError("each geometry loop needs at least three vertices")
+    signed_area = sum(
+        float(
+            points[index][1][0] * points[(index + 1) % len(points)][1][1]
+            - points[(index + 1) % len(points)][1][0] * points[index][1][1]
+        )
+        for index in range(len(points))
+    )
+    if signed_area < 0.0:
+        points.reverse()
+    return points
+
+
+def _sketch_loops(document: object) -> list[list[tuple[str, np.ndarray]]] | None:
+    extensions = getattr(document, "extensions", {}) or {}
+    geometry = extensions.get("geometry") if isinstance(extensions, dict) else None
+    if not isinstance(geometry, dict):
+        return None
+    raw_vertices = geometry.get("vertices")
+    raw_loops = geometry.get("loops")
+    if not isinstance(raw_vertices, list) or not isinstance(raw_loops, list):
+        return None
+    vertex_lookup: dict[str, np.ndarray] = {}
+    for item in raw_vertices:
+        if not isinstance(item, dict) or not isinstance(item.get("id"), str):
+            continue
+        coordinates = item.get("coordinates")
+        if not isinstance(coordinates, list) or len(coordinates) < 2:
+            continue
+        vertex_lookup[item["id"]] = np.asarray([float(coordinates[0]), float(coordinates[1]), float(coordinates[2]) if len(coordinates) > 2 else 0.0], dtype=float)
+    if not vertex_lookup:
+        return None
+    outer: list[tuple[str, np.ndarray]] | None = None
+    holes: list[list[tuple[str, np.ndarray]]] = []
+    for item in raw_loops:
+        if not isinstance(item, dict):
+            continue
+        vertex_ids = item.get("vertex_ids") or item.get("vertexIds")
+        if not isinstance(vertex_ids, list):
+            continue
+        names = [str(vertex_id) for vertex_id in vertex_ids if str(vertex_id) in vertex_lookup]
+        loop = _loop_points(vertex_lookup, names)
+        if item.get("kind") == "hole":
+            holes.append(list(reversed(loop)))
+        else:
+            outer = loop
+    if outer is None:
+        return None
+    return [outer, *holes]
+
+
 def _surface_boundary(model: SurfaceMeshRequest) -> list[tuple[str, np.ndarray]]:
     document = model.model
     if document.model_family not in _SURFACE_FAMILIES:
         raise SurfaceMeshError("Gmsh surface meshing is available for Continuum, Plate, and Shell")
+    sketch = _sketch_loops(document)
+    if sketch is not None:
+        return sketch[0]
     if not document.elements:
         raise SurfaceMeshError(
             "surface meshing requires at least one Q4 element as a boundary source"
@@ -152,7 +217,9 @@ def _edge_distance(point: np.ndarray, start: np.ndarray, end: np.ndarray) -> tup
 def _generate_surface_mesh_serialized(request: SurfaceMeshRequest) -> SurfaceMeshResponse:
     """Generate one first-order all-Q4 mesh on the dedicated Gmsh thread."""
 
-    boundary = _surface_boundary(request)
+    sketch_loops = _sketch_loops(request.model)
+    boundary_loops = sketch_loops if sketch_loops is not None else [_surface_boundary(request)]
+    boundary = boundary_loops[0]
     template = request.model.elements[0]
     z_value = float(boundary[0][1][2]) if boundary[0][1].size > 2 else 0.0
 
@@ -165,19 +232,26 @@ def _generate_surface_mesh_serialized(request: SurfaceMeshRequest) -> SurfaceMes
         gmsh.option.setNumber("Mesh.Algorithm", 8)
         gmsh.option.setNumber("Mesh.RecombinationAlgorithm", 2)
 
-        point_tags = [
-            gmsh.model.geo.addPoint(float(point[0]), float(point[1]), z_value, request.mesh_size)
-            for _, point in boundary
-        ]
-        line_tags = [
-            gmsh.model.geo.addLine(point_tags[index], point_tags[(index + 1) % len(point_tags)])
-            for index in range(len(point_tags))
-        ]
-        loop_tag = gmsh.model.geo.addCurveLoop(line_tags)
-        surface_tag = gmsh.model.geo.addPlaneSurface([loop_tag])
+        curve_loop_tags: list[int] = []
+        outer_line_tags: list[int] = []
+        outer_point_tags: list[int] = []
+        for loop_index, loop in enumerate(boundary_loops):
+            point_tags = [
+                gmsh.model.geo.addPoint(float(point[0]), float(point[1]), z_value, request.mesh_size)
+                for _, point in loop
+            ]
+            line_tags = [
+                gmsh.model.geo.addLine(point_tags[index], point_tags[(index + 1) % len(point_tags)])
+                for index in range(len(point_tags))
+            ]
+            curve_loop_tags.append(gmsh.model.geo.addCurveLoop(line_tags))
+            if loop_index == 0:
+                outer_line_tags = line_tags
+                outer_point_tags = point_tags
+        surface_tag = gmsh.model.geo.addPlaneSurface(curve_loop_tags)
         gmsh.model.geo.synchronize()
 
-        if len(boundary) == 4:
+        if len(boundary_loops) == 1 and len(boundary) == 4:
             lengths = [
                 hypot(
                     float(boundary[(index + 1) % 4][1][0] - boundary[index][1][0]),
@@ -189,11 +263,23 @@ def _generate_surface_mesh_serialized(request: SurfaceMeshRequest) -> SurfaceMes
                 max(1, round((lengths[0] + lengths[2]) / (2.0 * request.mesh_size))),
                 max(1, round((lengths[1] + lengths[3]) / (2.0 * request.mesh_size))),
             ]
-            for index, line_tag in enumerate(line_tags):
+            for index, line_tag in enumerate(outer_line_tags):
                 gmsh.model.mesh.setTransfiniteCurve(line_tag, divisions[index % 2] + 1)
-            gmsh.model.mesh.setTransfiniteSurface(surface_tag, cornerTags=point_tags)
+            gmsh.model.mesh.setTransfiniteSurface(surface_tag, cornerTags=outer_point_tags)
         gmsh.model.mesh.setRecombine(2, surface_tag)
         gmsh.model.mesh.generate(2)
+        if len(boundary_loops) > 1:
+            gmsh.model.mesh.recombine()
+            element_types, _, _ = gmsh.model.mesh.getElements(2, surface_tag)
+            needs_subdivision = False
+            for element_type in element_types:
+                name, _, _, node_count, _, _ = gmsh.model.mesh.getElementProperties(element_type)
+                if node_count != 4 or not name.lower().startswith("quad"):
+                    needs_subdivision = True
+                    break
+            if needs_subdivision:
+                gmsh.option.setNumber("Mesh.SubdivisionAlgorithm", 1)
+                gmsh.model.mesh.refine()
 
         node_tags, coordinates, _ = gmsh.model.mesh.getNodes()
         if len(node_tags) > _MAX_MESH_NODES:
@@ -271,30 +357,30 @@ def _generate_surface_mesh_serialized(request: SurfaceMeshRequest) -> SurfaceMes
             element_by_edge[key] = (element.id, local_edge, pair)
 
     node_coordinates = {node.id: np.asarray(node.coordinates[:2], dtype=float) for node in nodes}
-    boundary_segments: list[list[tuple[float, MeshBoundarySegment]]] = [[] for _ in boundary]
+    mesh_edges: list[tuple[np.ndarray, np.ndarray]] = []
+    for loop in boundary_loops:
+        for index, item in enumerate(loop):
+            start = item[1][:2]
+            end = loop[(index + 1) % len(loop)][1][:2]
+            mesh_edges.append((start, end))
+    outer_edge_count = len(boundary_loops[0])
+    boundary_segments: list[list[tuple[float, MeshBoundarySegment]]] = [[] for _ in mesh_edges]
     for key, count in edge_counts.items():
         if count != 1:
             continue
         element_id, local_edge, pair = element_by_edge[key]
         midpoint = (node_coordinates[pair[0]] + node_coordinates[pair[1]]) / 2.0
-        distances = [
-            _edge_distance(
-                midpoint,
-                item[1][:2],
-                boundary[(index + 1) % len(boundary)][1][:2],
-            )
-            for index, item in enumerate(boundary)
-        ]
+        distances = [_edge_distance(midpoint, start, end) for start, end in mesh_edges]
         boundary_index = min(range(len(distances)), key=lambda index: distances[index][0])
         _, start_parameter = _edge_distance(
             node_coordinates[pair[0]],
-            boundary[boundary_index][1][:2],
-            boundary[(boundary_index + 1) % len(boundary)][1][:2],
+            mesh_edges[boundary_index][0],
+            mesh_edges[boundary_index][1],
         )
         _, end_parameter = _edge_distance(
             node_coordinates[pair[1]],
-            boundary[boundary_index][1][:2],
-            boundary[(boundary_index + 1) % len(boundary)][1][:2],
+            mesh_edges[boundary_index][0],
+            mesh_edges[boundary_index][1],
         )
         ordered_pair = pair if start_parameter <= end_parameter else (pair[1], pair[0])
         boundary_segments[boundary_index].append(
@@ -314,7 +400,9 @@ def _generate_surface_mesh_serialized(request: SurfaceMeshRequest) -> SurfaceMes
             item[1] for item in sorted(segments_with_parameter, key=lambda item: item[0])
         )
         if not segments:
-            raise SurfaceMeshError(f"Gmsh boundary {index + 1} has no Q4 edge segments")
+            if index < outer_edge_count:
+                raise SurfaceMeshError(f"Gmsh boundary {index + 1} has no Q4 edge segments")
+            continue
         ordered_node_ids = (segments[0].node_ids[0],) + tuple(
             segment.node_ids[1] for segment in segments
         )

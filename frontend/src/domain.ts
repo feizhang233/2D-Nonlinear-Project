@@ -238,7 +238,7 @@ export interface AnalysisRecord {
 }
 
 export type EntityKind = 'model' | 'nodes' | 'elements' | 'materials' | 'constraints' | 'loads'
-export type SelectionKind = EntityKind | 'mesh'
+export type SelectionKind = EntityKind | 'mesh' | 'geometry'
 export interface Selection { kind: SelectionKind; id?: string }
 export type ResultView = 'model' | 'deformation' | 'reactions' | 'internal'
 export type ResultTab = 'monitor' | 'curves' | 'tables' | 'failure'

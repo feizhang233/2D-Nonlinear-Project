@@ -22,7 +22,7 @@ interface WorkflowBarProps {
 }
 
 const STEP_COPY: Array<{ key: WorkflowStep; label: string; helper: string }> = [
-  { key: 'model', label: 'Model', helper: 'Family and geometry' },
+  { key: 'model', label: 'Model', helper: 'Family and CAD geometry' },
   { key: 'materials', label: 'Materials', helper: 'Constitutive data' },
   { key: 'supports', label: 'Supports', helper: 'Boundary conditions' },
   { key: 'loads', label: 'Loads', helper: 'Reference loading' },

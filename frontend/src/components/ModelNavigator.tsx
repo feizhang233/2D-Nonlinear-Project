@@ -23,9 +23,10 @@ import Typography from '@mui/material/Typography'
 import { useEffect, useMemo, useState, type MouseEvent } from 'react'
 import type { EntityKind, ModelInput, Selection } from '../domain'
 import { entityDisplayLabel, loadDisplayLabel, modelDisplayLabel, supportDisplayLabel } from '../entityLabels'
+import { editablePlacementNodes, firstFreePlacementNodeId, isGeneratedMesh } from '../geometrySketch'
 import { meshStatusForModel } from '../meshing'
 import { dofsForModel, MODEL_FAMILIES } from '../modelFamilies'
-import { groupedSupports, nextPrefixedId } from '../supports'
+import { addNodalLoadAtNode, addSupportAtNode, groupedSupports, nextPrefixedId } from '../supports'
 
 interface ModelNavigatorProps {
   model: ModelInput
@@ -59,6 +60,7 @@ export function ModelNavigator({ model, selection, onSelection, onModelChange, o
   const [openGroups, setOpenGroups] = useState<Record<string, boolean>>({})
   const supports = useMemo(() => groupedSupports(model, familyDofs), [model, familyDofs])
   const meshStatus = meshStatusForModel(model)
+  const hideMeshTopology = isGeneratedMesh(model)
   const meshDescription = model.model_family === 'frame'
     ? `Line topology · ${meshStatus.nodeCount} nodes · ${meshStatus.elementCount} elements`
     : `${meshStatus.sourceLabel} · ${meshStatus.nodeCount} nodes · ${meshStatus.elementCount} Q4`
@@ -91,22 +93,13 @@ export function ModelNavigator({ model, selection, onSelection, onModelChange, o
       next.materials.push({ id, model: family.defaultMaterial.model, parameters: structuredClone(family.defaultMaterial.parameters) })
       onModelChange(next, { kind, id })
     } else if (kind === 'constraints') {
-      const used = new Set(next.constraints.map((item) => item.node_id))
-      const node = next.nodes.find((item) => !used.has(item.id))
-      if (!node) return
-      for (const dof of familyDofs) {
-        next.constraints.push({ id: nextPrefixedId('C', next.constraints.map((item) => item.id)), node_id: node.id, dof, value: 0 })
-      }
-      onModelChange(next, { kind, id: node.id })
+      const nodeId = firstFreePlacementNodeId(next)
+      if (!nodeId) return
+      onModelChange(addSupportAtNode(next, nodeId, familyDofs), { kind, id: nodeId })
     } else if (kind === 'loads') {
-      const id = nextPrefixedId('P', next.loads.map((item) => item.id))
-      next.loads.push({
-        id,
-        kind: 'nodal',
-        node_id: next.nodes[0]?.id ?? '',
-        components: { [family.primaryLoadDof]: family.primaryLoadDof === 'UX' ? 1 : -1 },
-      })
-      onModelChange(next, { kind, id })
+      const nodeId = editablePlacementNodes(next)[0]?.id ?? next.nodes[0]?.id ?? ''
+      const added = addNodalLoadAtNode(next, nodeId, family.primaryLoadDof, family.primaryLoadDof === 'UX' ? 1 : -1)
+      onModelChange(added.model, { kind, id: added.id })
     }
     setOpenGroups((current) => ({ ...current, [kind]: true }))
   }
@@ -125,10 +118,11 @@ export function ModelNavigator({ model, selection, onSelection, onModelChange, o
 
   const groups = useMemo(() => definitions.map((definition) => {
     const ids = idsFor(model, definition.kind)
+    const hideIds = hideMeshTopology && (definition.kind === 'nodes' || definition.kind === 'elements')
     return {
       ...definition,
       ids,
-      visibleIds: ids,
+      visibleIds: hideIds ? [] : ids,
       supportGroups: definition.kind === 'constraints' ? supports.groups : [],
     }
   }), [model, supports.groups])
@@ -142,9 +136,11 @@ export function ModelNavigator({ model, selection, onSelection, onModelChange, o
     const active = selection.kind === kind
     const open = kind in openGroups ? Boolean(openGroups[kind]) : active
     const count = kind === 'constraints' ? supports.nodeCount : ids.length
-    const addDisabled = (kind === 'elements' && model.nodes.length < family.elementNodeCount)
-      || (kind === 'constraints' && (model.nodes.length === 0 || supports.nodeCount >= model.nodes.length))
-      || (kind === 'loads' && !model.nodes.length)
+    const placementCount = editablePlacementNodes(model).length
+    const addDisabled = (kind === 'nodes' && hideMeshTopology)
+      || (kind === 'elements' && (hideMeshTopology || model.nodes.length < family.elementNodeCount))
+      || (kind === 'constraints' && (placementCount === 0 || !firstFreePlacementNodeId(model)))
+      || (kind === 'loads' && placementCount === 0)
 
     return (
       <Box key={kind} sx={{ mt: 0.5 }}>
@@ -226,7 +222,9 @@ export function ModelNavigator({ model, selection, onSelection, onModelChange, o
             ))
           ) : visibleIds.length === 0 ? (
             <Typography variant="caption" color="text.secondary" sx={{ display: 'block', pl: 6, py: 0.75 }}>
-              No {label.toLowerCase()} yet
+              {hideMeshTopology && (kind === 'nodes' || kind === 'elements')
+                ? `Mesh ${label.toLowerCase()} are hidden. Edit contour vertices in Geometry.`
+                : `No ${label.toLowerCase()} yet`}
             </Typography>
           ) : visibleIds.map((id) => (
             <ListItemButton

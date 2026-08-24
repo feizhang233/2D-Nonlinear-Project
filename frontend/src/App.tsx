@@ -38,6 +38,7 @@ import { useCallback, useEffect, useReducer, useRef, useState, type ChangeEvent,
 import { cancelAnalysis, generateSurfaceMesh, getAnalysis, runAnalysis, StudioApiError, validateModel } from './api'
 import { AnalysisPanel } from './components/AnalysisPanel'
 import { AuthDialog, type AuthDialogMode } from './components/AuthDialog'
+import { GeometryPanel } from './components/GeometryPanel'
 import { GettingStartedDialog } from './components/GettingStartedDialog'
 import { ModelCanvas } from './components/ModelCanvas'
 import { ModelNavigator } from './components/ModelNavigator'
@@ -47,12 +48,14 @@ import { ResultsDock } from './components/ResultsDock'
 import { WorkflowBar, type WorkflowStep } from './components/WorkflowBar'
 import type { AnalysisRecord, AnalysisRestart, ModelFamily, ModelInput, RestartBundle, RunOptions, Selection } from './domain'
 import { modelDisplayLabel } from './entityLabels'
+import { CadTool, geometryNeedsMesh, PlacementState } from './geometrySketch'
 import { useIdentity } from './hooks/useIdentity'
 import { useModelHistory } from './hooks/useModelHistory'
 import { defaultRunOptions, dofsForModel, MODEL_FAMILIES, MODEL_FAMILY_ORDER } from './modelFamilies'
 import { applySurfaceMesh, meshSizeForModel } from './meshing'
 import { cloneSampleModel } from './sampleModel'
 import { initialStudioState, studioReducer } from './state'
+import { addNodalLoadAtNode, addSupportAtNode, moveSupportToNode } from './supports'
 
 interface Toast { message: string; severity: 'success' | 'info' | 'warning' | 'error' }
 
@@ -111,6 +114,9 @@ export default function App() {
   const [authMode, setAuthMode] = useState<AuthDialogMode>('login')
   const [authReason, setAuthReason] = useState<'save' | 'history' | null>(null)
   const [historyOpen, setHistoryOpen] = useState(false)
+  const [cadTool, setCadTool] = useState<CadTool>('select')
+  const [placement, setPlacement] = useState<PlacementState>(null)
+  const [pendingMember, setPendingMember] = useState<string | null>(null)
   const pendingAuthActionRef = useRef<'save' | 'history' | null>(null)
   const abortRef = useRef<AbortController | null>(null)
   const meshAbortRef = useRef<AbortController | null>(null)
@@ -208,11 +214,45 @@ export default function App() {
   }, [state.model.model_family])
 
   const loadFamilySample = (family: ModelFamily) => {
+    setCadTool('select')
+    setPlacement(null)
+    setPendingMember(null)
     changeModel(cloneSampleModel(family), { kind: 'model' }, null, defaultRunOptions(family))
     setToast({ severity: 'info', message: `${MODEL_FAMILIES[family].label} verification example loaded` })
   }
 
+  const handlePlace = (nodeId: string) => {
+    if (!placement || !nodeId) return
+    if (placement.kind === 'support') {
+      if (placement.targetId) {
+        changeModel(moveSupportToNode(state.model, placement.targetId, nodeId), { kind: 'constraints', id: nodeId })
+      } else if (state.model.constraints.some((item) => item.node_id === nodeId)) {
+        changeModel(state.model, { kind: 'constraints', id: nodeId })
+      } else {
+        changeModel(addSupportAtNode(state.model, nodeId, dofsForModel(state.model)), { kind: 'constraints', id: nodeId })
+      }
+    } else if (placement.targetId) {
+      const next = structuredClone(state.model)
+      const load = next.loads.find((item) => item.id === placement.targetId)
+      if (load) {
+        load.kind = 'nodal'
+        load.node_id = nodeId
+      }
+      changeModel(next, { kind: 'loads', id: placement.targetId })
+    } else {
+      const info = MODEL_FAMILIES[state.model.model_family]
+      const added = addNodalLoadAtNode(state.model, nodeId, info.primaryLoadDof, info.primaryLoadDof === 'UX' ? 1 : -1)
+      changeModel(added.model, { kind: 'loads', id: added.id })
+    }
+    setPlacement(null)
+  }
+
   const handleRun = useCallback(async () => {
+    if (geometryNeedsMesh(state.model)) {
+      setToast({ severity: 'warning', message: 'Geometry changed. Generate a new mesh before solving.' })
+      dispatch({ type: 'selectionChanged', selection: { kind: 'mesh' } })
+      return
+    }
     if (analysisIdRef.current) void cancelAnalysis(analysisIdRef.current).catch(() => undefined)
     analysisIdRef.current = null
     abortRef.current?.abort()
@@ -269,6 +309,12 @@ export default function App() {
 
   useEffect(() => {
     const onKeyDown = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') {
+        setPlacement(null)
+        setCadTool('select')
+        setPendingMember(null)
+        return
+      }
       if (!(event.metaKey || event.ctrlKey) || event.key !== 'Enter') return
       event.preventDefault()
       if (state.analysisState === 'running') handleCancel()
@@ -526,13 +572,27 @@ export default function App() {
           }}
         >
           <Box sx={{ width: 260, minWidth: 260, overflow: 'hidden', display: 'flex', flexDirection: 'column', borderRight: '1px solid', borderColor: 'divider' }}>
-            <ModelNavigator
+            <GeometryPanel
               model={state.model}
               selection={state.selection}
+              cadTool={cadTool}
+              onCadToolChange={(tool) => {
+                setCadTool(tool)
+                setPlacement(null)
+                setPendingMember(null)
+              }}
               onSelection={(selection) => dispatch({ type: 'selectionChanged', selection })}
               onModelChange={changeModel}
-              onEntityDoubleClick={() => setPropertiesCollapsed(true)}
             />
+            <Box sx={{ flex: 1, minHeight: 0, overflow: 'hidden' }}>
+              <ModelNavigator
+                model={state.model}
+                selection={state.selection}
+                onSelection={(selection) => dispatch({ type: 'selectionChanged', selection })}
+                onModelChange={changeModel}
+                onEntityDoubleClick={() => setPropertiesCollapsed(true)}
+              />
+            </Box>
           </Box>
 
           {propertiesCollapsed ? (
@@ -587,6 +647,13 @@ export default function App() {
                       onGenerateMesh={handleGenerateMesh}
                       meshing={meshing}
                       meshDisabled={state.analysisState === 'running'}
+                      placement={placement}
+                      onStartPlacement={(next) => {
+                        setPlacement(next)
+                        setCadTool('select')
+                        setPendingMember(null)
+                      }}
+                      onCancelPlacement={() => setPlacement(null)}
                     />
                   : <AnalysisPanel model={state.model} runOptions={state.runOptions} onModelChange={changeModel} onRunOptionsChange={(options) => dispatch({ type: 'runOptionsChanged', options })} />}
               </Box>
@@ -607,6 +674,9 @@ export default function App() {
               selectedStep={state.selectedStep}
               view={state.resultView}
               selection={state.selection}
+              cadTool={cadTool}
+              placement={placement}
+              pendingMember={pendingMember}
               onViewChange={(view) => {
                 dispatch({ type: 'resultViewChanged', view })
                 if ((view === 'reactions' || view === 'internal') && state.record?.result?.steps.length) {
@@ -614,6 +684,9 @@ export default function App() {
                 }
               }}
               onSelection={(selection) => dispatch({ type: 'selectionChanged', selection })}
+              onModelChange={changeModel}
+              onPlace={handlePlace}
+              onPendingMember={setPendingMember}
             />
           </Box>
           <ResultsDock
@@ -635,9 +708,11 @@ export default function App() {
       </Snackbar>
       <GettingStartedDialog
         open={guideOpen}
+        currentFamily={state.model.model_family}
         onClose={() => setGuideOpen(false)}
         onDoNotShowAgain={hideGuide}
         onOpenStep={openWorkflowStep}
+        onChooseFamily={loadFamilySample}
       />
       <AuthDialog
         open={authOpen}

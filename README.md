@@ -6,6 +6,8 @@
 
 React workbench · FastAPI · Python nonlinear FE core · Gmsh surface meshing
 
+### [🚀 Try Nonlinear Studio Online →](https://nonlinear.feizhang233.com)
+
 </div>
 
 ---

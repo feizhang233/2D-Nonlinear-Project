@@ -9,9 +9,23 @@ import ToggleButton from '@mui/material/ToggleButton'
 import ToggleButtonGroup from '@mui/material/ToggleButtonGroup'
 import Tooltip from '@mui/material/Tooltip'
 import Typography from '@mui/material/Typography'
-import { useMemo, useState, type KeyboardEvent, type MouseEvent } from 'react'
+import { useMemo, useRef, useState, type KeyboardEvent, type MouseEvent, type PointerEvent as ReactPointerEvent } from 'react'
 import type { Dof, JsonValue, LoadInput, ModelInput, ResultView, Selection, SolveResult } from '../domain'
 import { elementDisplayLabel, loadDisplayLabel, nodeDisplayLabel } from '../entityLabels'
+import {
+  addFrameMember,
+  addFrameNode,
+  addOuterVertexAt,
+  addRectangularHole,
+  CadTool,
+  getSketch,
+  isGeneratedMesh,
+  isSurfaceFamily,
+  moveFrameNode,
+  moveSketchVertex,
+  nodeForSketchVertex,
+  PlacementState,
+} from '../geometrySketch'
 import { meshBoundaries, meshStatusForModel } from '../meshing'
 import { dofsForModel, MODEL_FAMILIES } from '../modelFamilies'
 import {
@@ -25,8 +39,14 @@ interface ModelCanvasProps {
   selectedStep: number
   view: ResultView
   selection: Selection
+  cadTool: CadTool
+  placement: PlacementState
+  pendingMember: string | null
   onViewChange: (view: ResultView) => void
   onSelection: (selection: Selection) => void
+  onModelChange: (model: ModelInput, selection?: Selection) => void
+  onPlace: (nodeId: string) => void
+  onPendingMember: (nodeId: string | null) => void
 }
 
 const WIDTH = 1000
@@ -43,13 +63,22 @@ const activateOnKeyboard = (event: KeyboardEvent<SVGGElement | SVGCircleElement>
   }
 }
 
-export function ModelCanvas({ model, result, selectedStep, view, selection, onViewChange, onSelection }: ModelCanvasProps) {
+export function ModelCanvas({
+  model, result, selectedStep, view, selection, cadTool, placement, pendingMember,
+  onViewChange, onSelection, onModelChange, onPlace, onPendingMember,
+}: ModelCanvasProps) {
   const [showGrid, setShowGrid] = useState(true)
+  const dragRef = useRef<{ id: string; kind: 'sketch' | 'frame'; moved: boolean } | null>(null)
+  const skipClickRef = useRef(false)
   const family = MODEL_FAMILIES[model.model_family]
   const dofs = dofsForModel(model)
   const isSurface = family.elementNodeCount === 4
   const meshStatus = meshStatusForModel(model)
+  const hideMeshNodes = isGeneratedMesh(model)
+  const hideFeNodes = isSurfaceFamily(model)
+  const sketch = getSketch(model)
   const denseSurfaceMesh = isSurface && (model.nodes.length > 80 || model.elements.length > 80)
+  const editingCad = cadTool !== 'select' || Boolean(placement)
   const hasOutOfPlane = dofs.includes('UZ')
   const step = result?.steps[selectedStep]
   const displacements = useMemo(() => displacementByNode(model, result, step), [model, result, step])
@@ -57,8 +86,16 @@ export function ModelCanvas({ model, result, selectedStep, view, selection, onVi
   const resultElements = useMemo(() => elementRecords(result), [result])
   const maxDisplacement = Math.max(0, ...Array.from(displacements.values()).map((value) =>
     Math.hypot(Number(value.UX ?? 0), Number(value.UY ?? 0), Number(value.UZ ?? 0))))
-  const xs = model.nodes.map((node) => node.coordinates[0] ?? 0)
-  const ys = model.nodes.map((node) => node.coordinates[1] ?? 0)
+  const xs = [
+    ...model.nodes.map((node) => node.coordinates[0] ?? 0),
+    ...sketch.vertices.map((vertex) => vertex.coordinates[0] ?? 0),
+  ]
+  const ys = [
+    ...model.nodes.map((node) => node.coordinates[1] ?? 0),
+    ...sketch.vertices.map((vertex) => vertex.coordinates[1] ?? 0),
+  ]
+  if (!xs.length) xs.push(0, 1)
+  if (!ys.length) ys.push(0, 1)
   const modelSpan = Math.max(1e-9, Math.max(...xs) - Math.min(...xs), Math.max(...ys) - Math.min(...ys))
   const deformationScale = maxDisplacement > 0 ? Math.min(25, Math.max(1, modelSpan * 0.15 / maxDisplacement)) : 1
   const shouldDeform = view === 'deformation' && result !== null
@@ -83,6 +120,17 @@ export function ModelCanvas({ model, result, selectedStep, view, selection, onVi
     x: WIDTH / 2 + (point.x - (minX + maxX) / 2) * scale,
     y: HEIGHT / 2 - (point.y - (minY + maxY) / 2) * scale,
   })
+  const unproject = (screenX: number, screenY: number) => ({
+    x: (minX + maxX) / 2 + (screenX - WIDTH / 2) / scale,
+    y: (minY + maxY) / 2 - (screenY - HEIGHT / 2) / scale,
+  })
+  const svgPoint = (event: { currentTarget: Element; clientX: number; clientY: number }) => {
+    const rect = event.currentTarget.getBoundingClientRect()
+    return {
+      x: ((event.clientX - rect.left) / Math.max(rect.width, 1)) * WIDTH,
+      y: ((event.clientY - rect.top) / Math.max(rect.height, 1)) * HEIGHT,
+    }
+  }
   const nodeScreen = new Map(Array.from(positions, ([id, point]) => [id, project(point)]))
   const referenceScreen = new Map(model.nodes.map((node) => [node.id, project({ x: node.coordinates[0] ?? 0, y: node.coordinates[1] ?? 0 })]))
   const constrainedNodes = new Set(model.constraints.map((constraint) => constraint.node_id))
@@ -115,6 +163,16 @@ export function ModelCanvas({ model, result, selectedStep, view, selection, onVi
     const uy = Number(load.components.UY ?? 0)
     const uz = Number(load.components.UZ ?? 0)
     return { dx: ux + 0.7 * uz, dy: -uy - 0.7 * uz }
+  }
+
+  const loadGlyph = (load: LoadInput) => {
+    const loadDof = dofs.find((dof) => Math.abs(load.components[dof] ?? 0) > 0)
+    const loadValue = loadDof ? load.components[loadDof] ?? 0 : 0
+    const sign = Math.sign(loadValue || 1)
+    const loadVector = loadDof === 'UX' ? { dx: 54 * sign, dy: 0 }
+      : loadDof === 'UY' ? { dx: 0, dy: -54 * sign }
+        : { dx: 38 * sign, dy: -38 * sign }
+    return { loadDof, loadVector }
   }
 
   const distributedGlyphs: Array<{
@@ -190,9 +248,86 @@ export function ModelCanvas({ model, result, selectedStep, view, selection, onVi
     }
   })
 
+  const worldFromEvent = (event: { currentTarget: Element; clientX: number; clientY: number }) => {
+    const screen = svgPoint(event)
+    return unproject(screen.x, screen.y)
+  }
+
   const selectElement = (event: MouseEvent<SVGGElement>, id: string) => {
     event.stopPropagation()
+    if (editingCad) return
     onSelection({ kind: 'elements', id })
+  }
+
+  const handleCanvasPointerMove = (event: ReactPointerEvent<SVGSVGElement>) => {
+    if (!dragRef.current) return
+    dragRef.current.moved = true
+    const world = worldFromEvent(event)
+    if (dragRef.current.kind === 'sketch') {
+      onModelChange(moveSketchVertex(model, dragRef.current.id, [world.x, world.y]))
+    } else {
+      onModelChange(moveFrameNode(model, dragRef.current.id, [world.x, world.y]))
+    }
+  }
+
+  const handleCanvasPointerUp = () => {
+    if (dragRef.current?.moved) skipClickRef.current = true
+    dragRef.current = null
+  }
+
+  const handleCanvasClick = (event: MouseEvent<SVGSVGElement>) => {
+    if (skipClickRef.current) {
+      skipClickRef.current = false
+      return
+    }
+    const world = worldFromEvent(event)
+    if (cadTool === 'add-vertex' && isSurfaceFamily(model)) {
+      const next = addOuterVertexAt(model, [world.x, world.y])
+      const added = getSketch(next).vertices.at(-1)
+      onModelChange(next, added ? { kind: 'geometry', id: added.id } : { kind: 'model' })
+      return
+    }
+    if (cadTool === 'add-hole' && isSurfaceFamily(model)) {
+      onModelChange(addRectangularHole(model, [world.x, world.y], Math.min(spanX, spanY) * 0.22))
+      return
+    }
+    if (cadTool === 'add-node' && !isSurfaceFamily(model)) {
+      const added = addFrameNode(model, [world.x, world.y])
+      onModelChange(added.model, { kind: 'nodes', id: added.nodeId })
+      return
+    }
+    if (cadTool === 'add-member') {
+      onPendingMember(null)
+      return
+    }
+    if (!placement) onSelection({ kind: 'model' })
+  }
+
+  const placeNode = (nodeId: string | undefined) => {
+    if (nodeId) onPlace(nodeId)
+  }
+
+  const canvasCursor = placement ? 'copy'
+    : cadTool === 'add-vertex' || cadTool === 'add-hole' || cadTool === 'add-node' ? 'crosshair'
+      : cadTool === 'add-member' ? 'cell'
+        : 'default'
+
+  const renderSupportAndLoad = (point: { x: number; y: number }, nodeId: string) => {
+    const load = loadedNodes.get(nodeId)
+    const glyph = load ? loadGlyph(load) : null
+    return (
+      <>
+        {constrainedNodes.has(nodeId) && (
+          <path d={`M ${point.x - 13} ${point.y + 21} L ${point.x + 13} ${point.y + 21} L ${point.x} ${point.y + 4} Z`} fill="#8c96a8" stroke="#596477" strokeWidth="1.5" />
+        )}
+        {load && glyph?.loadDof && view !== 'reactions' && (
+          <g>
+            <line x1={point.x} y1={point.y} x2={point.x + glyph.loadVector.dx} y2={point.y + glyph.loadVector.dy} stroke="#d64e66" strokeWidth="2.5" markerEnd="url(#load-arrow)" />
+            <text x={point.x + glyph.loadVector.dx + 7} y={point.y + glyph.loadVector.dy - 6} fill="#a42d43" fontSize="10">{loadDisplayLabel(model, load.id)} · {glyph.loadDof}</text>
+          </g>
+        )}
+      </>
+    )
   }
 
   return (
@@ -252,7 +387,33 @@ export function ModelCanvas({ model, result, selectedStep, view, selection, onVi
           </Tooltip>
         </Paper>
       </Stack>
-      <svg viewBox={`0 0 ${WIDTH} ${HEIGHT}`} role="img" aria-label={`${family.label} 2D engineering projection`} style={{ width: '100%', height: '100%', minHeight: 360, display: 'block' }} onClick={() => onSelection({ kind: 'model' })}>
+      {placement && (
+        <Paper elevation={3} sx={{ position: 'absolute', zIndex: 3, top: 68, left: '50%', transform: 'translateX(-50%)', px: 2, py: 1, borderRadius: 5 }}>
+          <Typography variant="body2">
+            Click a {isSurfaceFamily(model) ? 'geometry vertex' : 'node'} to {placement.targetId ? 'move' : 'place'} this {placement.kind}. Esc cancels.
+          </Typography>
+        </Paper>
+      )}
+      {cadTool !== 'select' && !placement && (
+        <Paper elevation={2} sx={{ position: 'absolute', zIndex: 3, top: 68, left: '50%', transform: 'translateX(-50%)', px: 2, py: 1, borderRadius: 5 }}>
+          <Typography variant="body2">
+            {cadTool === 'add-vertex' && 'Click the contour to insert a vertex.'}
+            {cadTool === 'add-hole' && 'Click inside the contour to add a rectangular hole.'}
+            {cadTool === 'add-node' && 'Click in empty space to add a frame node.'}
+            {cadTool === 'add-member' && (pendingMember ? 'Click the second node to create the member.' : 'Click the first node of the new member.')}
+          </Typography>
+        </Paper>
+      )}
+      <svg
+        viewBox={`0 0 ${WIDTH} ${HEIGHT}`}
+        role="img"
+        aria-label={`${family.label} 2D engineering projection`}
+        style={{ width: '100%', height: '100%', minHeight: 360, display: 'block', cursor: canvasCursor }}
+        onClick={handleCanvasClick}
+        onPointerMove={handleCanvasPointerMove}
+        onPointerUp={handleCanvasPointerUp}
+        onPointerLeave={() => { dragRef.current = null }}
+      >
         <defs>
           <pattern id="minor-grid" width="25" height="25" patternUnits="userSpaceOnUse"><path d="M 25 0 L 0 0 0 25" fill="none" stroke="#e9edf5" strokeWidth="0.7" /></pattern>
           <pattern id="major-grid" width="100" height="100" patternUnits="userSpaceOnUse"><rect width="100" height="100" fill="url(#minor-grid)" /><path d="M 100 0 L 0 0 0 100" fill="none" stroke="#dce3ef" strokeWidth="1" /></pattern>
@@ -281,18 +442,27 @@ export function ModelCanvas({ model, result, selectedStep, view, selection, onVi
           const center = points.reduce((sum, point) => ({ x: sum.x + point.x / points.length, y: sum.y + point.y / points.length }), { x: 0, y: 0 })
           const action = () => onSelection({ kind: 'elements', id: element.id })
           const elementLabel = elementDisplayLabel(model, element.id)
+          const showLabel = selected || (!hideMeshNodes && !denseSurfaceMesh)
           return (
-            <g key={element.id} role="button" tabIndex={0} aria-label={`Select ${elementLabel}`} onKeyDown={(event) => activateOnKeyboard(event, action)} onClick={(event) => selectElement(event, element.id)} style={{ cursor: 'pointer', outline: 'none' }}>
+            <g
+              key={element.id}
+              role="button"
+              tabIndex={editingCad ? -1 : 0}
+              aria-label={`Select ${elementLabel}`}
+              onKeyDown={(event) => activateOnKeyboard(event, action)}
+              onClick={(event) => selectElement(event, element.id)}
+              style={{ cursor: editingCad ? canvasCursor : 'pointer', outline: 'none', pointerEvents: editingCad ? 'none' : 'auto' }}
+            >
               {isSurface ? (
-                <polygon points={points.map((point) => `${point.x},${point.y}`).join(' ')} fill={selected ? 'rgba(69,99,181,.18)' : `rgba(69,99,181,${view === 'internal' ? 0.12 + forceLevel * 0.22 : 0.08})`} stroke={selected ? '#4563b5' : color} strokeWidth={selected ? 5 : denseSurfaceMesh ? 1.4 : 3.2} strokeLinejoin="round" />
+                <polygon points={points.map((point) => `${point.x},${point.y}`).join(' ')} fill={selected ? 'rgba(69,99,181,.18)' : `rgba(69,99,181,${view === 'internal' ? 0.12 + forceLevel * 0.22 : 0.08})`} stroke={selected ? '#4563b5' : color} strokeWidth={selected ? 5 : denseSurfaceMesh || hideMeshNodes ? 1.4 : 3.2} strokeLinejoin="round" />
               ) : (
                 <>
                   <line x1={points[0].x} y1={points[0].y} x2={points[1].x} y2={points[1].y} stroke="transparent" strokeWidth="18" />
                   <line x1={points[0].x} y1={points[0].y} x2={points[1].x} y2={points[1].y} stroke={selected ? '#4563b5' : color} strokeWidth={selected ? 5 : 3.2} strokeLinecap="round" />
                 </>
               )}
-              {(!denseSurfaceMesh || selected) && <text x={center.x} y={center.y - 10} textAnchor="middle" fill="#394154" fontSize="12" fontWeight="600">{elementLabel}</text>}
-              {view === 'internal' && record && (!denseSurfaceMesh || selected) && <text x={center.x} y={center.y + 16} textAnchor="middle" fill="#9a5a00" fontSize="10">{elementInternalLabel(model.model_family, record)}</text>}
+              {showLabel && <text x={center.x} y={center.y - 10} textAnchor="middle" fill="#394154" fontSize="12" fontWeight="600">{elementLabel}</text>}
+              {view === 'internal' && record && (selected || !denseSurfaceMesh) && <text x={center.x} y={center.y + 16} textAnchor="middle" fill="#9a5a00" fontSize="10">{elementInternalLabel(model.model_family, record)}</text>}
             </g>
           )
         })}
@@ -312,31 +482,119 @@ export function ModelCanvas({ model, result, selectedStep, view, selection, onVi
           </g>
         ))}
 
-        {model.nodes.map((node) => {
+        {!hideFeNodes && model.nodes.map((node) => {
           const point = nodeScreen.get(node.id); if (!point) return null
           const selected = selection.kind === 'nodes' && selection.id === node.id
-          const load = loadedNodes.get(node.id)
-          const loadDof = load ? dofs.find((dof) => Math.abs(load.components[dof] ?? 0) > 0) : undefined
-          const loadValue = loadDof && load ? load.components[loadDof] ?? 0 : 0
-          const sign = Math.sign(loadValue || 1)
-          const loadVector = loadDof === 'UX' ? { dx: 54 * sign, dy: 0 }
-            : loadDof === 'UY' ? { dx: 0, dy: -54 * sign }
-              : { dx: 38 * sign, dy: -38 * sign }
-          const selectNode = () => onSelection({ kind: 'nodes', id: node.id })
+          const selectNode = () => {
+            if (placement) { placeNode(node.id); return }
+            if (cadTool === 'add-member') {
+              if (!pendingMember) onPendingMember(node.id)
+              else {
+                onModelChange(addFrameMember(model, pendingMember, node.id), { kind: 'elements' })
+                onPendingMember(null)
+              }
+              return
+            }
+            onSelection({ kind: 'nodes', id: node.id })
+          }
           const nodeLabel = nodeDisplayLabel(model, node.id)
           return (
             <g key={node.id}>
-              {constrainedNodes.has(node.id) && <path d={`M ${point.x - 13} ${point.y + 21} L ${point.x + 13} ${point.y + 21} L ${point.x} ${point.y + 4} Z`} fill="#8c96a8" stroke="#596477" strokeWidth="1.5" />}
-              {load && loadDof && view !== 'reactions' && <g><line x1={point.x} y1={point.y} x2={point.x + loadVector.dx} y2={point.y + loadVector.dy} stroke="#d64e66" strokeWidth="2.5" markerEnd="url(#load-arrow)" /><text x={point.x + loadVector.dx + 7} y={point.y + loadVector.dy - 6} fill="#a42d43" fontSize="10">{loadDisplayLabel(model, load.id)} · {loadDof}</text></g>}
-              <circle cx={point.x} cy={point.y} r={selected ? 8 : denseSurfaceMesh ? 2.75 : 6} fill={selected ? '#ffffff' : '#eaf0ff'} stroke="#4563b5" strokeWidth={selected ? 3 : denseSurfaceMesh ? 1 : 3} role="button" tabIndex={0} aria-label={`Select ${nodeLabel}`} onKeyDown={(event) => activateOnKeyboard(event, selectNode)} onClick={(event) => { event.stopPropagation(); selectNode() }} style={{ cursor: 'pointer', outline: 'none' }} />
-              {(!denseSurfaceMesh || selected || load || constrainedNodes.has(node.id)) && <text x={point.x + 10} y={point.y - 8} fill="#394154" fontSize="11" fontWeight="600">{nodeLabel}</text>}
+              {renderSupportAndLoad(point, node.id)}
+              <circle
+                cx={point.x}
+                cy={point.y}
+                r={selected || pendingMember === node.id ? 8 : 6}
+                fill={selected ? '#ffffff' : '#eaf0ff'}
+                stroke="#4563b5"
+                strokeWidth={3}
+                role="button"
+                tabIndex={0}
+                aria-label={`Select ${nodeLabel}`}
+                onKeyDown={(event) => activateOnKeyboard(event, selectNode)}
+                onPointerDown={(event) => {
+                  event.stopPropagation()
+                  if (cadTool === 'select' && !placement) {
+                    dragRef.current = { id: node.id, kind: 'frame', moved: false }
+                  }
+                }}
+                onClick={(event) => { event.stopPropagation(); selectNode() }}
+                style={{ cursor: placement ? 'copy' : 'pointer', outline: 'none' }}
+              />
+              <text x={point.x + 10} y={point.y - 8} fill="#394154" fontSize="11" fontWeight="600">{nodeLabel}</text>
+            </g>
+          )
+        })}
+
+        {isSurfaceFamily(model) && sketch.loops.map((loop) => {
+          const points = loop.vertexIds.map((id) => {
+            const vertex = sketch.vertices.find((item) => item.id === id)
+            return vertex ? project({ x: vertex.coordinates[0], y: vertex.coordinates[1] }) : null
+          }).filter(Boolean) as Array<{ x: number; y: number }>
+          if (points.length < 2) return null
+          return (
+            <polygon
+              key={loop.id}
+              points={points.map((point) => `${point.x},${point.y}`).join(' ')}
+              fill={loop.kind === 'hole' ? '#fbfcff' : hideMeshNodes ? 'rgba(69,99,181,.06)' : 'none'}
+              stroke={loop.kind === 'hole' ? '#b76a00' : '#1f3b73'}
+              strokeWidth={loop.kind === 'hole' ? 2 : 2.8}
+              strokeDasharray={loop.kind === 'hole' ? '7 5' : undefined}
+              pointerEvents="none"
+            />
+          )
+        })}
+
+        {isSurfaceFamily(model) && sketch.vertices.map((vertex, index) => {
+          const point = project({ x: vertex.coordinates[0], y: vertex.coordinates[1] })
+          const selected = selection.kind === 'geometry' && selection.id === vertex.id
+          const node = nodeForSketchVertex(model, vertex)
+          return (
+            <g key={vertex.id}>
+              {node && renderSupportAndLoad(point, node.id)}
+              <circle
+                cx={point.x}
+                cy={point.y}
+                r={selected ? 8 : 6.5}
+                fill={selected ? '#fff4d6' : '#ffffff'}
+                stroke={selected ? '#b76a00' : '#1f3b73'}
+                strokeWidth={2.4}
+                role="button"
+                tabIndex={0}
+                aria-label={`Geometry vertex ${index + 1}`}
+                style={{ cursor: placement ? 'copy' : 'grab', outline: 'none' }}
+                onPointerDown={(event) => {
+                  event.stopPropagation()
+                  if (placement) return
+                  dragRef.current = { id: vertex.id, kind: 'sketch', moved: false }
+                }}
+                onClick={(event) => {
+                  event.stopPropagation()
+                  if (placement) {
+                    placeNode(node?.id)
+                    return
+                  }
+                  onSelection({ kind: 'geometry', id: vertex.id })
+                }}
+              />
+              <text x={point.x + 10} y={point.y - 9} fill="#1f3b73" fontSize="11" fontWeight="700">V{index + 1}</text>
             </g>
           )
         })}
 
         {view === 'reactions' && model.nodes.map((node) => {
           if (!constrainedNodes.has(node.id)) return null
-          const point = nodeScreen.get(node.id); const reaction = reactions.get(node.id)
+          if (hideMeshNodes) {
+            const onGeometry = sketch.vertices.some((vertex) => nodeForSketchVertex(model, vertex)?.id === node.id)
+            if (!onGeometry) return null
+          }
+          const point = hideMeshNodes
+            ? (() => {
+              const vertex = sketch.vertices.find((item) => nodeForSketchVertex(model, item)?.id === node.id)
+              return vertex ? project({ x: vertex.coordinates[0], y: vertex.coordinates[1] }) : nodeScreen.get(node.id)
+            })()
+            : nodeScreen.get(node.id)
+          const reaction = reactions.get(node.id)
           if (!point || !reaction) return null
           const arrows = TRANSLATIONAL_DOFS.filter((dof) => dofs.includes(dof)).map((dof) => {
             const value = Number(reaction[dof] ?? 0)

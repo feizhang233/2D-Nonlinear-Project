@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import type { SurfaceMeshResponse } from './domain'
+import { getSketch } from './geometrySketch'
 import { applySurfaceMesh, meshBoundaries, meshSizeForModel, meshStatusForModel, withMeshSize } from './meshing'
 import { cloneSampleModel } from './sampleModel'
 
@@ -56,6 +57,8 @@ describe('Gmsh model bridge', () => {
       nodeCount: 9,
       elementCount: 4,
     })
+    expect(getSketch(remeshed).vertices).toHaveLength(4)
+    expect(remeshed.nodes.filter((node) => node.extensions?.geometry_vertex_id)).toHaveLength(4)
   })
 
   it('distinguishes the sample topology from a Gmsh-generated mesh', () => {

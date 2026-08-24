@@ -13,9 +13,98 @@ export const SUPPORT_CLASS_LABEL: Record<SupportClass, string> = {
 }
 
 export const nextPrefixedId = (prefix: string, ids: string[]) => {
-  let index = ids.length + 1
+  const numbers = ids.map((id) => {
+    if (id === prefix) return 1
+    if (!id.startsWith(prefix)) return 0
+    const rest = id.slice(prefix.length)
+    if (!/^\d+$/.test(rest)) return 0
+    const value = Number(rest)
+    return Number.isInteger(value) && value > 0 ? value : 0
+  })
+  let index = Math.max(0, ...numbers) + 1
   while (ids.includes(`${prefix}${index}`)) index += 1
   return `${prefix}${index}`
+}
+
+const nodeNumericSuffix = (id: string): number => {
+  const match = id.match(/(\d+)$/)
+  if (!match) return 0
+  const value = Number(match[1])
+  return Number.isInteger(value) && value > 0 ? value : 0
+}
+
+export function supportNumber(model: ModelInput, nodeId: string): number | null {
+  for (const item of model.constraints) {
+    if (item.node_id !== nodeId) continue
+    const value = Number(item.extensions?.support_number)
+    if (Number.isInteger(value) && value > 0) return value
+  }
+  return null
+}
+
+export function nextSupportNumber(model: ModelInput): number {
+  const seen = new Set<string>()
+  const numbers: number[] = []
+  for (const item of model.constraints) {
+    if (seen.has(item.node_id)) continue
+    seen.add(item.node_id)
+    numbers.push(supportNumber(model, item.node_id) ?? nodeNumericSuffix(item.node_id))
+  }
+  return Math.max(0, ...numbers) + 1
+}
+
+export function addSupportAtNode(model: ModelInput, nodeId: string, familyDofs: Dof[]): ModelInput {
+  if (!nodeId || model.constraints.some((item) => item.node_id === nodeId)) return model
+  const number = nextSupportNumber(model)
+  const used = model.constraints.map((item) => item.id)
+  const created: ConstraintInput[] = familyDofs.map((dof) => {
+    const id = nextPrefixedId('C', used)
+    used.push(id)
+    return { id, node_id: nodeId, dof, value: 0, extensions: { support_number: number } }
+  })
+  return { ...model, constraints: [...model.constraints, ...created] }
+}
+
+export function moveSupportToNode(model: ModelInput, fromNodeId: string, toNodeId: string): ModelInput {
+  if (!fromNodeId || !toNodeId || fromNodeId === toNodeId) return model
+  const moving = model.constraints.filter((item) => item.node_id === fromNodeId)
+  if (!moving.length) return model
+  const number = supportNumber(model, fromNodeId) ?? nextSupportNumber(model)
+  const remaining = model.constraints.filter((item) => item.node_id !== fromNodeId)
+  const existingDofs = new Set(remaining.filter((item) => item.node_id === toNodeId).map((item) => item.dof))
+  const relocated = moving
+    .filter((item) => !existingDofs.has(item.dof))
+    .map((item) => ({
+      ...item,
+      node_id: toNodeId,
+      extensions: { ...(item.extensions ?? {}), support_number: number },
+    }))
+  return { ...model, constraints: [...remaining, ...relocated] }
+}
+
+export function addNodalLoadAtNode(
+  model: ModelInput,
+  nodeId: string,
+  dof: Dof,
+  value: number,
+): { model: ModelInput; id: string } {
+  const id = nextPrefixedId('P', model.loads.map((item) => item.id))
+  return {
+    id,
+    model: {
+      ...model,
+      loads: [
+        ...model.loads,
+        {
+          id,
+          kind: 'nodal',
+          node_id: nodeId,
+          components: { [dof]: value },
+          coordinate_system: 'global',
+        },
+      ],
+    },
+  }
 }
 
 const translational = (dofs: Dof[]) => dofs.filter((dof) => dof.startsWith('U'))

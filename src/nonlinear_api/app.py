@@ -5,13 +5,15 @@ from __future__ import annotations
 import os
 from collections.abc import AsyncIterator, Sequence
 from contextlib import asynccontextmanager
+from pathlib import Path
 from typing import Annotated, Any
 from uuid import UUID
 
 from fastapi import Body, Depends, FastAPI, Request, Response
 from fastapi.exceptions import RequestValidationError
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import JSONResponse
+from fastapi.responses import FileResponse, JSONResponse
+from fastapi.staticfiles import StaticFiles
 
 from nonlinear_api.iam_store import (
     SESSION_TTL_DAYS,
@@ -40,6 +42,19 @@ from nonlinear_api.schemas import (
 )
 from nonlinear_api.service import AnalysisService, ApiProblem
 from nonlinear_core import __version__
+
+
+def _frontend_dist() -> Path | None:
+    """Locate a production frontend build if one is available."""
+    configured = os.environ.get("NONLINEAR_FRONTEND_DIST", "").strip()
+    candidates: list[Path] = []
+    if configured:
+        candidates.append(Path(configured))
+    candidates.append(Path(__file__).resolve().parents[2] / "frontend" / "dist")
+    for path in candidates:
+        if path.is_dir() and (path / "index.html").is_file():
+            return path
+    return None
 
 
 def _request_json_path(location: Sequence[Any]) -> str:
@@ -391,6 +406,27 @@ def create_app(
     def cancel_analysis(analysis_id: UUID) -> AnalysisRecord:
         actual_service.get(analysis_id)
         return actual_service.mark_cancelled(analysis_id)
+
+    dist = _frontend_dist()
+    if dist is not None:
+        assets_dir = dist / "assets"
+        if assets_dir.is_dir():
+            app.mount("/assets", StaticFiles(directory=assets_dir), name="frontend-assets")
+
+        @app.get("/{full_path:path}", include_in_schema=False, response_model=None)
+        def spa_fallback(full_path: str) -> FileResponse | JSONResponse:
+            """Serve SPA assets or index.html; keep API 404s as JSON."""
+            if full_path.startswith("api/") or full_path in {
+                "docs",
+                "redoc",
+                "openapi.json",
+                "health",
+            }:
+                return JSONResponse({"detail": "Not Found"}, status_code=404)
+            candidate = dist / full_path
+            if candidate.is_file():
+                return FileResponse(candidate)
+            return FileResponse(dist / "index.html")
 
     return app
 

@@ -1,6 +1,7 @@
 import type {
   JsonValue, LoadInput, MeshBoundary, ModelInput, NodeInput, SurfaceMeshResponse,
 } from './domain'
+import { getSketch, nearestSketchVertex, withMeshedSignature, writeSketch } from './geometrySketch'
 
 const objectValue = (value: JsonValue | undefined): Record<string, JsonValue> | undefined => (
   value && typeof value === 'object' && !Array.isArray(value) ? value : undefined
@@ -166,10 +167,28 @@ const bindEdgeLoad = (
 
 export function applySurfaceMesh(model: ModelInput, response: SurfaceMeshResponse): ModelInput {
   if (!response.nodes.length || !response.elements.length) throw new Error('Gmsh returned an empty mesh')
+  const sketch = getSketch(model)
+  const span = Math.max(
+    1e-6,
+    ...sketch.vertices.flatMap((vertex) => vertex.coordinates.slice(0, 2).map(Math.abs)),
+    ...response.nodes.flatMap((node) => node.coordinates.slice(0, 2).map(Math.abs)),
+  )
+  const snapTolerance = (span * 1e-6) ** 2
+  const taggedNodes = response.nodes.map((node) => {
+    const vertex = nearestSketchVertex(sketch, node.coordinates)
+    if (!vertex) return node
+    const dx = (vertex.coordinates[0] ?? 0) - (node.coordinates[0] ?? 0)
+    const dy = (vertex.coordinates[1] ?? 0) - (node.coordinates[1] ?? 0)
+    if (dx * dx + dy * dy > snapTolerance) return node
+    return {
+      ...node,
+      extensions: { ...(node.extensions ?? {}), geometry_vertex_id: vertex.id },
+    }
+  })
   const oldNodeById = new Map(model.nodes.map((node) => [node.id, node]))
   const remapNode = (nodeId: string) => {
     const oldNode = oldNodeById.get(nodeId)
-    return oldNode ? nearestNodeId(oldNode.coordinates, response.nodes) : response.nodes[0].id
+    return oldNode ? nearestNodeId(oldNode.coordinates, taggedNodes) : taggedNodes[0].id
   }
   const remappedConstraints = model.constraints.map((constraint) => ({
     ...constraint, node_id: remapNode(constraint.node_id),
@@ -210,9 +229,9 @@ export function applySurfaceMesh(model: ModelInput, response: SurfaceMeshRespons
     return load
   })
   const displacement = model.analysis.displacement_control
-  return {
+  const next = {
     ...model,
-    nodes: response.nodes,
+    nodes: taggedNodes,
     elements: response.elements,
     loads: remappedLoads,
     constraints: remappedConstraints,
@@ -236,4 +255,5 @@ export function applySurfaceMesh(model: ModelInput, response: SurfaceMeshRespons
       },
     },
   }
+  return withMeshedSignature(writeSketch(next, sketch))
 }

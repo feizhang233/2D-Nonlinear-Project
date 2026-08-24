@@ -1,0 +1,32 @@
+services:
+  nonlinear:
+    build: .
+    container_name: nonlinear-studio
+    restart: unless-stopped
+    environment:
+      NONLINEAR_HOST: "0.0.0.0"
+      NONLINEAR_API_PORT: "8007"
+      NONLINEAR_DATA_DIR: /data
+      NONLINEAR_COOKIE_SECURE: "1"
+      NONLINEAR_FRONTEND_DIST: /app/frontend/dist
+      OMP_NUM_THREADS: "1"
+      OPENBLAS_NUM_THREADS: "1"
+    ports:
+      - "127.0.0.1:8007:8007"
+    volumes:
+      - nonlinear_data:/data
+    healthcheck:
+      test:
+        [
+          "CMD",
+          "python",
+          "-c",
+          "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8007/health', timeout=3)",
+        ]
+      interval: 10s
+      timeout: 5s
+      retries: 12
+      start_period: 30s
+
+volumes:
+  nonlinear_data:

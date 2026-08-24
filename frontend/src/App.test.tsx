@@ -237,16 +237,27 @@ describe('Nonlinear Studio shell', () => {
 
     expect(screen.getByRole('dialog', { name: 'Getting started with Nonlinear Studio' })).toBeTruthy()
     expect(screen.getByText('Step 1 of 6')).toBeTruthy()
-    fireEvent.click(screen.getAllByRole('button', { name: 'Continue' }).at(-1)!)
-    expect(screen.getByText('Step 2 of 6')).toBeTruthy()
-    fireEvent.click(screen.getAllByRole('button', { name: 'Continue' }).at(-1)!)
+    expect(screen.getByText('Choose the model family')).toBeTruthy()
+    expect(screen.getByRole('button', { name: 'Use Frame example' })).toBeTruthy()
+    expect(screen.getByRole('button', { name: 'Use Continuum example' })).toBeTruthy()
+    expect(screen.getByRole('button', { name: 'Use Plate example' })).toBeTruthy()
+    expect(screen.getByRole('button', { name: 'Use Shell example' })).toBeTruthy()
+
+    fireEvent.click(screen.getByRole('button', { name: 'Use Plate example' }))
+    await waitFor(() => expect(screen.getByText('Step 2 of 6')).toBeTruthy())
+    expect(screen.getByText('von Kármán MITC4 plate cantilever')).toBeTruthy()
+    expect(screen.getByText('Review geometry')).toBeTruthy()
+
+    fireEvent.click(screen.getByRole('button', { name: 'Continue' }))
     expect(screen.getByText('Step 3 of 6')).toBeTruthy()
-    fireEvent.click(screen.getAllByRole('button', { name: 'Open this step' }).at(-1)!)
-    await waitFor(() => expect(screen.queryByRole('dialog', { name: 'Getting started with Nonlinear Studio' })).toBeNull())
     expect(screen.getAllByText('Material 1').length).toBeGreaterThan(0)
+
+    fireEvent.click(screen.getByRole('button', { name: 'Close guide' }))
+    await waitFor(() => expect(screen.queryByRole('dialog', { name: 'Getting started with Nonlinear Studio' })).toBeNull())
 
     fireEvent.click(screen.getByRole('button', { name: 'Guide' }))
     expect(screen.getByText('Step 1 of 6')).toBeTruthy()
+    expect(screen.getByRole('button', { name: 'Use Continuum example' })).toBeTruthy()
     fireEvent.click(screen.getByRole('button', { name: 'Close guide' }))
     await waitFor(() => expect(screen.queryByRole('dialog', { name: 'Getting started with Nonlinear Studio' })).toBeNull())
 

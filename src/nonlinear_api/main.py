@@ -18,7 +18,9 @@ app = create_app(
 def run() -> None:
     import uvicorn
 
-    uvicorn.run("nonlinear_api.main:app", host="127.0.0.1", port=8000)
+    host = os.environ.get("NONLINEAR_HOST", "127.0.0.1")
+    port = int(os.environ.get("NONLINEAR_API_PORT", "8000"))
+    uvicorn.run("nonlinear_api.main:app", host=host, port=port)
 
 
 if __name__ == "__main__":

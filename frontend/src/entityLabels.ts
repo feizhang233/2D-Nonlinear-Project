@@ -1,4 +1,5 @@
 import type { EntityKind, ModelInput } from './domain'
+import { supportNumber } from './supports'
 
 const singular: Record<Exclude<EntityKind, 'model'>, string> = {
   nodes: 'Node',
@@ -55,6 +56,13 @@ const supportNodeIds = (model: ModelInput): string[] => {
   ]
 }
 
+const numericSuffix = (id: string): number | null => {
+  const match = id.match(/(\d+)$/)
+  if (!match) return null
+  const value = Number(match[1])
+  return Number.isInteger(value) && value > 0 ? value : null
+}
+
 export function entityDisplayLabel(
   model: ModelInput,
   kind: EntityLabelKind,
@@ -62,6 +70,12 @@ export function entityDisplayLabel(
 ): string {
   const customName = customDisplayName(model, kind, id)
   if (customName) return customName
+  if (kind === 'constraints') {
+    const stored = supportNumber(model, id)
+    if (stored !== null) return `${singular[kind]} ${stored}`
+  }
+  const fromId = numericSuffix(id)
+  if (fromId !== null) return `${singular[kind]} ${fromId}`
   const ids = kind === 'constraints' ? supportNodeIds(model) : model[kind].map((item) => item.id)
   const index = ids.indexOf(id)
   return index >= 0 ? `${singular[kind]} ${index + 1}` : singular[kind]

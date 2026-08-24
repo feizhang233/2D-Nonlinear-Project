@@ -15,10 +15,21 @@ import TextField from '@mui/material/TextField'
 import Typography from '@mui/material/Typography'
 import type { Dof, EntityKind, JsonValue, LoadInput, ModelInput, Selection } from '../domain'
 import { elementDisplayLabel, loadDisplayLabel, materialDisplayLabel, modelDisplayLabel, nodeDisplayLabel, supportDisplayLabel, withEntityDisplayName } from '../entityLabels'
+import {
+  deleteSketchVertex,
+  editablePlacementNodes,
+  firstFreePlacementNodeId,
+  geometryNeedsMesh,
+  getSketch,
+  moveSketchVertex,
+  PlacementState,
+} from '../geometrySketch'
 import { meshBoundaries, meshSizeForModel, meshStatusForModel, withMeshSize } from '../meshing'
 import { dofsForModel, MODEL_FAMILIES } from '../modelFamilies'
 import {
-  classifySupport, constraintsForClass, groupedSupports, SUPPORT_CLASS_LABEL, SUPPORT_CLASS_ORDER,
+  addNodalLoadAtNode,
+  addSupportAtNode,
+  classifySupport, constraintsForClass, groupedSupports, moveSupportToNode, SUPPORT_CLASS_LABEL, SUPPORT_CLASS_ORDER,
   supportNodeId, toggleConstraintDof, type SupportClass,
 } from '../supports'
 import { SectionHeader } from './chrome'
@@ -30,6 +41,9 @@ interface PropertyPanelProps {
   onGenerateMesh?: () => void
   meshing?: boolean
   meshDisabled?: boolean
+  placement?: PlacementState
+  onStartPlacement?: (placement: NonNullable<PlacementState>) => void
+  onCancelPlacement?: () => void
 }
 
 const numberValue = (value: string) => Number.isFinite(Number(value)) ? Number(value) : 0
@@ -50,12 +64,20 @@ const unitForKey = (key: string, model: ModelInput): string | undefined => {
 
 export function PropertyPanel({
   model, selection, onChange, onGenerateMesh, meshing = false, meshDisabled = false,
+  placement = null, onStartPlacement, onCancelPlacement,
 }: PropertyPanelProps) {
   const family = MODEL_FAMILIES[model.model_family]
   const meshStatus = meshStatusForModel(model)
   const meshSize = meshSizeForModel(model)
   const meshSizeInvalid = !Number.isFinite(meshSize) || meshSize <= 0
   const dofs = dofsForModel(model)
+  const placementNodes = editablePlacementNodes(model)
+  const locationOptions = (currentId?: string) => {
+    if (currentId && !placementNodes.some((node) => node.id === currentId)) {
+      return [{ id: currentId, label: nodeDisplayLabel(model, currentId), coordinates: [] }, ...placementNodes]
+    }
+    return placementNodes
+  }
   const changeModel = (patch: Partial<ModelInput>) => onChange({ ...model, ...patch })
   const updateEntity = (kind: Exclude<EntityKind, 'model'>, id: string, mutate: (entity: Record<string, unknown>) => void) => {
     const next = structuredClone(model)
@@ -108,8 +130,11 @@ export function PropertyPanel({
                 ? 'Target element size must be greater than 0.'
                 : 'The API only requires a value greater than 0. This model value is not a fixed lower limit.'}
             />
+            {geometryNeedsMesh(model) && (
+              <Alert severity="warning">Geometry changed. Generate a new mesh before solving.</Alert>
+            )}
             <Alert severity="info">
-              The current bridge supports one exterior boundary. Shell geometry must be planar and parallel to XY.
+              Outer contours and holes come from the Geometry panel. Shell geometry must be planar and parallel to XY.
               The interactive service limit is 10,000 nodes; the backend rejects excessively small sizes.
             </Alert>
             <Button
@@ -149,17 +174,117 @@ export function PropertyPanel({
     )
   }
 
+  if (selection.kind === 'geometry') {
+    const sketch = getSketch(model)
+    const vertex = selection.id ? sketch.vertices.find((item) => item.id === selection.id) : undefined
+    if (!vertex) {
+      return (
+        <Stack spacing={2}>
+          <SectionHeader title="Geometry" subtitle="Select a contour vertex to edit coordinates" />
+        </Stack>
+      )
+    }
+    const outer = sketch.loops.find((loop) => loop.kind === 'outer')
+    const index = sketch.vertices.findIndex((item) => item.id === vertex.id) + 1
+    return (
+      <Stack spacing={2}>
+        <SectionHeader title={`Vertex ${index}`} subtitle="Geometry vertex used for the CAD contour, not a mesh node" />
+        <Stack direction="row" spacing={1}>
+          {['X', 'Y'].map((label, axis) => (
+            <TextField
+              key={label}
+              type="number"
+              label={label}
+              value={vertex.coordinates[axis] ?? 0}
+              slotProps={{
+                htmlInput: { step: 'any' },
+                input: { endAdornment: <InputAdornment position="end">{model.units.length}</InputAdornment> },
+              }}
+              onChange={(event) => {
+                const next = [...vertex.coordinates]
+                next[axis] = numberValue(event.target.value)
+                onChange(moveSketchVertex(model, vertex.id, next), { kind: 'geometry', id: vertex.id })
+              }}
+            />
+          ))}
+        </Stack>
+        <Button
+          color="error"
+          variant="outlined"
+          startIcon={<DeleteOutlineRoundedIcon />}
+          disabled={(outer?.vertexIds.length ?? 0) <= 3}
+          onClick={() => onChange(deleteSketchVertex(model, vertex.id), { kind: 'model' })}
+        >
+          Delete vertex
+        </Button>
+      </Stack>
+    )
+  }
+
   if (!selection.id) {
     if (selection.kind === 'constraints') {
       const grouped = groupedSupports(model, dofs)
+      const defaultNode = firstFreePlacementNodeId(model) ?? placementNodes[0]?.id
       return (
         <Stack spacing={2}>
-          <SectionHeader title="Supports" subtitle="Grouped by support type instead of individual DOF records" />
-          <Alert severity="info">
-            {grouped.nodeCount} supports currently define {grouped.recordCount} DOF constraints.{' '}
-            {grouped.groups.map((group) => `${group.label} ${group.items.length}`).join(' · ') || 'No supports yet'}.
-            Select a nodal support to edit it, or use the group + action to add a fixed support at an unconstrained node.
+          <SectionHeader title="Supports" subtitle="Add a support, then click the CAD contour or choose a vertex" />
+          <Alert severity={placement?.kind === 'support' ? 'warning' : 'info'}>
+            {placement?.kind === 'support'
+              ? 'Click a geometry vertex or frame node on the canvas to place the new support.'
+              : `${grouped.nodeCount} supports currently define ${grouped.recordCount} DOF constraints. ${grouped.groups.map((group) => `${group.label} ${group.items.length}`).join(' · ') || 'No supports yet'}.`}
           </Alert>
+          <Button
+            variant="contained"
+            disabled={!defaultNode || Boolean(placement)}
+            onClick={() => onStartPlacement?.({ kind: 'support' })}
+          >
+            {placement?.kind === 'support' ? 'Waiting for canvas click…' : 'Add support'}
+          </Button>
+          {placement?.kind === 'support' && (
+            <Button onClick={onCancelPlacement}>Cancel placement</Button>
+          )}
+          {defaultNode && (
+            <Button
+              variant="outlined"
+              onClick={() => onChange(addSupportAtNode(model, defaultNode, dofs), { kind: 'constraints', id: defaultNode })}
+            >
+              Add at {placementNodes.find((node) => node.id === defaultNode)?.label ?? defaultNode}
+            </Button>
+          )}
+        </Stack>
+      )
+    }
+    if (selection.kind === 'loads') {
+      const defaultNode = placementNodes[0]?.id ?? model.nodes[0]?.id
+      return (
+        <Stack spacing={2}>
+          <SectionHeader title="Loads" subtitle="Add a load, then click the CAD contour or choose a vertex" />
+          <Alert severity={placement?.kind === 'load' ? 'warning' : 'info'}>
+            {placement?.kind === 'load'
+              ? 'Click a geometry vertex or frame node on the canvas to place the new load.'
+              : `This group contains ${model.loads.length} loads. New loads keep their own numbers and are not renamed when earlier loads are deleted.`}
+          </Alert>
+          <Button
+            variant="contained"
+            disabled={!defaultNode || Boolean(placement)}
+            onClick={() => onStartPlacement?.({ kind: 'load' })}
+          >
+            {placement?.kind === 'load' ? 'Waiting for canvas click…' : 'Add load'}
+          </Button>
+          {placement?.kind === 'load' && (
+            <Button onClick={onCancelPlacement}>Cancel placement</Button>
+          )}
+          {defaultNode && (
+            <Button
+              variant="outlined"
+              onClick={() => {
+                const added = addNodalLoadAtNode(model, defaultNode, family.primaryLoadDof, family.primaryLoadDof === 'UX' ? 1 : -1)
+                onChange(added.model, { kind: 'loads', id: added.id })
+              }}
+            >
+              Add at {placementNodes[0]?.label ?? 'first node'}
+            </Button>
+          )}
         </Stack>
       )
     }
@@ -304,8 +429,7 @@ export function PropertyPanel({
     }
     const moveToNode = (nextNodeId: string) => {
       if (nextNodeId === nodeId) return
-      const moved = model.constraints.map((item) => item.node_id === nodeId ? { ...item, node_id: nextNodeId } : item)
-      onChange({ ...model, constraints: moved }, { kind: 'constraints', id: nextNodeId })
+      onChange(moveSupportToNode(model, nodeId, nextNodeId), { kind: 'constraints', id: nextNodeId })
     }
     return (
       <Stack spacing={2}>
@@ -324,9 +448,19 @@ export function PropertyPanel({
           slotProps={{ htmlInput: { maxLength: 80 } }}
           onChange={(event) => onChange(withEntityDisplayName(model, 'constraints', nodeId, event.target.value), { kind: 'constraints', id: nodeId })}
         />
-        <TextField select label="Node" value={nodeId} onChange={(event) => moveToNode(event.target.value)}>
-          {model.nodes.map((node) => <MenuItem key={node.id} value={node.id}>{nodeDisplayLabel(model, node.id)}</MenuItem>)}
+        <TextField select label="Location" value={nodeId} onChange={(event) => moveToNode(event.target.value)}>
+          {locationOptions(nodeId).map((node) => <MenuItem key={node.id} value={node.id}>{node.label}</MenuItem>)}
         </TextField>
+        <Button
+          variant={placement?.kind === 'support' && placement.targetId === nodeId ? 'contained' : 'outlined'}
+          onClick={() => (
+            placement?.kind === 'support' && placement.targetId === nodeId
+              ? onCancelPlacement?.()
+              : onStartPlacement?.({ kind: 'support', targetId: nodeId })
+          )}
+        >
+          {placement?.kind === 'support' && placement.targetId === nodeId ? 'Click a vertex on the canvas…' : 'Pick location on canvas'}
+        </Button>
         <TextField select label="Support type" value={supportClass} onChange={(event) => applyClass(event.target.value as SupportClass)}>
           {SUPPORT_CLASS_ORDER.map((item) => <MenuItem key={item} value={item}>{SUPPORT_CLASS_LABEL[item]}</MenuItem>)}
         </TextField>
@@ -448,9 +582,19 @@ export function PropertyPanel({
       </TextField>
       {load.kind === 'nodal' && (
         <>
-          <TextField select label="Node" value={load.node_id ?? ''} onChange={(event) => updateEntity('loads', id, (entity) => { entity.node_id = event.target.value })}>
-            {model.nodes.map((node) => <MenuItem key={node.id} value={node.id}>{nodeDisplayLabel(model, node.id)}</MenuItem>)}
+          <TextField select label="Location" value={load.node_id ?? ''} onChange={(event) => updateEntity('loads', id, (entity) => { entity.node_id = event.target.value })}>
+            {locationOptions(load.node_id ?? undefined).map((node) => <MenuItem key={node.id} value={node.id}>{node.label}</MenuItem>)}
           </TextField>
+          <Button
+            variant={placement?.kind === 'load' && placement.targetId === id ? 'contained' : 'outlined'}
+            onClick={() => (
+              placement?.kind === 'load' && placement.targetId === id
+                ? onCancelPlacement?.()
+                : onStartPlacement?.({ kind: 'load', targetId: id })
+            )}
+          >
+            {placement?.kind === 'load' && placement.targetId === id ? 'Click a vertex on the canvas…' : 'Pick location on canvas'}
+          </Button>
           {dofs.map((dof) => (
             <TextField
               key={dof}

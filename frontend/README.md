@@ -1,5 +1,12 @@
 # Nonlinear Studio frontend
 
+## Try it online
+
+**[Launch Nonlinear Studio in your browser →](https://nonlinear.feizhang233.com)**
+
+No installation is required. Guest mode includes modeling, meshing, analysis,
+and export; create an account only when you want to save models.
+
 P11 is a React + TypeScript + Material UI workbench for the existing P10 FastAPI service.
 
 The model-family selector loads complete verified examples for Frame, Continuum, Plate, and Shell.

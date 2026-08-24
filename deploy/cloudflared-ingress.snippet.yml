@@ -1,0 +1,11 @@
+# Nonlinear Studio uses a DEDICATED Cloudflare tunnel (not the main DocFlow tunnel).
+#
+# Tunnel name: nonlinear
+# Tunnel ID:   a347daa4-2658-4aca-91e8-d0a19fa23711
+# Config:      /home/fei/.cloudflared/config-nonlinear.yml
+# Hostname:    nonlinear.feizhang233.com -> http://127.0.0.1:8007
+#
+# Run via pm2 process nonlinear-tunnel (see ../ecosystem.config.cjs).
+#
+# Do NOT add nonlinear hostnames into the main sillytavern tunnel:
+# that tunnel is remotely managed in Zero Trust and overwrites local ingress.

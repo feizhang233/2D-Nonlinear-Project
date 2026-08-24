@@ -8,6 +8,8 @@ import {
   supportDisplayLabel,
   withEntityDisplayName,
 } from './entityLabels'
+import { dofsForModel } from './modelFamilies'
+import { addNodalLoadAtNode, addSupportAtNode } from './supports'
 import { cloneSampleModel } from './sampleModel'
 
 describe('entity display labels', () => {
@@ -35,5 +37,18 @@ describe('entity display labels', () => {
     expect(renamedLoad.constraints[0].node_id).toBe('N1')
     expect(renamedLoad.loads[0].id).toBe('P')
     expect(renamedLoad.extensions?.ui).toBeTruthy()
+  })
+
+  it('keeps existing load and support numbers when a later entity is added', () => {
+    const model = cloneSampleModel('frame')
+    const withLoad = addNodalLoadAtNode(model, 'N2', 'UY', -50)
+    expect(loadDisplayLabel(withLoad.model, 'P')).toBe('Load 1')
+    expect(loadDisplayLabel(withLoad.model, withLoad.id)).toBe('Load 2')
+
+    const continuum = cloneSampleModel('continuum')
+    const withSupport = addSupportAtNode(continuum, 'N2', dofsForModel(continuum))
+    expect(supportDisplayLabel(withSupport, 'N1')).toBe('Support 1')
+    expect(supportDisplayLabel(withSupport, 'N4')).toBe('Support 4')
+    expect(supportDisplayLabel(withSupport, 'N2')).toBe('Support 5')
   })
 })
