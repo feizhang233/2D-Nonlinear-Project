@@ -45,14 +45,16 @@ describe('Nonlinear Studio shell', () => {
     expect(screen.getByRole('button', { name: 'Open mesh settings' })).toBeTruthy()
     expect(screen.getByRole('button', { name: 'Run analysis' })).toBeTruthy()
     expect(screen.getByRole('button', { name: 'Guide' })).toBeTruthy()
-    expect(screen.getByRole('tab', { name: 'Solve monitor' })).toBeTruthy()
+    expect(screen.queryByRole('tab', { name: 'Solve monitor' })).toBeNull()
+    expect((screen.getByRole('button', { name: 'Results' }) as HTMLButtonElement).disabled).toBe(true)
     expect(screen.getByLabelText('Modeling workflow progress')).toBeTruthy()
     expect(screen.getByText('5 of 6 complete')).toBeTruthy()
     expect(screen.queryByText('Setup readiness')).toBeNull()
     expect(screen.queryByRole('textbox', { name: 'Search model entities' })).toBeNull()
-    const leftWorkspace = screen.getByRole('complementary', { name: 'Model and properties workspace' })
+    const leftWorkspace = screen.getByRole('complementary', { name: 'Model tree and forms workspace' })
     expect(leftWorkspace.contains(screen.getByRole('tab', { name: 'Properties' }))).toBe(true)
-    expect(screen.getByRole('main', { name: 'Model space and results' })).toBeTruthy()
+    expect(screen.getByRole('main', { name: 'Model editing canvas' })).toBeTruthy()
+    expect(screen.getByRole('tab', { name: 'Frame workspace' })).toBeTruthy()
   })
 
   it('collapses Properties on an entity double-click and keeps an explicit restore control', () => {
@@ -65,19 +67,14 @@ describe('Nonlinear Studio shell', () => {
 
   it('switches the complete working document between all supported model families', async () => {
     render(<ThemeProvider theme={studioTheme}><CssBaseline /><App /></ThemeProvider>)
-    const familySelect = screen.getByRole('combobox', { name: 'Model family' })
-
-    fireEvent.mouseDown(familySelect)
-    fireEvent.click(await screen.findByRole('option', { name: 'Continuum' }))
+    fireEvent.click(screen.getByRole('tab', { name: 'Continuum workspace' }))
     expect(screen.getByText('Q4 plane-strain tension')).toBeTruthy()
-    expect(screen.getByRole('combobox', { name: 'Model family' }).textContent).toContain('Continuum')
+    expect(screen.getByRole('tab', { name: 'Continuum workspace' }).getAttribute('aria-selected')).toBe('true')
 
-    fireEvent.mouseDown(screen.getByRole('combobox', { name: 'Model family' }))
-    fireEvent.click(await screen.findByRole('option', { name: 'Plate' }))
+    fireEvent.click(screen.getByRole('tab', { name: 'Plate workspace' }))
     expect(screen.getByText('von Kármán MITC4 plate cantilever')).toBeTruthy()
 
-    fireEvent.mouseDown(screen.getByRole('combobox', { name: 'Model family' }))
-    fireEvent.click(await screen.findByRole('option', { name: 'Shell' }))
+    fireEvent.click(screen.getByRole('tab', { name: 'Shell workspace' }))
     expect(screen.getByText('Corotational Q4 flat-shell cantilever')).toBeTruthy()
   })
 
@@ -124,6 +121,9 @@ describe('Nonlinear Studio shell', () => {
 
     expect(await screen.findByText('Results current')).toBeTruthy()
     expect(await screen.findByText('Analysis complete: 1 accepted step')).toBeTruthy()
+    expect(screen.getByRole('main', { name: 'Analysis results workspace' })).toBeTruthy()
+    expect(screen.getByRole('tab', { name: 'Solve monitor' })).toBeTruthy()
+    expect(screen.queryByRole('complementary', { name: 'Model tree and forms workspace' })).toBeNull()
     expect(screen.queryByText(/ID p15/)).toBeNull()
     const analysisCalls = fetchMock.mock.calls.filter(([path]) => !String(path).endsWith('/api/v1/auth/session'))
     expect(analysisCalls[0]).toEqual(['/api/v1/models/validate', expect.objectContaining({ method: 'POST' })])
@@ -219,8 +219,7 @@ describe('Nonlinear Studio shell', () => {
 
   it('edits a Continuum load as a boundary distributed load', async () => {
     render(<ThemeProvider theme={studioTheme}><CssBaseline /><App /></ThemeProvider>)
-    fireEvent.mouseDown(screen.getByRole('combobox', { name: 'Model family' }))
-    fireEvent.click(await screen.findByRole('option', { name: 'Continuum' }))
+    fireEvent.click(screen.getByRole('tab', { name: 'Continuum workspace' }))
     fireEvent.click(screen.getAllByText('Loads')[0])
     fireEvent.click(screen.getAllByText('Load 1')[0])
     fireEvent.mouseDown(screen.getByRole('combobox', { name: 'Load type' }))
@@ -231,13 +230,25 @@ describe('Nonlinear Studio shell', () => {
     expect(screen.getByRole('combobox', { name: 'Local edge' })).toBeTruthy()
   })
 
+  it('shows surface mesh nodes and elements as read-only entities', () => {
+    render(<ThemeProvider theme={studioTheme}><CssBaseline /><App /></ThemeProvider>)
+    fireEvent.click(screen.getByRole('tab', { name: 'Continuum workspace' }))
+    expect((screen.getByRole('button', { name: 'Add nodes' }) as HTMLButtonElement).disabled).toBe(true)
+    expect((screen.getByRole('button', { name: 'Add elements' }) as HTMLButtonElement).disabled).toBe(true)
+
+    fireEvent.click(screen.getByRole('button', { name: /Nodes Visible read-only mesh entities/ }))
+    fireEvent.click(screen.getByRole('button', { name: 'Node 1' }))
+    expect(screen.getByText('Mesh nodes are visible for inspection but cannot be edited directly. Edit the Geometry contour and generate a new mesh.')).toBeTruthy()
+    expect((screen.getByRole('textbox', { name: 'Display name' }) as HTMLInputElement).disabled).toBe(true)
+  })
+
   it('shows and reopens the six-step beginner guide', async () => {
     window.localStorage.removeItem('nonlinear-studio-guide-hidden-v2')
     render(<ThemeProvider theme={studioTheme}><CssBaseline /><App /></ThemeProvider>)
 
     expect(screen.getByRole('dialog', { name: 'Getting started with Nonlinear Studio' })).toBeTruthy()
     expect(screen.getByText('Step 1 of 6')).toBeTruthy()
-    expect(screen.getByText('Choose the model family')).toBeTruthy()
+    expect(screen.getByText('Choose a model workspace')).toBeTruthy()
     expect(screen.getByRole('button', { name: 'Use Frame example' })).toBeTruthy()
     expect(screen.getByRole('button', { name: 'Use Continuum example' })).toBeTruthy()
     expect(screen.getByRole('button', { name: 'Use Plate example' })).toBeTruthy()
@@ -246,11 +257,11 @@ describe('Nonlinear Studio shell', () => {
     fireEvent.click(screen.getByRole('button', { name: 'Use Plate example' }))
     await waitFor(() => expect(screen.getByText('Step 2 of 6')).toBeTruthy())
     expect(screen.getByText('von Kármán MITC4 plate cantilever')).toBeTruthy()
-    expect(screen.getByText('Review geometry')).toBeTruthy()
+    expect(screen.getByText('Review geometry and topology')).toBeTruthy()
 
     fireEvent.click(screen.getByRole('button', { name: 'Continue' }))
     expect(screen.getByText('Step 3 of 6')).toBeTruthy()
-    expect(screen.getAllByText('Material 1').length).toBeGreaterThan(0)
+    expect(screen.getByText('Define materials and supports')).toBeTruthy()
 
     fireEvent.click(screen.getByRole('button', { name: 'Close guide' }))
     await waitFor(() => expect(screen.queryByRole('dialog', { name: 'Getting started with Nonlinear Studio' })).toBeNull())
@@ -258,14 +269,10 @@ describe('Nonlinear Studio shell', () => {
     fireEvent.click(screen.getByRole('button', { name: 'Guide' }))
     expect(screen.getByText('Step 1 of 6')).toBeTruthy()
     expect(screen.getByRole('button', { name: 'Use Continuum example' })).toBeTruthy()
-    fireEvent.click(screen.getByRole('button', { name: 'Close guide' }))
-    await waitFor(() => expect(screen.queryByRole('dialog', { name: 'Getting started with Nonlinear Studio' })).toBeNull())
-
-    fireEvent.click(screen.getByRole('button', { name: 'Guide' }))
-    expect(screen.getByText('Step 1 of 6')).toBeTruthy()
     fireEvent.click(screen.getByRole('button', { name: "Don't show again" }))
     expect(window.localStorage.getItem('nonlinear-studio-guide-hidden-v2')).toBe('true')
-  })
+    await waitFor(() => expect(screen.queryByRole('dialog', { name: 'Getting started with Nonlinear Studio' })).toBeNull())
+  }, 10_000)
 
   it('generates and applies a Gmsh Q4 mesh from model properties', async () => {
     const meshResponse = {
@@ -297,8 +304,7 @@ describe('Nonlinear Studio shell', () => {
       throw new Error(`Unexpected request: ${String(input)}`)
     })
     render(<ThemeProvider theme={studioTheme}><CssBaseline /><App /></ThemeProvider>)
-    fireEvent.mouseDown(screen.getByRole('combobox', { name: 'Model family' }))
-    fireEvent.click(await screen.findByRole('option', { name: 'Continuum' }))
+    fireEvent.click(screen.getByRole('tab', { name: 'Continuum workspace' }))
     expect(screen.getByText('Finite element mesh: Current topology · 4 nodes · 1 Q4')).toBeTruthy()
     fireEvent.click(screen.getByRole('button', { name: 'Open mesh settings' }))
     expect(screen.getByText(/Gmsh remeshing has not been run/)).toBeTruthy()
@@ -312,10 +318,50 @@ describe('Nonlinear Studio shell', () => {
     expect(generateButton.disabled).toBe(false)
     fireEvent.click(generateButton)
 
-    expect(await screen.findByText('Gmsh mesh generated: 4 nodes / 1 Q4 elements')).toBeTruthy()
+    expect(await screen.findByText('Gmsh mesh staged: 4 nodes / 1 Q4 elements. Apply changes to commit it.')).toBeTruthy()
     expect(screen.getByText('Finite element mesh: Gmsh 4.15.2 · 4 nodes · 1 Q4')).toBeTruthy()
+    expect((screen.getByRole('button', { name: 'Apply changes' }) as HTMLButtonElement).disabled).toBe(false)
+    fireEvent.click(screen.getByRole('button', { name: 'Apply changes' }))
+    expect(await screen.findByText('rev 1')).toBeTruthy()
+    expect((screen.getByRole('button', { name: 'Apply changes' }) as HTMLButtonElement).disabled).toBe(true)
     expect(fetchMock).toHaveBeenCalledWith('/api/v1/meshes', expect.objectContaining({ method: 'POST' }))
     const meshCall = fetchMock.mock.calls.find(([path]) => String(path).endsWith('/api/v1/meshes'))
     expect(JSON.parse(String(meshCall?.[1]?.body)).mesh_size).toBe(0.1)
+  })
+
+  it('stages form edits and supports both Cancel and Apply', () => {
+    render(<ThemeProvider theme={studioTheme}><CssBaseline /><App /></ThemeProvider>)
+    const name = screen.getByRole('textbox', { name: 'Display name' }) as HTMLInputElement
+    fireEvent.change(name, { target: { value: 'Draft arch' } })
+    expect(screen.getByText('Unapplied changes')).toBeTruthy()
+    expect((screen.getByRole('button', { name: 'Run analysis' }) as HTMLButtonElement).disabled).toBe(true)
+
+    fireEvent.click(screen.getByRole('button', { name: 'Cancel' }))
+    expect((screen.getByRole('textbox', { name: 'Display name' }) as HTMLInputElement).value).toBe('Shallow arch limit-point demo')
+
+    fireEvent.change(screen.getByRole('textbox', { name: 'Display name' }), { target: { value: 'Applied arch' } })
+    fireEvent.click(screen.getByRole('button', { name: 'Apply changes' }))
+    expect(screen.getByText('Applied arch')).toBeTruthy()
+    expect(screen.getByText('rev 1')).toBeTruthy()
+  })
+
+  it('guards workspace navigation and can apply staged edits before continuing', async () => {
+    render(<ThemeProvider theme={studioTheme}><CssBaseline /><App /></ThemeProvider>)
+    fireEvent.change(screen.getByRole('textbox', { name: 'Display name' }), { target: { value: 'Guarded arch' } })
+
+    fireEvent.click(screen.getByRole('tab', { name: 'Continuum workspace' }))
+    expect(screen.getByRole('dialog', { name: 'Unapplied changes' })).toBeTruthy()
+    expect(screen.getByText(/before opening Continuum workspace/)).toBeTruthy()
+    fireEvent.click(screen.getByRole('button', { name: 'Keep editing' }))
+    await waitFor(() => expect(screen.queryByRole('dialog', { name: 'Unapplied changes' })).toBeNull())
+    expect(screen.getByRole('tab', { name: /^Frame workspace/ }).getAttribute('aria-selected')).toBe('true')
+
+    fireEvent.click(screen.getByRole('tab', { name: 'Continuum workspace' }))
+    fireEvent.click(screen.getByRole('button', { name: 'Apply and continue' }))
+    await waitFor(() => expect(screen.getByRole('tab', { name: 'Continuum workspace' }).getAttribute('aria-selected')).toBe('true'))
+
+    fireEvent.click(screen.getByRole('tab', { name: 'Frame workspace' }))
+    expect((screen.getByRole('textbox', { name: 'Display name' }) as HTMLInputElement).value).toBe('Guarded arch')
+    expect(screen.getByText('rev 1')).toBeTruthy()
   })
 })

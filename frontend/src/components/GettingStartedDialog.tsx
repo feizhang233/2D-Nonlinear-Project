@@ -27,12 +27,12 @@ interface GettingStartedDialogProps {
 }
 
 const steps: Array<{ title: string; body: string; workflow: WorkflowStep }> = [
-  { title: 'Choose the model family', body: 'These choices are active now. Pick one to load a complete verification example you can edit.', workflow: 'model' },
-  { title: 'Review geometry and topology', body: 'Use the Geometry panel to drag contour vertices, insert vertices, and cut holes. Frame models can add nodes and members directly on the canvas.', workflow: 'model' },
+  { title: 'Choose a model workspace', body: 'Frame, Continuum, Plate, and Shell keep separate working documents. Move between them from the workspace bar without merging their models.', workflow: 'model' },
+  { title: 'Review geometry and topology', body: 'Use the model tree and Properties form as the primary entry points. The canvas provides direct geometry editing when graphical placement is useful.', workflow: 'model' },
   { title: 'Define materials and supports', body: 'Check constitutive parameters. Add a support from Properties, then click a geometry vertex or choose it from the location list.', workflow: 'materials' },
-  { title: 'Apply loads', body: 'Add a load from Properties, then click the CAD contour or a node to place it. New loads keep their numbers when earlier loads are deleted.', workflow: 'loads' },
-  { title: 'Prepare the mesh', body: 'Frame uses explicit line elements. Continuum, Plate, and Shell generate an all-Q4 Gmsh mesh from the Geometry contour, including holes. Mesh nodes stay hidden on the canvas.', workflow: 'mesh' },
-  { title: 'Run and inspect the analysis', body: 'Choose the nonlinear control method, run the solve, then review committed steps, convergence, tables, and failure evidence.', workflow: 'solve' },
+  { title: 'Apply loads', body: 'Add a load from Properties, then use a form location or the canvas. All form and canvas edits remain staged until you choose Apply changes.', workflow: 'loads' },
+  { title: 'Prepare the mesh', body: 'Frame uses explicit line elements. Surface workspaces generate an all-Q4 Gmsh mesh; its nodes and elements remain visible but read-only.', workflow: 'mesh' },
+  { title: 'Run and inspect the analysis', body: 'Apply staged edits, choose the nonlinear control method, then run the solve. Monitoring, curves, tables, and failure evidence open in the separate Results mode.', workflow: 'solve' },
 ]
 
 export function GettingStartedDialog({
@@ -62,9 +62,6 @@ export function GettingStartedDialog({
       onClose={close}
       fullWidth
       maxWidth="sm"
-      disableAutoFocus
-      disableEnforceFocus
-      disableRestoreFocus
       aria-labelledby="getting-started-title"
     >
       <DialogTitle id="getting-started-title" sx={{ pr: 7 }}>Getting started with Nonlinear Studio</DialogTitle>

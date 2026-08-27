@@ -68,8 +68,8 @@ controls and evidence remain explicit rather than being hidden behind the simple
 - **Usage scene:** desktop-first, keyboard-and-pointer, information-dense local engineering work.
 - **Register:** product. Familiar model tree, inspector, viewport, and results-dock patterns win over
   brand expression.
-- **Memorable signature:** a load-path workflow rail whose connected nodes move from model definition
-  to the committed solve, paired with a compact model builder and a persistent left Properties workspace.
+- **Memorable signature:** four persistent model-family workspaces paired with an explicit Model/Results
+  mode boundary and a staged-edit strip that makes Apply/Cancel ownership continuously visible.
 - **Restraint:** forms, tables, toolbars, warnings, and failure evidence remain flat, compact, and
   literal.
 - **Anti-references:** not a marketing dashboard, consumer 3D viewer, glassmorphic control panel,
@@ -105,17 +105,19 @@ contract.
 
 ## Layout
 
-The desktop shell follows Frame Studio's working order: a workflow-led model builder at the far left,
-a persistent Properties/Analysis workspace immediately beside it, the canvas as the main right-hand
-region, and a bottom result dock. The two left regions share one bounded work surface so selecting a
-tree or canvas entity always reveals its editable properties without crossing the screen. The shell
-sits under a two-row top app bar (identity/actions, then model-family context) and a collapsible
-six-step workflow rail.
+The desktop shell separates Frame, Continuum, Plate, and Shell into persistent workspaces and separates
+Model from Results as top-level modes. Model mode places the workflow rail at the far left, gives the
+combined model tree and Properties/Analysis forms the dominant work surface, and reserves the right
+region for graphical model editing. Results mode replaces those mutation surfaces with a read-only
+result canvas and a dedicated evidence workspace; results are never embedded in a bottom model dock.
+The shell sits under a two-row top app bar (identity/actions, then mode and workspace context) and a
+collapsible six-step workflow rail. A persistent transaction strip below the context bar owns staged
+edit status, Cancel, and Apply changes.
 The model builder starts directly with Setup and Topology entities; it does not repeat workflow
 readiness or search controls above the list. Double-clicking an entity collapses Properties to a
 named 48 px restore rail, while the visible collapse/expand buttons provide keyboard and touch access.
 `toolbar-height`, `context-bar-height`, `panel-padding`, `content-gap`, and `control-gap` mirror
-the MUI 8 dp grid. The canvas and results dock may own bounded scrolling; the Properties workspace and
+the MUI 8 dp grid. The canvas and result workspace may own bounded scrolling; the Properties workspace and
 navigator keep visible scrollbars. Geometry is reserved during analysis so progress, success, and
 error states do not move the primary action.
 
@@ -163,8 +165,9 @@ icons retain the button's dimensions.
 
 ### Navigation and data display
 
-The model-family selector changes the entire working document and must show all four supported
-families by name. The workflow rail opens the canonical edit target for Model, Materials, Supports,
+The workspace bar changes the active working document and must show all four supported families by
+name while preserving each family's independent model, draft, selection, analysis, and result state.
+The Model/Results toggle owns the top-level mode boundary. The workflow rail opens the canonical edit target for Model, Materials, Supports,
 Loads, Mesh, and Solve; completion markers come from live model/analysis state. The left builder
 starts directly with Setup and Topology and keeps every entity reachable. Entity navigation,
 inspector tabs, canvas result modes, and result tabs each own one level of state. Tables retain headers
@@ -178,8 +181,11 @@ bar and canvas toolbar do not duplicate that canonical action. The canvas status
 reports mesh provenance plus live node/element counts. Target size accepts every finite value
 greater than zero; an example value is never presented or enforced as a lower bound. Limitations,
 explicit generation, busy state, and generated node/element summary stay together in the inspector.
-Dense surface meshes keep every node and element selectable but suppress unselected entity labels;
-selected, loaded, and constrained node labels remain visible so topology is readable after refinement.
+Dense surface meshes show every node and element in the tree and canvas by default and keep them
+selectable for inspection. They are read-only: topology changes originate from Geometry and Mesh, not
+from direct node movement, renaming, connectivity edits, additions, or deletion. Unselected entity
+labels remain suppressed; selected, loaded, and constrained node labels remain visible so topology is
+readable after refinement.
 `Show background grid` controls only the plotting aid; Q4 element edges are always the finite-element mesh.
 Distributed loads render as repeated directional arrows over their member, surface, or boundary,
 while exact components, units, coordinate system, and fixed-reference limitation remain in the
@@ -189,8 +195,10 @@ selected load inspector.
 
 MUI filled TextField/Select remains the canonical field and authored select owner. Fields keep
 persistent labels, numeric step metadata, unit adornments where the unit is already in the model,
-and inline helper/error text. Snackbars acknowledge completed
-low-risk actions; validation, solve failure, and invalidated results remain persistent inline.
+and inline helper/error text. Model and analysis-option edits are staged; the persistent transaction
+strip owns Apply changes and Cancel, while an app-owned three-outcome dialog guards navigation away
+from staged work. Snackbars acknowledge completed low-risk actions; validation, solve failure, and
+invalidated results remain persistent inline.
 Tooltips supplement icon actions and never contain the only instruction. The application stylesheet
 owns one visible, tokenized scrollbar baseline; component styles only add geometry exceptions such
 as stable gutters.

@@ -8,6 +8,7 @@ import TableChartRoundedIcon from '@mui/icons-material/TableChartRounded'
 import Alert from '@mui/material/Alert'
 import Badge from '@mui/material/Badge'
 import Box from '@mui/material/Box'
+import Button from '@mui/material/Button'
 import Chip from '@mui/material/Chip'
 import IconButton from '@mui/material/IconButton'
 import LinearProgress from '@mui/material/LinearProgress'
@@ -36,6 +37,7 @@ import {
 } from '../resultUtils'
 
 interface ResultsDockProps {
+  standalone?: boolean
   model: ModelInput
   record: AnalysisRecord | null
   state: 'idle' | 'validating' | 'running' | 'succeeded' | 'failed'
@@ -47,14 +49,14 @@ interface ResultsDockProps {
   onStepChange: (step: number) => void
 }
 
-const tabLabels: Array<{ value: ResultTab; label: string }> = [
-  { value: 'monitor', label: 'Solve monitor' },
-  { value: 'curves', label: 'Path and convergence' },
-  { value: 'tables', label: 'Result tables' },
-  { value: 'failure', label: 'Failure evidence' },
+const tabLabels: Array<{ value: ResultTab; label: string; compactLabel: string }> = [
+  { value: 'monitor', label: 'Solve monitor', compactLabel: 'Monitor' },
+  { value: 'curves', label: 'Path and convergence', compactLabel: 'Paths' },
+  { value: 'tables', label: 'Result tables', compactLabel: 'Tables' },
+  { value: 'failure', label: 'Failure evidence', compactLabel: 'Failures' },
 ]
 
-export function ResultsDock({ model, record, state, error, invalidated, tab, selectedStep, onTabChange, onStepChange }: ResultsDockProps) {
+export function ResultsDock({ standalone = false, model, record, state, error, invalidated, tab, selectedStep, onTabChange, onStepChange }: ResultsDockProps) {
   const [expanded, setExpanded] = useState(false)
   const result = record?.result ?? null
   const step = result?.steps[selectedStep]
@@ -71,32 +73,44 @@ export function ResultsDock({ model, record, state, error, invalidated, tab, sel
     if (state === 'running' || state === 'succeeded' || state === 'failed') setExpanded(true)
   }, [state])
 
+  const open = standalone || expanded
+
   return (
-    <Box sx={{ height: expanded ? 300 : 48, flexShrink: 0, borderTop: '1px solid', borderColor: 'divider', overflow: 'hidden', transition: 'height .18s ease', bgcolor: 'background.paper' }}>
-      <Stack direction="row" sx={{ alignItems: 'center', height: 48, borderBottom: expanded ? '1px solid' : 0, borderColor: 'divider', px: 1, bgcolor: 'background.containerLow' }}>
-        <Tabs value={tab} onChange={(_, value: ResultTab) => onTabChange(value)} sx={{ minHeight: 48, '& .MuiTab-root': { minHeight: 48, py: 0 } }}>
+    <Box sx={{ height: standalone ? '100%' : open ? 300 : 48, minHeight: 0, flexShrink: 0, borderTop: standalone ? 0 : '1px solid', borderColor: 'divider', overflow: 'hidden', transition: 'height .18s ease', bgcolor: 'background.paper' }}>
+      <Stack direction="row" sx={{ alignItems: 'center', height: 48, borderBottom: open ? '1px solid' : 0, borderColor: 'divider', px: 1, bgcolor: 'background.containerLow' }}>
+        <Tabs
+          value={tab}
+          onChange={(_, value: ResultTab) => onTabChange(value)}
+          variant={standalone ? 'scrollable' : 'standard'}
+          scrollButtons={standalone ? 'auto' : false}
+          allowScrollButtonsMobile
+          sx={{ minWidth: 0, minHeight: 48, flex: standalone ? 1 : undefined, '& .MuiTab-root': { minWidth: standalone ? 82 : 90, minHeight: 48, px: standalone ? 1 : 2, py: 0 } }}
+        >
           {tabLabels.map((item) => (
             <Tab
               key={item.value}
               value={item.value}
+              aria-label={item.label}
               label={item.value === 'failure' && failureCount > 0
-                ? <Badge color="error" badgeContent={failureCount} sx={{ '& .MuiBadge-badge': { right: -10, top: 2 } }}>{item.label}</Badge>
-                : item.label}
+                ? <Badge color="error" badgeContent={failureCount} sx={{ '& .MuiBadge-badge': { right: -10, top: 2 } }}>{standalone ? item.compactLabel : item.label}</Badge>
+                : standalone ? item.compactLabel : item.label}
             />
           ))}
         </Tabs>
-        <Box sx={{ flex: 1 }} />
+        {!standalone && <Box sx={{ flex: 1 }} />}
         {state === 'running' && <Chip size="small" color="primary" label="Solving" />}
-        {state === 'succeeded' && <Chip size="small" color="success" icon={<CheckCircleRoundedIcon />} label={`${record?.progress.accepted_steps ?? 0} accepted steps`} />}
+        {state === 'succeeded' && <Chip size="small" color="success" icon={<CheckCircleRoundedIcon />} label={`${record?.progress.accepted_steps ?? 0} accepted${standalone ? '' : ' steps'}`} />}
         {state === 'failed' && <Chip size="small" color="error" icon={<ErrorRoundedIcon />} label="Analysis failed" />}
-        <Tooltip title={expanded ? 'Collapse results' : 'Expand results'}>
-          <IconButton size="small" aria-label={expanded ? 'Collapse results' : 'Expand results'} onClick={() => setExpanded((value) => !value)}>
-            {expanded ? <ExpandMoreRoundedIcon /> : <ExpandLessRoundedIcon />}
-          </IconButton>
-        </Tooltip>
+        {!standalone && (
+          <Tooltip title={expanded ? 'Collapse results' : 'Expand results'}>
+            <IconButton size="small" aria-label={expanded ? 'Collapse results' : 'Expand results'} onClick={() => setExpanded((value) => !value)}>
+              {expanded ? <ExpandMoreRoundedIcon /> : <ExpandLessRoundedIcon />}
+            </IconButton>
+          </Tooltip>
+        )}
       </Stack>
-      {expanded && (
-        <Box sx={{ height: 252, overflow: 'auto', p: 1.5 }}>
+      {open && (
+        <Box sx={{ height: standalone ? 'calc(100% - 48px)' : 252, overflow: 'auto', p: 1.5, scrollbarGutter: 'stable' }}>
           {invalidated && !result && <Alert severity="warning" sx={{ mb: 1 }}>The model changed, so the previous results were invalidated and removed from this workspace. Run the analysis again.</Alert>}
           {tab === 'monitor' && (
             <Stack spacing={1.25}>
@@ -208,8 +222,17 @@ export function ResultsDock({ model, record, state, error, invalidated, tab, sel
                     </TableHead>
                     <TableBody>
                       {result.steps.map((item, index) => (
-                        <TableRow key={`${item.step_index}-${item.state_id}`} hover selected={index === selectedStep} onClick={() => onStepChange(index)} sx={{ cursor: 'pointer' }}>
-                          <TableCell>{item.step_index}</TableCell>
+                        <TableRow key={`${item.step_index}-${item.state_id}`} selected={index === selectedStep}>
+                          <TableCell>
+                            <Button
+                              size="small"
+                              variant={index === selectedStep ? 'contained' : 'text'}
+                              aria-label={`Show result step ${item.step_index}`}
+                              onClick={() => onStepChange(index)}
+                            >
+                              {item.step_index}
+                            </Button>
+                          </TableCell>
                           <TableCell>{item.status}</TableCell>
                           <TableCell>{formatNumber(item.load_factor)}</TableCell>
                           <TableCell>{formatNumber(item.accepted_step_size ?? item.requested_step_size)}</TableCell>

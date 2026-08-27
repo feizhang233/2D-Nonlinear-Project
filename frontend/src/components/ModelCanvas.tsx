@@ -34,6 +34,8 @@ import {
 } from '../resultUtils'
 
 interface ModelCanvasProps {
+  readOnly?: boolean
+  showResultControls?: boolean
   model: ModelInput
   result: SolveResult | null
   selectedStep: number
@@ -64,6 +66,7 @@ const activateOnKeyboard = (event: KeyboardEvent<SVGGElement | SVGCircleElement>
 }
 
 export function ModelCanvas({
+  readOnly = false, showResultControls = false,
   model, result, selectedStep, view, selection, cadTool, placement, pendingMember,
   onViewChange, onSelection, onModelChange, onPlace, onPendingMember,
 }: ModelCanvasProps) {
@@ -75,10 +78,10 @@ export function ModelCanvas({
   const isSurface = family.elementNodeCount === 4
   const meshStatus = meshStatusForModel(model)
   const hideMeshNodes = isGeneratedMesh(model)
-  const hideFeNodes = isSurfaceFamily(model)
+  const hideFeNodes = false
   const sketch = getSketch(model)
   const denseSurfaceMesh = isSurface && (model.nodes.length > 80 || model.elements.length > 80)
-  const editingCad = cadTool !== 'select' || Boolean(placement)
+  const editingCad = !readOnly && (cadTool !== 'select' || Boolean(placement))
   const hasOutOfPlane = dofs.includes('UZ')
   const step = result?.steps[selectedStep]
   const displacements = useMemo(() => displacementByNode(model, result, step), [model, result, step])
@@ -260,7 +263,7 @@ export function ModelCanvas({
   }
 
   const handleCanvasPointerMove = (event: ReactPointerEvent<SVGSVGElement>) => {
-    if (!dragRef.current) return
+    if (readOnly || !dragRef.current) return
     dragRef.current.moved = true
     const world = worldFromEvent(event)
     if (dragRef.current.kind === 'sketch') {
@@ -280,6 +283,7 @@ export function ModelCanvas({
       skipClickRef.current = false
       return
     }
+    if (readOnly) return
     const world = worldFromEvent(event)
     if (cadTool === 'add-vertex' && isSurfaceFamily(model)) {
       const next = addOuterVertexAt(model, [world.x, world.y])
@@ -307,7 +311,7 @@ export function ModelCanvas({
     if (nodeId) onPlace(nodeId)
   }
 
-  const canvasCursor = placement ? 'copy'
+  const canvasCursor = readOnly ? 'default' : placement ? 'copy'
     : cadTool === 'add-vertex' || cadTool === 'add-hole' || cadTool === 'add-node' ? 'crosshair'
       : cadTool === 'add-member' ? 'cell'
         : 'default'
@@ -347,12 +351,14 @@ export function ModelCanvas({
         }}
       >
         <Paper elevation={2} sx={{ display: 'flex', alignItems: 'center', gap: 1, px: 1, py: 0.75, borderRadius: 5, flexWrap: 'wrap', maxWidth: '100%' }}>
-          <ToggleButtonGroup exclusive size="small" value={view} onChange={(_, value: ResultView | null) => value && onViewChange(value)}>
-            <ToggleButton value="model">Model</ToggleButton>
-            <ToggleButton value="deformation" disabled={!result}>Deformation</ToggleButton>
-            <ToggleButton value="reactions" disabled={!result}>Reactions</ToggleButton>
-            <ToggleButton value="internal" disabled={!result}>Internal / stress</ToggleButton>
-          </ToggleButtonGroup>
+          {showResultControls && (
+            <ToggleButtonGroup exclusive size="small" value={view} onChange={(_, value: ResultView | null) => value && onViewChange(value)}>
+              <ToggleButton value="model">Model</ToggleButton>
+              <ToggleButton value="deformation" disabled={!result}>Deformation</ToggleButton>
+              <ToggleButton value="reactions" disabled={!result}>Reactions</ToggleButton>
+              <ToggleButton value="internal" disabled={!result}>Internal / stress</ToggleButton>
+            </ToggleButtonGroup>
+          )}
           {shouldDeform && <Chip size="small" label={`Deformation × ${formatNumber(deformationScale, 2)}`} />}
           {result && <Chip size="small" color={result.status === 'succeeded' ? 'success' : 'error'} label={`Step ${step?.step_index ?? '—'} · λ ${formatNumber(step?.load_factor)}`} />}
           {result && !isFinalStep && (view === 'reactions' || view === 'internal') && <Chip size="small" color="warning" label="Recovered fields use the final committed state" />}
@@ -387,14 +393,14 @@ export function ModelCanvas({
           </Tooltip>
         </Paper>
       </Stack>
-      {placement && (
+      {!readOnly && placement && (
         <Paper elevation={3} sx={{ position: 'absolute', zIndex: 3, top: 68, left: '50%', transform: 'translateX(-50%)', px: 2, py: 1, borderRadius: 5 }}>
           <Typography variant="body2">
             Click a {isSurfaceFamily(model) ? 'geometry vertex' : 'node'} to {placement.targetId ? 'move' : 'place'} this {placement.kind}. Esc cancels.
           </Typography>
         </Paper>
       )}
-      {cadTool !== 'select' && !placement && (
+      {!readOnly && cadTool !== 'select' && !placement && (
         <Paper elevation={2} sx={{ position: 'absolute', zIndex: 3, top: 68, left: '50%', transform: 'translateX(-50%)', px: 2, py: 1, borderRadius: 5 }}>
           <Typography variant="body2">
             {cadTool === 'add-vertex' && 'Click the contour to insert a vertex.'}
@@ -486,6 +492,10 @@ export function ModelCanvas({
           const point = nodeScreen.get(node.id); if (!point) return null
           const selected = selection.kind === 'nodes' && selection.id === node.id
           const selectNode = () => {
+            if (readOnly) {
+              onSelection({ kind: 'nodes', id: node.id })
+              return
+            }
             if (placement) { placeNode(node.id); return }
             if (cadTool === 'add-member') {
               if (!pendingMember) onPendingMember(node.id)
@@ -514,12 +524,12 @@ export function ModelCanvas({
                 onKeyDown={(event) => activateOnKeyboard(event, selectNode)}
                 onPointerDown={(event) => {
                   event.stopPropagation()
-                  if (cadTool === 'select' && !placement) {
+                  if (!readOnly && !isSurfaceFamily(model) && cadTool === 'select' && !placement) {
                     dragRef.current = { id: node.id, kind: 'frame', moved: false }
                   }
                 }}
                 onClick={(event) => { event.stopPropagation(); selectNode() }}
-                style={{ cursor: placement ? 'copy' : 'pointer', outline: 'none' }}
+                style={{ cursor: readOnly ? 'pointer' : placement ? 'copy' : 'pointer', outline: 'none' }}
               />
               <text x={point.x + 10} y={point.y - 8} fill="#394154" fontSize="11" fontWeight="600">{nodeLabel}</text>
             </g>
@@ -565,11 +575,15 @@ export function ModelCanvas({
                 style={{ cursor: placement ? 'copy' : 'grab', outline: 'none' }}
                 onPointerDown={(event) => {
                   event.stopPropagation()
-                  if (placement) return
+                  if (readOnly || placement) return
                   dragRef.current = { id: vertex.id, kind: 'sketch', moved: false }
                 }}
                 onClick={(event) => {
                   event.stopPropagation()
+                  if (readOnly) {
+                    onSelection({ kind: 'geometry', id: vertex.id })
+                    return
+                  }
                   if (placement) {
                     placeNode(node?.id)
                     return

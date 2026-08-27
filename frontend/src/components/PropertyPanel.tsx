@@ -21,6 +21,7 @@ import {
   firstFreePlacementNodeId,
   geometryNeedsMesh,
   getSketch,
+  isSurfaceFamily,
   moveSketchVertex,
   PlacementState,
 } from '../geometrySketch'
@@ -70,6 +71,7 @@ export function PropertyPanel({
   const meshStatus = meshStatusForModel(model)
   const meshSize = meshSizeForModel(model)
   const meshSizeInvalid = !Number.isFinite(meshSize) || meshSize <= 0
+  const topologyReadOnly = isSurfaceFamily(model)
   const dofs = dofsForModel(model)
   const placementNodes = editablePlacementNodes(model)
   const locationOptions = (currentId?: string) => {
@@ -304,10 +306,12 @@ export function PropertyPanel({
     const referenced = model.elements.some((item) => item.node_ids.includes(id)) || model.loads.some((item) => item.node_id === id) || model.constraints.some((item) => item.node_id === id)
     return (
       <Stack spacing={2}>
-        <SectionHeader title={nodeDisplayLabel(model, id)} subtitle={`${model.model_family === 'shell' ? '3D reference coordinates' : '2D reference coordinates'}; units come from model metadata`} />
+        <SectionHeader title={nodeDisplayLabel(model, id)} subtitle={topologyReadOnly ? 'Read-only finite-element mesh node' : `${model.model_family === 'shell' ? '3D reference coordinates' : '2D reference coordinates'}; units come from model metadata`} />
+        {topologyReadOnly && <Alert severity="info">Mesh nodes are visible for inspection but cannot be edited directly. Edit the Geometry contour and generate a new mesh.</Alert>}
         <TextField
           label="Display name"
           value={nodeDisplayLabel(model, id)}
+          disabled={topologyReadOnly}
           slotProps={{ htmlInput: { maxLength: 80 } }}
           onChange={(event) => onChange(withEntityDisplayName(model, kind, id, event.target.value), { kind, id })}
         />
@@ -319,6 +323,7 @@ export function PropertyPanel({
               type="number"
               label={label}
               value={node.coordinates[index] ?? 0}
+              disabled={topologyReadOnly}
               slotProps={{
                 htmlInput: { step: 'any' },
                 input: { endAdornment: <InputAdornment position="end">{model.units.length}</InputAdornment> },
@@ -327,9 +332,9 @@ export function PropertyPanel({
             />
           ))}
         </Stack>
-        <Divider />
-        <Button color="error" variant="outlined" startIcon={<DeleteOutlineRoundedIcon />} disabled={referenced} onClick={() => removeEntity(kind, id)}>Delete node</Button>
-        {referenced && <Typography variant="caption" color="text.secondary">This node is referenced by an element, support, or load. Remove those references first.</Typography>}
+        {!topologyReadOnly && <Divider />}
+        {!topologyReadOnly && <Button color="error" variant="outlined" startIcon={<DeleteOutlineRoundedIcon />} disabled={referenced} onClick={() => removeEntity(kind, id)}>Delete node</Button>}
+        {!topologyReadOnly && referenced && <Typography variant="caption" color="text.secondary">This node is referenced by an element, support, or load. Remove those references first.</Typography>}
       </Stack>
     )
   }
@@ -339,10 +344,12 @@ export function PropertyPanel({
     if (!element) return null
     return (
       <Stack spacing={2}>
-        <SectionHeader title={elementDisplayLabel(model, id)} subtitle={family.capability} />
+        <SectionHeader title={elementDisplayLabel(model, id)} subtitle={topologyReadOnly ? `Read-only ${family.formulation} mesh element` : family.capability} />
+        {topologyReadOnly && <Alert severity="info">Mesh elements are visible for connectivity and formulation inspection. Their topology is controlled by Geometry and Gmsh.</Alert>}
         <TextField
           label="Display name"
           value={elementDisplayLabel(model, id)}
+          disabled={topologyReadOnly}
           slotProps={{ htmlInput: { maxLength: 80 } }}
           onChange={(event) => onChange(withEntityDisplayName(model, kind, id, event.target.value), { kind, id })}
         />
@@ -353,6 +360,7 @@ export function PropertyPanel({
               key={index}
               label={family.elementNodeCount === 2 ? (index === 0 ? 'i node' : 'j node') : `Node ${index + 1}`}
               value={element.node_ids[index] ?? ''}
+              disabled={topologyReadOnly}
               sx={{ minWidth: family.elementNodeCount === 2 ? 145 : 136, flex: 1 }}
               onChange={(event) => updateEntity(kind, id, (entity) => { (entity.node_ids as string[])[index] = event.target.value })}
             >
@@ -360,7 +368,7 @@ export function PropertyPanel({
             </TextField>
           ))}
         </Stack>
-        <TextField select label="Material" value={element.material_id} onChange={(event) => updateEntity(kind, id, (entity) => { entity.material_id = event.target.value })}>
+        <TextField select disabled={topologyReadOnly} label="Material" value={element.material_id} onChange={(event) => updateEntity(kind, id, (entity) => { entity.material_id = event.target.value })}>
           {model.materials.map((material) => <MenuItem key={material.id} value={material.id}>{materialDisplayLabel(model, material.id)}</MenuItem>)}
         </TextField>
         {Object.entries(element.properties).map(([key, value]) => (
@@ -369,7 +377,7 @@ export function PropertyPanel({
             type={typeof value === 'number' ? 'number' : 'text'}
             label={propertyLabels[key] ?? key}
             value={typeof value === 'object' ? JSON.stringify(value) : String(value)}
-            disabled={typeof value === 'object'}
+            disabled={topologyReadOnly || typeof value === 'object'}
             slotProps={{
               htmlInput: typeof value === 'number' ? { step: 'any' } : undefined,
               input: unitForKey(key, model) ? { endAdornment: <InputAdornment position="end">{unitForKey(key, model)}</InputAdornment> } : undefined,
@@ -378,7 +386,7 @@ export function PropertyPanel({
           />
         ))}
         <TextField label="Formulation" value={element.formulation} disabled />
-        <Button color="error" variant="outlined" startIcon={<DeleteOutlineRoundedIcon />} onClick={() => removeEntity(kind, id)}>Delete element</Button>
+        {!topologyReadOnly && <Button color="error" variant="outlined" startIcon={<DeleteOutlineRoundedIcon />} onClick={() => removeEntity(kind, id)}>Delete element</Button>}
       </Stack>
     )
   }

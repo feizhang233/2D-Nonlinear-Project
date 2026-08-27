@@ -53,7 +53,7 @@ Open in the browser:
 
 > An account is not required for modeling, meshing, analysis, JSON import, or JSON export. Registration and login add a private, server-side model history. Guest models are not saved.
 
-> **What you see first:** Nonlinear Studio opens with a shallow-arch Frame verification model. Choose Frame, Continuum, Plate, or Shell from the model-family selector, then edit the model and run the analysis.
+> **What you see first:** Nonlinear Studio opens with a shallow-arch Frame verification model. Frame, Continuum, Plate, and Shell are separate workspaces. Edit through the model tree, forms, or graphical canvas, then Apply or Cancel the staged changes before running the analysis. Completed solves open in the separate Results mode.
 
 ---
 
@@ -62,7 +62,7 @@ Open in the browser:
 | Area | What you get |
 | --- | --- |
 | Four model families | One workflow for nonlinear Frame, Continuum, Plate, and flat-Shell models |
-| Visual modeling | Editable nodes, elements, materials, supports, loads, names, and solver settings |
+| Visual modeling | Model tree and forms as the primary editor, graphical canvas editing, transactional Apply/Cancel, editable Frame topology, and visible read-only surface meshes |
 | Nonlinear solution | Full or modified Newton, load/displacement control, line search, adaptive stepping, cutback, and spherical arc length |
 | State safety | Trial, commit, rollback, restart, rejected-step history, and model provenance |
 | Meshing | Gmsh-backed all-Q4 remeshing for Continuum, Plate, and flat-Shell boundaries |

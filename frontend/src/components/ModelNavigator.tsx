@@ -23,7 +23,7 @@ import Typography from '@mui/material/Typography'
 import { useEffect, useMemo, useState, type MouseEvent } from 'react'
 import type { EntityKind, ModelInput, Selection } from '../domain'
 import { entityDisplayLabel, loadDisplayLabel, modelDisplayLabel, supportDisplayLabel } from '../entityLabels'
-import { editablePlacementNodes, firstFreePlacementNodeId, isGeneratedMesh } from '../geometrySketch'
+import { editablePlacementNodes, firstFreePlacementNodeId, isSurfaceFamily } from '../geometrySketch'
 import { meshStatusForModel } from '../meshing'
 import { dofsForModel, MODEL_FAMILIES } from '../modelFamilies'
 import { addNodalLoadAtNode, addSupportAtNode, groupedSupports, nextPrefixedId } from '../supports'
@@ -60,7 +60,7 @@ export function ModelNavigator({ model, selection, onSelection, onModelChange, o
   const [openGroups, setOpenGroups] = useState<Record<string, boolean>>({})
   const supports = useMemo(() => groupedSupports(model, familyDofs), [model, familyDofs])
   const meshStatus = meshStatusForModel(model)
-  const hideMeshTopology = isGeneratedMesh(model)
+  const surfaceTopologyReadOnly = isSurfaceFamily(model)
   const meshDescription = model.model_family === 'frame'
     ? `Line topology · ${meshStatus.nodeCount} nodes · ${meshStatus.elementCount} elements`
     : `${meshStatus.sourceLabel} · ${meshStatus.nodeCount} nodes · ${meshStatus.elementCount} Q4`
@@ -118,27 +118,27 @@ export function ModelNavigator({ model, selection, onSelection, onModelChange, o
 
   const groups = useMemo(() => definitions.map((definition) => {
     const ids = idsFor(model, definition.kind)
-    const hideIds = hideMeshTopology && (definition.kind === 'nodes' || definition.kind === 'elements')
     return {
       ...definition,
       ids,
-      visibleIds: hideIds ? [] : ids,
+      visibleIds: ids,
+      readOnly: surfaceTopologyReadOnly && (definition.kind === 'nodes' || definition.kind === 'elements'),
       supportGroups: definition.kind === 'constraints' ? supports.groups : [],
     }
-  }), [model, supports.groups])
+  }), [model, supports.groups, surfaceTopologyReadOnly])
 
   const handleEntityDoubleClick = (event: MouseEvent<HTMLElement>) => {
     if ((event.target as HTMLElement).closest('[data-navigator-action="true"]')) return
     onEntityDoubleClick?.()
   }
 
-  const renderGroup = ({ kind, label, description, icon: Icon, ids, visibleIds, supportGroups }: typeof groups[number]) => {
+  const renderGroup = ({ kind, label, description, icon: Icon, ids, visibleIds, readOnly, supportGroups }: typeof groups[number]) => {
     const active = selection.kind === kind
     const open = kind in openGroups ? Boolean(openGroups[kind]) : active
     const count = kind === 'constraints' ? supports.nodeCount : ids.length
     const placementCount = editablePlacementNodes(model).length
-    const addDisabled = (kind === 'nodes' && hideMeshTopology)
-      || (kind === 'elements' && (hideMeshTopology || model.nodes.length < family.elementNodeCount))
+    const addDisabled = (kind === 'nodes' && surfaceTopologyReadOnly)
+      || (kind === 'elements' && (surfaceTopologyReadOnly || model.nodes.length < family.elementNodeCount))
       || (kind === 'constraints' && (placementCount === 0 || !firstFreePlacementNodeId(model)))
       || (kind === 'loads' && placementCount === 0)
 
@@ -156,7 +156,7 @@ export function ModelNavigator({ model, selection, onSelection, onModelChange, o
           <ListItemIcon><Icon fontSize="small" /></ListItemIcon>
           <ListItemText
             primary={label}
-            secondary={description}
+            secondary={readOnly ? 'Visible read-only mesh entities' : description}
             slotProps={{ primary: { sx: { fontWeight: 600 } }, secondary: { variant: 'caption', noWrap: true } }}
           />
           <Chip label={count} size="small" variant="outlined" sx={{ height: 22, mr: 0.25 }} />
@@ -222,9 +222,7 @@ export function ModelNavigator({ model, selection, onSelection, onModelChange, o
             ))
           ) : visibleIds.length === 0 ? (
             <Typography variant="caption" color="text.secondary" sx={{ display: 'block', pl: 6, py: 0.75 }}>
-              {hideMeshTopology && (kind === 'nodes' || kind === 'elements')
-                ? `Mesh ${label.toLowerCase()} are hidden. Edit contour vertices in Geometry.`
-                : `No ${label.toLowerCase()} yet`}
+              No {label.toLowerCase()} yet
             </Typography>
           ) : visibleIds.map((id) => (
             <ListItemButton
@@ -236,6 +234,7 @@ export function ModelNavigator({ model, selection, onSelection, onModelChange, o
               sx={{ pl: 6, minHeight: 34, pr: 0.5 }}
             >
               <ListItemText primary={entityDisplayLabel(model, kind, id)} slotProps={{ primary: { variant: 'body2' } }} />
+              {readOnly && <LockRoundedIcon aria-label="Read-only mesh entity" sx={{ fontSize: 15, color: 'text.disabled', mr: 0.75 }} />}
               {kind === 'loads' && (
                 <Tooltip title={`Delete ${loadDisplayLabel(model, id)}`}>
                   <IconButton data-navigator-action="true" size="small" aria-label={`Delete ${loadDisplayLabel(model, id)}`} onClick={(event) => { event.stopPropagation(); removeLoad(id) }}>
