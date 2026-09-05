@@ -17,12 +17,12 @@ interface WorkspaceSwitcherProps {
 
 export function WorkspaceSwitcher({ activeFamily, draftFamilies, resultFamilies, onChange }: WorkspaceSwitcherProps) {
   return (
-    <Box sx={{ minWidth: 610, borderRight: '1px solid', borderColor: 'divider' }}>
+    <Box sx={{ minWidth: 510, borderRight: '1px solid', borderColor: 'divider' }}>
       <Tabs
         value={activeFamily}
         onChange={(_, family: ModelFamily) => onChange(family)}
         aria-label="Structural model workspaces"
-        sx={{ minHeight: 64, '& .MuiTab-root': { minHeight: 64, minWidth: 146, px: 1.5 } }}
+        sx={{ minHeight: 54, '& .MuiTab-root': { minHeight: 54, minWidth: 124, px: 1.25 } }}
       >
         {MODEL_FAMILY_ORDER.map((family) => {
           const info = MODEL_FAMILIES[family]
@@ -43,7 +43,7 @@ export function WorkspaceSwitcher({ activeFamily, draftFamilies, resultFamilies,
                     {hasDraft && <Chip size="small" color="warning" label="Draft" sx={{ height: 20 }} />}
                   </Box>
                   <Typography component="span" variant="caption" color="text.secondary" noWrap sx={{ display: 'block', pl: 2.9 }}>
-                    {info.formulation}
+                    {family === 'frame' ? 'Line elements' : family === 'continuum' ? 'Plane strain' : family === 'plate' ? 'Plate bending' : 'Flat shell'}
                   </Typography>
                 </Box>
               }

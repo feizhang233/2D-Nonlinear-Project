@@ -51,6 +51,9 @@ def test_health_and_openapi_publish_only_the_planned_p10_paths():
         "/api/v1/models",
         "/api/v1/models/validate",
         "/api/v1/models/{entry_id}",
+        "/api/v1/math-cores",
+        "/api/v1/math-cores/{core_id}",
+        "/api/v1/math-cores/execute",
         "/api/v1/meshes",
         "/api/v1/analyses",
         "/api/v1/analyses/{analysis_id}",
@@ -265,3 +268,19 @@ def test_explicit_cors_origin_is_opt_in_and_supports_frontend_requests():
 
     assert response.status_code == 200
     assert response.headers["access-control-allow-origin"] == "http://127.0.0.1:5173"
+
+
+def test_spa_fallback_keeps_assets_out_of_html_and_contains_paths(tmp_path, monkeypatch):
+    dist = tmp_path / "dist"
+    dist.mkdir()
+    (dist / "index.html").write_text("<html>Studio test</html>")
+    (tmp_path / "private.txt").write_text("outside frontend")
+    (dist / "outside.txt").symlink_to(tmp_path / "private.txt")
+    monkeypatch.setenv("NONLINEAR_FRONTEND_DIST", str(dist))
+    with TestClient(create_app()) as client:
+        assert "Studio test" in client.get("/workspace").text
+        for path in ("/api", "/api/missing", "/missing.js", "/outside.txt", "/%2e%2e/private.txt"):
+            response = client.get(path)
+            assert response.status_code == 404
+            assert "outside frontend" not in response.text
+            assert "Studio test" not in response.text

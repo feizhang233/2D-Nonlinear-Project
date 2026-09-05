@@ -25,6 +25,7 @@ import Tabs from '@mui/material/Tabs'
 import TextField from '@mui/material/TextField'
 import Tooltip from '@mui/material/Tooltip'
 import Typography from '@mui/material/Typography'
+import { useTheme } from '@mui/material/styles'
 import { useEffect, useState } from 'react'
 import type { AnalysisRecord, ModelInput, ResultTab } from '../domain'
 import { elementDisplayLabel } from '../entityLabels'
@@ -57,6 +58,7 @@ const tabLabels: Array<{ value: ResultTab; label: string; compactLabel: string }
 ]
 
 export function ResultsDock({ standalone = false, model, record, state, error, invalidated, tab, selectedStep, onTabChange, onStepChange }: ResultsDockProps) {
+  const theme = useTheme()
   const [expanded, setExpanded] = useState(false)
   const result = record?.result ?? null
   const step = result?.steps[selectedStep]
@@ -101,6 +103,7 @@ export function ResultsDock({ standalone = false, model, record, state, error, i
         {state === 'running' && <Chip size="small" color="primary" label="Solving" />}
         {state === 'succeeded' && <Chip size="small" color="success" icon={<CheckCircleRoundedIcon />} label={`${record?.progress.accepted_steps ?? 0} accepted${standalone ? '' : ' steps'}`} />}
         {state === 'failed' && <Chip size="small" color="error" icon={<ErrorRoundedIcon />} label="Analysis failed" />}
+        {record?.status === 'cancelled' && <Chip size="small" color="warning" label="Cancelled" />}
         {!standalone && (
           <Tooltip title={expanded ? 'Collapse results' : 'Expand results'}>
             <IconButton size="small" aria-label={expanded ? 'Collapse results' : 'Expand results'} onClick={() => setExpanded((value) => !value)}>
@@ -114,7 +117,8 @@ export function ResultsDock({ standalone = false, model, record, state, error, i
           {invalidated && !result && <Alert severity="warning" sx={{ mb: 1 }}>The model changed, so the previous results were invalidated and removed from this workspace. Run the analysis again.</Alert>}
           {tab === 'monitor' && (
             <Stack spacing={1.25}>
-              {state === 'idle' && !invalidated && (
+              {record?.status === 'cancelled' && <Alert severity="info">The solver confirmed cancellation. Only accepted, committed evidence is retained.</Alert>}
+              {state === 'idle' && !invalidated && !record && (
                 <EmptyState
                   icon={<HistoryToggleOffRoundedIcon />}
                   title="Ready to solve"
@@ -155,7 +159,7 @@ export function ResultsDock({ standalone = false, model, record, state, error, i
                       <StatTile label="Iterations" value={String(step.iterations.length)} />
                     </Stack>
                   )}
-                  <TableContainer sx={{ maxHeight: 118, borderRadius: 2, border: '1px solid', borderColor: 'divider' }}>
+                  <TableContainer sx={{ maxHeight: standalone ? 440 : 118, borderRadius: 2, border: '1px solid', borderColor: 'divider' }}>
                     <Table size="small" stickyHeader aria-label="Iteration records">
                       <TableHead>
                         <TableRow>
@@ -192,12 +196,12 @@ export function ResultsDock({ standalone = false, model, record, state, error, i
 
           {tab === 'curves' && (
             result ? (
-              <Stack direction="row" spacing={2}>
-                <Box sx={{ flex: 1, minWidth: 0 }}><MiniChart title="Load–displacement path" xLabel="Monitored DOF displacement" yLabel="Load factor λ" series={[{ name: 'Path', color: '#4563b5', points: loadPath }]} /></Box>
+              <Stack direction={standalone ? 'column' : 'row'} spacing={2}>
+                <Box sx={{ flex: 1, minWidth: 0 }}><MiniChart title="Load–displacement path" xLabel="Monitored DOF displacement" yLabel="Load factor λ" series={[{ name: 'Path', color: theme.palette.primary.main, points: loadPath }]} /></Box>
                 <Box sx={{ flex: 1, minWidth: 0 }}><MiniChart title="Iteration convergence history" xLabel="Global iteration index" yLabel="Norm (log)" logY series={[
-                  { name: 'Residual', color: '#c43d4b', points: convergence.map((point) => ({ x: point.x, y: point.y })) },
-                  { name: 'Displacement', color: '#4563b5', points: convergence.map((point) => ({ x: point.x, y: point.correction })) },
-                  { name: 'Energy', color: '#138a63', points: convergence.map((point) => ({ x: point.x, y: point.energy })) },
+                  { name: 'Residual', color: theme.palette.error.main, points: convergence.map((point) => ({ x: point.x, y: point.y })) },
+                  { name: 'Displacement', color: theme.palette.primary.main, points: convergence.map((point) => ({ x: point.x, y: point.correction })) },
+                  { name: 'Energy', color: theme.palette.secondary.main, points: convergence.map((point) => ({ x: point.x, y: point.energy })) },
                 ]} /></Box>
               </Stack>
             ) : (
@@ -207,8 +211,8 @@ export function ResultsDock({ standalone = false, model, record, state, error, i
 
           {tab === 'tables' && (
             result ? (
-              <Stack direction="row" spacing={2}>
-                <TableContainer sx={{ flex: 1, maxHeight: 216, borderRadius: 2, border: '1px solid', borderColor: 'divider' }}>
+              <Stack direction={standalone ? 'column' : 'row'} spacing={2}>
+                <TableContainer sx={{ flex: 1, maxHeight: standalone ? 360 : 216, borderRadius: 2, border: '1px solid', borderColor: 'divider' }}>
                   <Table size="small" stickyHeader>
                     <TableHead>
                       <TableRow>
@@ -243,7 +247,7 @@ export function ResultsDock({ standalone = false, model, record, state, error, i
                     </TableBody>
                   </Table>
                 </TableContainer>
-                <TableContainer sx={{ flex: 1, maxHeight: 216, borderRadius: 2, border: '1px solid', borderColor: 'divider' }}>
+                <TableContainer sx={{ flex: 1, maxHeight: standalone ? 360 : 216, borderRadius: 2, border: '1px solid', borderColor: 'divider' }}>
                   <Table size="small" stickyHeader aria-label={`${family.label} element recovery results`}>
                     <TableHead>
                       <TableRow>
@@ -273,7 +277,9 @@ export function ResultsDock({ standalone = false, model, record, state, error, i
 
           {tab === 'failure' && (
             <Stack spacing={1}>
-              {!failures.length && !record?.error && <Alert severity="success">The current result has no failure records. Rejected steps, if any, remain available in the result tables.</Alert>}
+              {error && !record?.error && <Alert severity="error">{error}</Alert>}
+              {!result && !error && !record?.error && <Alert severity="info">No result evidence is available yet. Run an analysis to inspect its outcome.</Alert>}
+              {result && !error && !failures.length && !record?.error && <Alert severity="success">The current result has no failure records. Rejected steps, if any, remain available in the result tables.</Alert>}
               {(failures.length ? failures : record?.error ? [{ ...record.error, details: record.error.details ?? {} }] : []).map((failure, index) => (
                 <Alert key={`${failure.code}-${index}`} severity="error">
                   <Typography variant="subtitle2">{failure.code} · {failure.message}</Typography>

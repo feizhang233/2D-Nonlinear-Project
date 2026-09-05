@@ -1,0 +1,401 @@
+{
+  "V00": {
+    "status": "PASS",
+    "tangent_formula": "[[1+q2+q1^2, q1], [q1, 2+q2^2]]",
+    "tangent": [
+      [
+        0.94,
+        0.2
+      ],
+      [
+        0.2,
+        2.01
+      ]
+    ],
+    "tangent_times_direction": [
+      0.20199999999999996,
+      -0.744
+    ],
+    "centered_error_coefficient": [
+      0.009,
+      -0.02133333333333334
+    ],
+    "minimum_error": 3.944559115871288e-12,
+    "minimum_error_step": 1e-05,
+    "scan": [
+      {
+        "h": 0.1,
+        "approximation": [
+          0.20209000000000005,
+          -0.7442133333333336
+        ],
+        "absolute_error": 0.00023154073315779649,
+        "observed_order": null
+      },
+      {
+        "h": 0.03,
+        "approximation": [
+          0.20200809999999977,
+          -0.7440191999999994
+        ],
+        "absolute_error": 2.083866598358919e-05,
+        "observed_order": 2.0000000000244125
+      },
+      {
+        "h": 0.01,
+        "approximation": [
+          0.2020009000000017,
+          -0.7440021333333338
+        ],
+        "absolute_error": 2.315407332651415e-06,
+        "observed_order": 1.999999999551248
+      },
+      {
+        "h": 0.003,
+        "approximation": [
+          0.2020000810000061,
+          -0.7440001920000031
+        ],
+        "absolute_error": 2.0838666510438792e-07,
+        "observed_order": 1.9999999794104109
+      },
+      {
+        "h": 0.001,
+        "approximation": [
+          0.20200000900000292,
+          -0.7440000213333325
+        ],
+        "absolute_error": 2.3154073741899668e-08,
+        "observed_order": 2.0000000062344494
+      },
+      {
+        "h": 0.0003,
+        "approximation": [
+          0.20200000081002648,
+          -0.7440000019199219
+        ],
+        "absolute_error": 2.083804937260332e-09,
+        "observed_order": 2.000024592436025
+      },
+      {
+        "h": 0.0001,
+        "approximation": [
+          0.20200000008990804,
+          -0.7440000002131852
+        ],
+        "absolute_error": 2.3136856455316243e-10,
+        "observed_order": 2.0006501514852375
+      },
+      {
+        "h": 1e-05,
+        "approximation": [
+          0.20200000000053506,
+          -0.7440000000039081
+        ],
+        "absolute_error": 3.944559115871288e-12,
+        "observed_order": 1.7683058830784817
+      },
+      {
+        "h": 1e-06,
+        "approximation": [
+          0.20200000000469842,
+          -0.7439999999830915
+        ],
+        "absolute_error": 1.7549133210723848e-11,
+        "observed_order": -0.6482572015164865
+      },
+      {
+        "h": 1e-07,
+        "approximation": [
+          0.20200000006020957,
+          -0.7440000002190139
+        ],
+        "absolute_error": 2.2713937147488104e-10,
+        "observed_order": -1.1120367491017842
+      },
+      {
+        "h": 1e-08,
+        "approximation": [
+          0.2019999986724308,
+          -0.7439999977210121
+        ],
+        "absolute_error": 2.637465768531892e-09,
+        "observed_order": -1.0648944119684747
+      },
+      {
+        "h": 1e-09,
+        "approximation": [
+          0.20200000006020957,
+          -0.7440000282521453
+        ],
+        "absolute_error": 2.8252209447744628e-08,
+        "observed_order": -1.0298655855658538
+      },
+      {
+        "h": 1e-10,
+        "approximation": [
+          0.20200008332693642,
+          -0.7440001392744477
+        ],
+        "absolute_error": 1.6229833682719892e-07,
+        "observed_order": -0.7592616521281728
+      },
+      {
+        "h": 1e-11,
+        "approximation": [
+          0.2019995282154241,
+          -0.7439979188283985
+        ],
+        "absolute_error": 2.133976551157927e-06,
+        "observed_order": -1.1188755735816467
+      },
+      {
+        "h": 1e-12,
+        "approximation": [
+          0.20200507933054723,
+          -0.7440020821647408
+        ],
+        "absolute_error": 5.4895363025037655e-06,
+        "observed_order": -0.41034601848920393
+      }
+    ]
+  },
+  "V01": {
+    "status": "PASS",
+    "case_a": {
+      "projection": 2.0,
+      "classification": "limit_point",
+      "nullity": 1,
+      "right_null_residual": 0.0,
+      "left_null_residual": 0.0
+    },
+    "case_b": {
+      "projection": 0.0,
+      "classification": "bifurcation_candidate",
+      "nullity": 1,
+      "right_null_residual": 0.0,
+      "left_null_residual": 0.0
+    }
+  },
+  "V02": {
+    "status": "PASS",
+    "characteristic_polynomial": "0.46*lambda^2 - 12.8*lambda + 68 = 0",
+    "eigenvalues": [
+      7.149413397346066,
+      20.676673559175672
+    ],
+    "mode_second_to_first_ratios": [
+      1.4142135623730947,
+      -1.4142135623730951
+    ],
+    "critical_loads_kn": [
+      71.49413397346066,
+      206.7667355917567
+    ],
+    "relative_residuals": [
+      5.734440033475793e-17,
+      3.5363213350401594e-17
+    ]
+  },
+  "V03": {
+    "status": "PASS",
+    "case_a": {
+      "amplitudes": [
+        -0.3162277660168379,
+        0.3162277660168379
+      ],
+      "hessian": 0.7999999999999998,
+      "type": "supercritical",
+      "stable": true
+    },
+    "case_b": {
+      "amplitudes": [
+        -0.3162277660168379,
+        0.3162277660168379
+      ],
+      "hessian": -0.7999999999999998,
+      "type": "subcritical",
+      "stable": false
+    }
+  },
+  "V04": {
+    "status": "PASS",
+    "single_mode": {
+      "amplitude": [
+        0.3162277660168379,
+        0.0
+      ],
+      "energy": -0.009999999999999997,
+      "hessian_eigenvalues": [
+        -0.19999999999999998,
+        0.7999999999999996
+      ],
+      "stable": false
+    },
+    "symmetric_mixed": {
+      "amplitude": [
+        0.2581988897471611,
+        0.2581988897471611
+      ],
+      "energy": -0.013333333333333326,
+      "hessian_eigenvalues": [
+        0.2666666666666666,
+        0.7999999999999998
+      ],
+      "stable": true
+    }
+  },
+  "V05": {
+    "status": "PASS",
+    "imperfections": [
+      1e-06,
+      0.0001,
+      0.01
+    ],
+    "load_factors": [
+      0.99985,
+      0.9967683479649522,
+      0.9303761674958083
+    ],
+    "log_slopes": [
+      0.6666666666666906,
+      0.6666666666666666
+    ]
+  },
+  "V06": {
+    "status": "PASS",
+    "predictor": [
+      0.5970142500145332,
+      0.3992535625036333
+    ],
+    "predictor_increment": [
+      0.09701425001453323,
+      0.024253562503633308
+    ],
+    "predictor_residual": -0.015030722353078008,
+    "augmented_newton_system": {
+      "matrix": "[[1-3*q^2, -1], [2*(q-0.5), 2*(lambda-0.375)]]",
+      "right_hand_side": "-[q-q^3-lambda, (q-0.5)^2+(lambda-0.375)^2-0.01]"
+    },
+    "corrected": [
+      0.5995912433545614,
+      0.3840323998523396
+    ],
+    "theoretical_limit": [
+      0.5773502691896258,
+      0.3849001794597505
+    ],
+    "iterations": 4,
+    "residual_norm": 0.0,
+    "constraint_error": 8.673617379884035e-18,
+    "past_limit_point": true
+  },
+  "V07": {
+    "status": "PASS",
+    "gamma": -1.0,
+    "seed": [
+      0.0,
+      -1.0
+    ],
+    "orthogonality_error": 0.0
+  },
+  "V08": {
+    "status": "PASS",
+    "critical_stress_mpa": 85.62571016595692,
+    "membrane_force_n_per_mm": 85.62571016595692,
+    "total_load_kn": 269.0011020157791,
+    "alpha_per_mm": 0.08087083369469977,
+    "full_wavelength_mm": 77.69408351717514,
+    "half_wave_count": 25.74198586894815
+  },
+  "V09": {
+    "status": "PASS",
+    "critical_pressure_mpa": 0.34250284066382763,
+    "membrane_force_n_per_mm": 85.6257101659569,
+    "same_ideal_membrane_scale_as_v08": true
+  },
+  "V10": {
+    "status": "PASS",
+    "audit_logic_status": "PASS",
+    "subject_report_status": "FAIL",
+    "given_report_reaches_gate": false,
+    "missing_categories": [
+      "residual_tangent",
+      "critical_classification",
+      "mode_interaction",
+      "imperfection",
+      "path_following",
+      "mesh_boundary",
+      "material_state",
+      "reproducibility_scope"
+    ],
+    "missing_requirements": [
+      "residual_tangent.residual_convention",
+      "residual_tangent.directional_tangent_check",
+      "residual_tangent.step_residuals_and_rollback",
+      "critical_classification.spectrum_and_inertia",
+      "critical_classification.left_right_null_spaces",
+      "critical_classification.critical_point_type",
+      "mode_interaction.neighboring_eigenpairs",
+      "mode_interaction.cluster_tracking",
+      "mode_interaction.multi_mode_directions",
+      "imperfection.normalization_and_application",
+      "imperfection.imperfection_scan",
+      "imperfection.measured_field_scope",
+      "path_following.arc_length_control",
+      "path_following.step_and_branch_convergence",
+      "path_following.stability_indicators",
+      "mesh_boundary.half_wave_and_element",
+      "mesh_boundary.mesh_convergence",
+      "mesh_boundary.boundary_sensitivity",
+      "material_state.material_and_initial_state",
+      "material_state.algorithmic_tangent",
+      "material_state.state_contract_and_level",
+      "reproducibility_scope.artifacts_and_versions",
+      "reproducibility_scope.conclusion_level",
+      "reproducibility_scope.claim_boundary"
+    ],
+    "requirements": {
+      "residual_tangent": {
+        "residual_convention": "残量符号与载荷参数化",
+        "directional_tangent_check": "一致切线方向差分",
+        "step_residuals_and_rollback": "每步平衡/弧长/线性残差与失败回滚"
+      },
+      "critical_classification": {
+        "spectrum_and_inertia": "最低特征值/奇异值与惯性",
+        "left_right_null_spaces": "左右零空间及 psi.T@f_ref",
+        "critical_point_type": "极限点或分岔候选分类"
+      },
+      "mode_interaction": {
+        "neighboring_eigenpairs": "邻近特征值与临界子空间",
+        "cluster_tracking": "模态簇/子空间相关性",
+        "multi_mode_directions": "双模态或多模态方向检查"
+      },
+      "imperfection": {
+        "normalization_and_application": "0.1h 的归一化、符号和几何施加方式",
+        "imperfection_scan": "缺陷幅值、方向、位置和类型扫描",
+        "measured_field_scope": "实测场或未覆盖范围说明"
+      },
+      "path_following": {
+        "arc_length_control": "弧长定义、beta、步长和根选择",
+        "step_and_branch_convergence": "步长收敛与分支身份",
+        "stability_indicators": "稳定性指标"
+      },
+      "mesh_boundary": {
+        "half_wave_and_element": "半波解析、元素和积分方案",
+        "mesh_convergence": "网格/畸变收敛",
+        "boundary_sensitivity": "端部、转动及载荷引入敏感性"
+      },
+      "material_state": {
+        "material_and_initial_state": "材料、残余应力和厚度偏差",
+        "algorithmic_tangent": "一致算法切线",
+        "state_contract_and_level": "trial/commit/rollback 与分析层级"
+      },
+      "reproducibility_scope": {
+        "artifacts_and_versions": "模型、版本、输入、日志和脚本",
+        "conclusion_level": "L1-L4 结论分级",
+        "claim_boundary": "非设计值/非统计下限的结论边界"
+      }
+    }
+  }
+}

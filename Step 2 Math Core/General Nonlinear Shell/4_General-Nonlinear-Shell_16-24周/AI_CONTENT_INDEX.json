@@ -1,0 +1,93 @@
+{
+  "schema_version": "1.0",
+  "package_id": "general-nonlinear-shell-16-24w-math-core-guide",
+  "package_title": "General Nonlinear Shell 16-24周数学核心引导",
+  "created_date": "2026-08-29",
+  "language": ["zh-CN", "en-technical-terms"],
+  "scope": {
+    "project_map_id": "P08",
+    "project_map_name": "General Nonlinear Shell",
+    "duration": "16-24 weeks, default 20-week route",
+    "included": [
+      "curved-shell midsurface director and thickness kinematics",
+      "SO(3) finite-rotation updates and objectivity",
+      "Total and Updated Lagrangian configuration contracts",
+      "internal force and consistent material geometric rotational stabilization and load tangents",
+      "through-thickness integration and local plane-stress condensation",
+      "elastoplastic trial commit rollback material protocol",
+      "follower pressure and potentially nonsymmetric load stiffness",
+      "MITC assumed strain locking and drilling or hourglass stabilization checks",
+      "Newton displacement and arc-length controls",
+      "verification V00 through V14",
+      "16-week compressed 20-week default and 24-week extended routes"
+    ],
+    "excluded": [
+      "production-ready universal nonlinear shell element implementation",
+      "contact friction fracture delamination and localization regularization",
+      "complete nonlinear dynamics",
+      "design-code resistance and knock-down factors",
+      "experimental calibration and probabilistic reliability",
+      "universal mesh integration step or tolerance values",
+      "automatic physical branch selection for arbitrary nonconservative systems"
+    ]
+  },
+  "canonical_source": {
+    "document_id": "A01",
+    "path": "01_核心算法/核心算法与实现顺序.md",
+    "rule": "Use for the package-level kinematics configuration residual tangent material load state and implementation contract."
+  },
+  "default_reading_sequence": ["G01", "G02", "G03", "A01", "C01", "L01", "V01", "P01", "M01"],
+  "documents": [
+    {"id": "G00", "path": "README.md", "category": "navigation", "priority": 1, "summary": "Package scope directory shortest reading path and completion boundary.", "keywords": ["scope", "P08", "general nonlinear shell"]},
+    {"id": "G01", "path": "AGENTS.md", "category": "agent-instructions", "priority": 1, "summary": "Mandatory rules for signs rotations work conjugacy state safety full tangents and verification gates.", "keywords": ["AGENTS", "SO(3)", "work conjugacy", "verification gate"]},
+    {"id": "G02", "path": "AI_USAGE.md", "category": "ai-instructions", "priority": 1, "summary": "Task routing canonical residual configuration and rotation conventions state responsibilities and prohibited inference.", "keywords": ["AI usage", "TL", "UL", "follower load", "commit rollback"]},
+    {"id": "G03", "path": "CONTENT_INDEX.md", "category": "human-readable-index", "priority": 1, "summary": "Human-readable file algorithm verification and PDF-page routing.", "keywords": ["content index", "routing", "verification pair", "PDF page"]},
+    {"id": "A01", "path": "01_核心算法/核心算法与实现顺序.md", "category": "core-algorithm", "priority": 1, "summary": "Curved-shell geometry finite rotations TL and UL virtual work full tangent thickness integration material state follower pressure stabilization Newton and pseudocode.", "keywords": ["director", "finite rotation", "consistent tangent", "thickness integration", "follower pressure", "MITC", "arc length"]},
+    {"id": "L01", "path": "02_算法局限/算法局限与适用边界.md", "category": "limitations", "priority": 1, "summary": "Kinematic rotational configuration material load locking continuation benchmark and GMNIA boundaries.", "keywords": ["limitation", "plane stress", "locking", "nonconservative", "GMNIA"]},
+    {"id": "Q01", "path": "03_验证题目与答案/验证题目.md", "category": "verification-questions", "priority": 1, "summary": "Independent V00-V14 problems from SO(3) and objectivity to nonlinear material shell benchmarks and GMNIA review.", "keywords": ["verification question", "objectivity", "pressure tangent", "plasticity", "large rotation"]},
+    {"id": "S01", "path": "03_验证题目与答案/配套答案.md", "category": "verification-solutions", "priority": 1, "summary": "Paired numerical analytical or evidence-based solutions for V00-V14.", "keywords": ["answer", "reference value", "plane stress condensation", "rollback", "digitization"]},
+    {"id": "V01", "path": "03_验证题目与答案/验证矩阵.md", "category": "verification-plan", "priority": 1, "summary": "Ordered validation matrix stage gates tolerance rules and automation metadata.", "keywords": ["test matrix", "acceptance gate", "directional derivative", "GMNIA"]},
+    {"id": "C01", "path": "08_Python数学核心/README.md", "category": "executable-math-core", "priority": 1, "summary": "Python L0 primitives tests commands and honest V00-V14 execution boundaries.", "keywords": ["Python", "SO(3)", "directional derivative", "arc length", "rollback"]},
+    {"id": "C02", "path": "08_Python数学核心/artifacts/V00-V14_演算报告.md", "category": "worked-results", "priority": 1, "summary": "Human-readable computed results status and limitations for every V00-V14 problem.", "keywords": ["worked examples", "verification report", "V00", "V14"]},
+    {"id": "C03", "path": "08_Python数学核心/artifacts/V00-V14_演算结果.json", "category": "machine-readable-results", "priority": 1, "summary": "Machine-readable calculations verification status conventions and stage-gate boundaries.", "keywords": ["JSON", "calculation results", "verification status"]},
+    {"id": "R00", "path": "04_参考资料/README.md", "category": "reference-navigation", "priority": 2, "summary": "Reading route and copyright boundary for six bundled PDFs.", "keywords": ["reference", "Chapelle", "de Borst", "Bonet", "Onate"]},
+    {"id": "R01", "path": "04_参考资料/Chapelle_Bathe_FEA_of_Shells.pdf", "category": "source-pdf", "priority": 2, "summary": "Primary shell geometry model MITC nonlinear shell and demonstrative solution source.", "page_routes": [{"topic": "shell geometry and models", "pdf_pages": "33-50, 93-109"}, {"topic": "general shell elements MITC and locking", "pdf_pages": "190-216, 262-301"}, {"topic": "nonlinear shell analysis", "pdf_pages": "302-312"}], "keywords": ["shell geometry", "MITC", "nonlinear shell"]},
+    {"id": "R02", "path": "04_参考资料/deBorst_Nonlinear_FEA_2e.pdf", "category": "source-pdf", "priority": 2, "summary": "Primary TL UL consistent tangent continuation plasticity shell and large-strain material source.", "page_routes": [{"topic": "TL UL and continuum tangent", "pdf_pages": "86-118"}, {"topic": "continuation and stability", "pdf_pages": "131-158"}, {"topic": "plasticity integration and tangent", "pdf_pages": "235-267"}, {"topic": "shell hyperelasticity and finite plasticity", "pdf_pages": "358-438"}], "keywords": ["Total Lagrangian", "Updated Lagrangian", "plasticity", "shell"]},
+    {"id": "R03", "path": "04_参考资料/Bonet_Worked_Examples_Nonlinear_Continuum.pdf", "category": "source-pdf", "priority": 2, "summary": "Worked objectivity stress hyperelasticity plasticity pressure linearization and tangent examples.", "page_routes": [{"topic": "kinematics stress and materials", "pdf_pages": "54-110"}, {"topic": "linearized equilibrium and discretization", "pdf_pages": "111-138"}], "keywords": ["worked example", "objectivity", "pressure", "tangent"]},
+    {"id": "R04", "path": "04_参考资料/Onate_Linear_Statics_Vol2_Beams_Plates_Shells.pdf", "category": "source-pdf", "priority": 3, "summary": "Linear degenerated curved-shell geometry thickness integration and assumed-strain baseline.", "page_routes": [{"topic": "curved 3D shell elements", "pdf_pages": "636-687"}], "keywords": ["degenerated shell", "thickness integration", "assumed strain"]},
+    {"id": "R05", "path": "04_参考资料/Shell_Instability_Research_完整數學邏輯推導與例題_繁中.pdf", "category": "prerequisite-pdf", "priority": 3, "summary": "Local lecture for critical points Koiter imperfections arc length and research evidence.", "keywords": ["instability", "Koiter", "arc length", "imperfection"]},
+    {"id": "R06", "path": "04_参考资料/Plate_Shell_Buckling_完整數學推導與例題_繁中.pdf", "category": "prerequisite-pdf", "priority": 3, "summary": "Local lecture for prestress geometric stiffness and linear buckling prerequisites.", "keywords": ["buckling", "geometric stiffness", "plate", "shell"]},
+    {"id": "M01", "path": "05_来源映射/参考资料与范围映射.md", "category": "provenance", "priority": 2, "summary": "Workspace origins formula routes synthesis exclusions and traceability rules.", "keywords": ["source mapping", "P08", "provenance"]},
+    {"id": "M02", "path": "05_来源映射/P08_核心章节映射.jsonl", "category": "machine-readable-source-map", "priority": 2, "summary": "Exact project_id P08 subset of the workspace project chapter map.", "keywords": ["JSONL", "P08", "chapter map"]},
+    {"id": "P01", "path": "06_学习路线/16-24周学习路线.md", "category": "study-plan", "priority": 1, "summary": "Default 20-week route with 16-week compression and 24-week extension.", "keywords": ["16 weeks", "20 weeks", "24 weeks", "study plan"]},
+    {"id": "T01", "path": "07_可复现脚本/validate_package.py", "category": "validation-script", "priority": 2, "summary": "Checks JSON documents verification pairing links and SHA256 manifest.", "keywords": ["validate", "manifest", "JSON", "links"]}
+  ],
+  "verification_pairs": [
+    {"test_id": "V00", "question_document": "Q01", "solution_document": "S01", "topic": "SO(3) exponential update"},
+    {"test_id": "V01", "question_document": "Q01", "solution_document": "S01", "topic": "finite rigid-motion objectivity"},
+    {"test_id": "V02", "question_document": "Q01", "solution_document": "S01", "topic": "objective strain measure"},
+    {"test_id": "V03", "question_document": "Q01", "solution_document": "S01", "topic": "TL UL stress transformation"},
+    {"test_id": "V04", "question_document": "Q01", "solution_document": "S01", "topic": "full tangent directional derivative"},
+    {"test_id": "V05", "question_document": "Q01", "solution_document": "S01", "topic": "follower pressure load tangent"},
+    {"test_id": "V06", "question_document": "Q01", "solution_document": "S01", "topic": "linear elastic thickness integration"},
+    {"test_id": "V07", "question_document": "Q01", "solution_document": "S01", "topic": "elastoplastic return mapping"},
+    {"test_id": "V08", "question_document": "Q01", "solution_document": "S01", "topic": "plane stress condensation"},
+    {"test_id": "V09", "question_document": "Q01", "solution_document": "S01", "topic": "locking and stabilization scan"},
+    {"test_id": "V10", "question_document": "Q01", "solution_document": "S01", "topic": "large-rotation pure-bending strip"},
+    {"test_id": "V11", "question_document": "Q01", "solution_document": "S01", "topic": "arc-length limit-point crossing"},
+    {"test_id": "V12", "question_document": "Q01", "solution_document": "S01", "topic": "trial commit rollback"},
+    {"test_id": "V13", "question_document": "Q01", "solution_document": "S01", "topic": "large-deformation elastoplastic square plate"},
+    {"test_id": "V14", "question_document": "Q01", "solution_document": "S01", "topic": "GMNIA evidence audit"}
+  ],
+  "routing": [
+    {"intent": "implement finite rotation shell kinematics", "read": ["G02", "A01", "Q01", "S01", "R01"]},
+    {"intent": "choose TL or UL", "read": ["G02", "A01", "L01", "R02"]},
+    {"intent": "verify complete tangent", "read": ["A01", "Q01", "S01", "R03"]},
+    {"intent": "implement shell material and thickness integration", "read": ["A01", "L01", "Q01", "S01", "R02"]},
+    {"intent": "implement follower pressure", "read": ["A01", "L01", "Q01", "S01", "R03"]},
+    {"intent": "debug locking or stabilization", "read": ["A01", "L01", "V01", "R01", "R04"]},
+    {"intent": "trace postbuckling path", "read": ["A01", "L01", "V01", "R05", "R06"]},
+    {"intent": "run the executable math core or worked verification problems", "read": ["C01", "Q01", "S01", "V01", "C02", "C03"]},
+    {"intent": "claim GMNIA or engineering capacity", "read": ["G01", "L01", "V01", "Q01", "S01"], "warning": "The package defines evidence gates but does not provide design-code resistance experimental calibration or reliability proof."}
+  ]
+}

@@ -86,7 +86,14 @@ def _sketch_loops(document: object) -> list[list[tuple[str, np.ndarray]]] | None
         coordinates = item.get("coordinates")
         if not isinstance(coordinates, list) or len(coordinates) < 2:
             continue
-        vertex_lookup[item["id"]] = np.asarray([float(coordinates[0]), float(coordinates[1]), float(coordinates[2]) if len(coordinates) > 2 else 0.0], dtype=float)
+        vertex_lookup[item["id"]] = np.asarray(
+            [
+                float(coordinates[0]),
+                float(coordinates[1]),
+                float(coordinates[2]) if len(coordinates) > 2 else 0.0,
+            ],
+            dtype=float,
+        )
     if not vertex_lookup:
         return None
     outer: list[tuple[str, np.ndarray]] | None = None
@@ -237,7 +244,9 @@ def _generate_surface_mesh_serialized(request: SurfaceMeshRequest) -> SurfaceMes
         outer_point_tags: list[int] = []
         for loop_index, loop in enumerate(boundary_loops):
             point_tags = [
-                gmsh.model.geo.addPoint(float(point[0]), float(point[1]), z_value, request.mesh_size)
+                gmsh.model.geo.addPoint(
+                    float(point[0]), float(point[1]), z_value, request.mesh_size
+                )
                 for _, point in loop
             ]
             line_tags = [

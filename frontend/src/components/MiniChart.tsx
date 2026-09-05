@@ -34,11 +34,17 @@ export function MiniChart({ title, xLabel, yLabel, series, logY = false, emptyTe
     const yMax = Math.max(...ys)
     const xSpan = xMax - xMin || 1
     const ySpan = yMax - yMin || 1
-    const path = (points: Array<{ x: number; y: number }>) => points.map((point, index) => {
+    const path = (points: Array<{ x: number; y: number }>) => {
+      let connected = false
+      return points.map((point) => {
+      if (!Number.isFinite(point.x) || !Number.isFinite(point.y)) { connected = false; return '' }
       const x = 46 + ((point.x - xMin) / xSpan) * 302
       const y = 14 + (1 - (yValue(point.y) - yMin) / ySpan) * 112
-      return `${index === 0 ? 'M' : 'L'} ${x.toFixed(2)} ${y.toFixed(2)}`
+      const command = connected ? 'L' : 'M'
+      connected = true
+      return `${command} ${x.toFixed(2)} ${y.toFixed(2)}`
     }).join(' ')
+    }
     return { xMin, xMax, yMin, yMax, path }
   }, [logY, series])
 
@@ -60,7 +66,7 @@ export function MiniChart({ title, xLabel, yLabel, series, logY = false, emptyTe
         </Stack>
       </Stack>
       {prepared ? (
-        <svg viewBox="0 0 370 158" role="img" aria-label={title} style={{ width: '100%', height: 150, display: 'block' }}>
+        <svg viewBox="0 0 370 158" role="img" aria-label={title} style={{ width: '100%', height: 'auto', aspectRatio: '370 / 158', display: 'block' }}>
           <rect x="46" y="14" width="302" height="112" rx="8" fill={plotFill} stroke={grid} />
           {[0, 0.5, 1].map((fraction) => <line key={fraction} x1="46" x2="348" y1={14 + fraction * 112} y2={14 + fraction * 112} stroke={grid} />)}
           {series.map((item) => <path key={item.name} d={prepared.path(item.points)} fill="none" stroke={item.color} strokeWidth="2.3" strokeLinejoin="round" />)}

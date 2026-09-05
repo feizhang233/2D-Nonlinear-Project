@@ -1,0 +1,2897 @@
+{
+  "analysis_contract": {
+    "compression_membrane_force": "positive",
+    "eigenproblem": "K_M phi = lambda K_G phi",
+    "equilibrium": "r(q, lambda) = f_int(q) - lambda f_ref = 0",
+    "geometric_mapping": "K_G = -K_sigma_ref"
+  },
+  "records": [
+    {
+      "analysis_level": "GNA foundation",
+      "computed": {
+        "branch_tangent_at_lambda_6": 4.0,
+        "classification": "symmetric_supercritical_bifurcation",
+        "lambda_c": 5.0,
+        "q_minus_at_lambda_6": -1.4142135623730951,
+        "q_plus_at_lambda_6": 1.4142135623730951
+      },
+      "evidence": "All equilibrium branches are explicit; the non-zero branch tangent is positive for lambda>5.",
+      "passed": true,
+      "reference": {
+        "classification": "symmetric_supercritical_bifurcation",
+        "lambda_c": 5.0
+      },
+      "scope": "reference_math_core",
+      "status": "ANALYTICAL_PASS",
+      "test_id": "V10",
+      "title": "Equilibrium, stability and bifurcation"
+    },
+    {
+      "analysis_level": "LBA",
+      "computed": {
+        "checks": [
+          "free residual",
+          "reaction",
+          "membrane units/sign",
+          "compression/tension direction",
+          "K_G symmetry",
+          "positive weakening energy",
+          "local operator ordering",
+          "multi-epsilon directional difference"
+        ],
+        "data_chain": [
+          "reference_load",
+          "equilibrated_q0",
+          "integration_point_membrane_forces",
+          "compression_positive_K_G",
+          "total_incremental_tangent"
+        ],
+        "directional_tangent_curve": [
+          {
+            "absolute_error": 0.001307881558787304,
+            "epsilon": 0.001,
+            "relative_error": 0.00020241508011357304
+          },
+          {
+            "absolute_error": 0.00013064668737412772,
+            "epsilon": 0.0001,
+            "relative_error": 2.0223293029723583e-05
+          },
+          {
+            "absolute_error": 1.3063253734776512e-05,
+            "epsilon": 1e-05,
+            "relative_error": 2.0221470237001618e-06
+          },
+          {
+            "absolute_error": 1.3063172398682457e-06,
+            "epsilon": 1e-06,
+            "relative_error": 2.022138108191463e-07
+          }
+        ],
+        "first_order_interval_found": true,
+        "free_residual_norm": 0.0,
+        "geometric_min_eigenvalue": 2.406302610769618,
+        "geometric_symmetry_error": 0.0,
+        "prebuckling_displacement": [
+          0.0,
+          0.8333333333333333
+        ],
+        "reaction_dof_0": -1.6666666666666665,
+        "recovered_membrane_forces": [
+          [
+            [
+              3.333333333333333,
+              0.41666666666666663
+            ],
+            [
+              0.41666666666666663,
+              1.6666666666666665
+            ]
+          ],
+          [
+            [
+              2.5,
+              0.20833333333333331
+            ],
+            [
+              0.20833333333333331,
+              1.25
+            ]
+          ]
+        ],
+        "successive_error_ratios": [
+          10.009006931564977,
+          10.000901414536433,
+          10.000044089514274
+        ]
+      },
+      "evidence": "The same equilibrated q0 now drives membrane-force recovery and K_G; the total tangent includes that K_G and is checked across a decreasing epsilon sequence.",
+      "passed": true,
+      "reference": {
+        "directional_difference": "first-order consistent",
+        "free_residual_norm": 0.0,
+        "symmetric": true
+      },
+      "scope": "reference_math_core",
+      "status": "REFERENCE_CORE_PASS",
+      "test_id": "V11",
+      "title": "Prebuckling equilibrium and geometric stiffness"
+    },
+    {
+      "analysis_level": "LBA",
+      "computed": {
+        "eigenvalues": [
+          7.149413397346066,
+          20.67667355917567
+        ],
+        "first_critical_load_kn": 71.49413397346066,
+        "max_residual": 2.165416280948275e-16
+      },
+      "evidence": "The solver uses K_G=-K_sigma_ref and preserves eigenvalue signs; no absolute-value sorting is applied.",
+      "passed": true,
+      "reference": {
+        "eigenvalues": [
+          7.1494,
+          20.6767
+        ],
+        "first_critical_load_kn": 71.494
+      },
+      "scope": "reference_math_core",
+      "status": "REFERENCE_CORE_PASS",
+      "test_id": "V12",
+      "title": "Two-DOF generalized eigenproblem and sign"
+    },
+    {
+      "analysis_level": "LBA",
+      "computed": {
+        "axial_halfwave_mm": 600.0,
+        "buckling_coefficient": 3.999999999999999,
+        "critical_membrane_force_n_per_mm": 455.52020312720106,
+        "critical_stress_mpa": 75.92003385453351,
+        "flexural_rigidity_n_mm": 4153846.153846154,
+        "mode_m": 2,
+        "mode_n": 1,
+        "total_edge_load_kn": 273.31212187632065
+      },
+      "evidence": "All integer Navier modes in the configured search are compared; the selected axial half-wave is 600 mm.",
+      "passed": true,
+      "reference": {
+        "D_n_mm": 4153846.0,
+        "Ncr_n_per_mm": 455.52,
+        "load_kn": 273.312,
+        "mode": [
+          2,
+          1
+        ],
+        "stress_mpa": 75.92
+      },
+      "scope": "reference_math_core",
+      "status": "ANALYTICAL_PASS",
+      "test_id": "V13",
+      "title": "Uniaxial simply supported rectangular plate"
+    },
+    {
+      "analysis_level": "LBA",
+      "computed": {
+        "D_n_mm": 52369.73029588897,
+        "Ncr_each_direction_n_per_mm": 6.460856507652106,
+        "biaxial_to_uniaxial_ratio": 0.5,
+        "mode": [
+          1,
+          1
+        ],
+        "stress_mpa": 3.230428253826053,
+        "uniaxial_Ncr_n_per_mm": 12.921713015304212
+      },
+      "evidence": "The same material and geometry are evaluated on two distinct proportional load paths.",
+      "passed": true,
+      "reference": {
+        "Ncr_each_direction_n_per_mm": 6.4609,
+        "ratio": 0.5,
+        "stress_mpa": 3.2304,
+        "uniaxial_Ncr_n_per_mm": 12.9217
+      },
+      "scope": "reference_math_core",
+      "status": "ANALYTICAL_PASS",
+      "test_id": "V14",
+      "title": "Equal biaxial compression of a simply supported square"
+    },
+    {
+      "analysis_level": "LBA",
+      "computed": {
+        "M16_ks": 9.324672700247284,
+        "M16_mode_count": 256,
+        "M16_residual": 2.222860221880254e-16,
+        "M2_ks": 11.103304951225528,
+        "M2_mode_count": 4
+      },
+      "evidence": "The code constructs the parity-coupled Navier matrix; it cannot produce a result from one uncoupled sine mode.",
+      "passed": true,
+      "reference": {
+        "M16_ks": 9.3247,
+        "M2_ks": 11.1033
+      },
+      "scope": "reference_math_core",
+      "status": "ANALYTICAL_PASS",
+      "test_id": "V15",
+      "title": "Pure-shear square-plate modal coupling"
+    },
+    {
+      "analysis_level": "LBA",
+      "computed": {
+        "axisymmetric_wavelength_mm": 77.69408351717514,
+        "axisymmetric_wavenumber_per_mm": 0.08087083369469977,
+        "continuous_axial_halfwaves": 25.74198586894815,
+        "critical_membrane_force_n_per_mm": 85.62571016595692,
+        "critical_stress_mpa": 85.62571016595692,
+        "flexural_rigidity_n_mm": 6546.216286986121,
+        "nearest_axial_halfwaves": 26,
+        "total_axial_load_kn": 269.0011020157791
+      },
+      "evidence": "This is the perfect elastic Donnell benchmark only; imperfection, end, residual-stress and material effects are excluded.",
+      "passed": true,
+      "reference": {
+        "load_kn": 269.0,
+        "membrane_force_n_per_mm": 85.626,
+        "nearest_m": 26,
+        "stress_mpa": 85.626,
+        "wavelength_mm": 77.694
+      },
+      "scope": "reference_math_core",
+      "status": "ANALYTICAL_PASS",
+      "test_id": "V16",
+      "title": "Classical axially compressed thin cylinder"
+    },
+    {
+      "analysis_level": "LBA",
+      "computed": {
+        "filter_results": {
+          "accepted": {
+            "accepted": true,
+            "reasons": []
+          },
+          "constraint_leakage": {
+            "accepted": false,
+            "reasons": [
+              "constraint_leakage",
+              "single_group_localization"
+            ]
+          },
+          "drilling": {
+            "accepted": false,
+            "reasons": [
+              "drilling_dominated",
+              "single_group_localization"
+            ]
+          },
+          "localized": {
+            "accepted": false,
+            "reasons": [
+              "single_group_localization"
+            ]
+          },
+          "rigid": {
+            "accepted": false,
+            "reasons": [
+              "rigid_dominated",
+              "single_group_localization"
+            ]
+          },
+          "wrong_load": {
+            "accepted": false,
+            "reasons": [
+              "single_group_localization",
+              "wrong_load_direction"
+            ]
+          },
+          "zero_energy": {
+            "accepted": false,
+            "reasons": [
+              "zero_energy",
+              "single_group_localization"
+            ]
+          }
+        },
+        "individual_MAC_after_basis_rotation": 0.5,
+        "near_repeated_groups": [
+          [
+            0,
+            1
+          ],
+          [
+            2
+          ]
+        ],
+        "principal_angles_rad": [
+          0.0,
+          0.0
+        ],
+        "sign_reversed_MAC": 1.0
+      },
+      "evidence": "Individual vectors rotate inside a repeated eigenspace; synthetic counterexamples now execute every required reference filter rather than listing filter names.",
+      "passed": true,
+      "reference": {
+        "repeated_subspace_max_angle_rad": 0.0,
+        "sign_reversed_MAC": 1.0
+      },
+      "scope": "reference_math_core",
+      "status": "REFERENCE_CORE_PASS",
+      "test_id": "V17",
+      "title": "Mode normalization, sign and repeated roots"
+    },
+    {
+      "analysis_level": "GNIA preparation",
+      "computed": {
+        "actual_max_mm": 3.0,
+        "applied_coordinates_mm": [
+          [
+            0.0,
+            0.0,
+            0.0
+          ],
+          [
+            100.0,
+            0.0,
+            -0.75
+          ],
+          [
+            100.0,
+            100.0,
+            1.5
+          ],
+          [
+            0.0,
+            100.0,
+            -3.0
+          ]
+        ],
+        "best_fit_rigid_fraction_diagnostic": 0.6454972243679026,
+        "fixed_boundary_max_movement_mm": 0.0,
+        "geometry_valid": true,
+        "minimum_area_ratio": 1.000182795792849,
+        "minimum_normal_alignment": 0.9998172376153459,
+        "offsets_mm": [
+          -0.0,
+          -0.75,
+          1.5,
+          -3.0
+        ],
+        "rigid_component_note": "reported as a diagnostic; the four-scalar exercise does not supply a full structural rigid-mode basis",
+        "rigid_filter_counterexample": {
+          "fraction_after": 3.065263002443168e-14,
+          "fraction_before": 0.9946734467242799,
+          "passed": true
+        },
+        "rms_amplitude_mm": 1.71846588560844,
+        "sign": -1,
+        "source_id": "V18-mode-1-normal-component",
+        "thickness_valid": true
+      },
+      "evidence": "The filtered scalar mode is now applied along unit nodal normals and checked for fixed-boundary motion, area collapse, normal reversal, thickness, actual maximum and RMS amplitude.",
+      "passed": true,
+      "reference": {
+        "actual_max_mm": 3.0,
+        "offsets_mm": [
+          0.0,
+          -0.75,
+          1.5,
+          -3.0
+        ]
+      },
+      "scope": "reference_math_core",
+      "status": "REFERENCE_CORE_PASS",
+      "test_id": "V18",
+      "title": "Mode-to-geometric-imperfection mapping"
+    },
+    {
+      "analysis_level": "GNIA",
+      "computed": {
+        "limit_load_factor": 0.9303761674958083,
+        "load_reduction_fraction": 0.06962383250419169,
+        "modal_amplitude": 0.1077217345015942
+      },
+      "evidence": "The formula is limited to the stated symmetric subcritical Koiter reduction near the critical point.",
+      "passed": true,
+      "reference": {
+        "lambda_star": 0.930376,
+        "modal_amplitude": 0.107722,
+        "reduction_percent": 6.9624
+      },
+      "scope": "reference_math_core",
+      "status": "ANALYTICAL_PASS",
+      "test_id": "V19",
+      "title": "Koiter two-thirds imperfection reduction"
+    },
+    {
+      "analysis_level": "GNA",
+      "computed": {
+        "closed_form_load_kn": 62.17086961602425,
+        "closed_form_w_mm": 85.2855553115594,
+        "fine_endpoint_relative_change": 1.5752567138396414e-05,
+        "step_sensitivity": [
+          {
+            "beta": 0.001,
+            "committed_steps": 34,
+            "max_normalized_arc_constraint_error": 1.0880185641326534e-14,
+            "max_normalized_residual": 1.0439672182078145e-13,
+            "nearest_peak_load_kn": 62.150348322294974,
+            "nearest_peak_w_mm": 87.00242113705235,
+            "path_max_w_mm": 110.56355562439954,
+            "peak_load_relative_error": 0.00033007892371486483,
+            "peak_w_relative_error": 0.020130792596952763,
+            "rejected_attempts": 0,
+            "step_size": 4.0
+          },
+          {
+            "beta": 0.001,
+            "committed_steps": 68,
+            "max_normalized_arc_constraint_error": 6.994405055138486e-15,
+            "max_normalized_residual": 3.5114724804684785e-13,
+            "nearest_peak_load_kn": 62.17028634359377,
+            "nearest_peak_w_mm": 84.99689744287883,
+            "path_max_w_mm": 110.55658817768409,
+            "peak_load_relative_error": 9.38176406528234e-06,
+            "peak_w_relative_error": 0.0033846044341983594,
+            "rejected_attempts": 0,
+            "step_size": 2.0
+          },
+          {
+            "beta": 0.001,
+            "committed_steps": 136,
+            "max_normalized_arc_constraint_error": 9.630074515598608e-12,
+            "max_normalized_residual": 2.0966460675598884e-13,
+            "nearest_peak_load_kn": 62.17028084430396,
+            "nearest_peak_w_mm": 84.99554038739443,
+            "path_max_w_mm": 110.55484665503968,
+            "peak_load_relative_error": 9.470218511052056e-06,
+            "peak_w_relative_error": 0.003400516337209926,
+            "rejected_attempts": 0,
+            "step_size": 1.0
+          }
+        ]
+      },
+      "evidence": "The closed form is independently checked at three decreasing arc lengths; the finest sampled peak is within 2% and all paths continue onto the descending segment.",
+      "passed": true,
+      "reference": {
+        "load_star_kn": 62.171,
+        "w_star_mm": 85.286
+      },
+      "scope": "reference_math_core",
+      "status": "REFERENCE_CORE_PASS",
+      "test_id": "V20",
+      "title": "Shallow two-bar arch limit point"
+    },
+    {
+      "analysis_level": "GNA/GNIA",
+      "computed": {
+        "branch_definition": "continuous primary equilibrium path selected by positive weighted predictor orientation",
+        "control": "spherical_arc_length",
+        "crossed_limit_point": true,
+        "descending_segment_found": true,
+        "fine_endpoint_relative_change": 1.5752567138396414e-05,
+        "finest_path_history": [
+          {
+            "accepted_step_size": 1.0,
+            "displacement_mm": [
+              0.5353044081436595
+            ],
+            "iterations": 3,
+            "load_factor": 0.8446592156747539,
+            "load_n": 844.6592156747539,
+            "minimum_tangent_eigenvalue": 1571.7984023155093,
+            "normalized_arc_constraint_error": 2.3239188351453777e-12,
+            "normalized_residual": 8.398722872113304e-14,
+            "predictor_load_increment": 0.8455926411962902,
+            "predictor_orientation": null,
+            "predictor_root_sign": 1,
+            "rejected_attempts": 0,
+            "step": 1
+          },
+          {
+            "accepted_step_size": 1.0,
+            "displacement_mm": [
+              1.0735838038249734
+            ],
+            "iterations": 3,
+            "load_factor": 1.6874256674200887,
+            "load_n": 1687.4256674200888,
+            "minimum_tangent_eigenvalue": 1559.5406784453623,
+            "normalized_arc_constraint_error": 2.462252624013672e-12,
+            "normalized_residual": 2.0966460675598884e-13,
+            "predictor_load_increment": 0.8437187033774997,
+            "predictor_orientation": 0.9999984607973027,
+            "predictor_root_sign": 1,
+            "rejected_attempts": 0,
+            "step": 2
+          },
+          {
+            "accepted_step_size": 1.0,
+            "displacement_mm": [
+              1.614874785264858
+            ],
+            "iterations": 3,
+            "load_factor": 2.5282610100493437,
+            "load_n": 2528.261010049344,
+            "minimum_tangent_eigenvalue": 1547.2414264609056,
+            "normalized_arc_constraint_error": 2.609912286288818e-12,
+            "normalized_residual": 1.0809926538297994e-13,
+            "predictor_load_increment": 0.8418069238276884,
+            "predictor_orientation": 0.9999984156170154,
+            "predictor_root_sign": 1,
+            "rejected_attempts": 0,
+            "step": 3
+          },
+          {
+            "accepted_step_size": 1.0,
+            "displacement_mm": [
+              2.159214520591489
+            ],
+            "iterations": 3,
+            "load_factor": 3.367125869575179,
+            "load_n": 3367.125869575179,
+            "minimum_tangent_eigenvalue": 1534.9003052129679,
+            "normalized_arc_constraint_error": 2.766453732760965e-12,
+            "normalized_residual": 9.75097457171743e-14,
+            "predictor_load_increment": 0.8398562896427082,
+            "predictor_orientation": 0.9999983688152294,
+            "predictor_root_sign": 1,
+            "rejected_attempts": 0,
+            "step": 4
+          },
+          {
+            "accepted_step_size": 1.0,
+            "displacement_mm": [
+              2.7066407542147486
+            ],
+            "iterations": 3,
+            "load_factor": 4.203979810680786,
+            "load_n": 4203.979810680786,
+            "minimum_tangent_eigenvalue": 1522.5169721402335,
+            "normalized_arc_constraint_error": 2.9340974094793637e-12,
+            "normalized_residual": 1.7307308650002872e-14,
+            "predictor_load_increment": 0.83786575592373,
+            "predictor_orientation": 0.9999983203253746,
+            "predictor_root_sign": 1,
+            "rejected_attempts": 0,
+            "step": 5
+          },
+          {
+            "accepted_step_size": 1.0,
+            "displacement_mm": [
+              3.257191812943666
+            ],
+            "iterations": 3,
+            "load_factor": 5.038781303094151,
+            "load_n": 5038.781303094151,
+            "minimum_tangent_eigenvalue": 1510.0910834362169,
+            "normalized_arc_constraint_error": 3.113065361048939e-12,
+            "normalized_residual": 8.772248654455722e-14,
+            "predictor_load_increment": 0.8358342446997296,
+            "predictor_orientation": 0.9999982700779333,
+            "predictor_root_sign": 1,
+            "rejected_attempts": 0,
+            "step": 6
+          },
+          {
+            "accepted_step_size": 1.0,
+            "displacement_mm": [
+              3.8109066118017783
+            ],
+            "iterations": 3,
+            "load_factor": 5.87148768683864,
+            "load_n": 5871.48768683864,
+            "minimum_tangent_eigenvalue": 1497.6222942304878,
+            "normalized_arc_constraint_error": 3.304689855099241e-12,
+            "normalized_residual": 5.91718819160637e-14,
+            "predictor_load_increment": 0.8337606438174323,
+            "predictor_orientation": 0.999998218000318,
+            "predictor_root_sign": 1,
+            "rejected_attempts": 0,
+            "step": 7
+          },
+          {
+            "accepted_step_size": 1.0,
+            "displacement_mm": [
+              4.367824659506615
+            ],
+            "iterations": 3,
+            "load_factor": 6.702055136323715,
+            "load_n": 6702.055136323715,
+            "minimum_tangent_eigenvalue": 1485.110258785189,
+            "normalized_arc_constraint_error": 3.5085268024204197e-12,
+            "normalized_residual": 7.938675372178621e-14,
+            "predictor_load_increment": 0.8316438057984783,
+            "predictor_orientation": 0.9999981640167281,
+            "predictor_root_sign": 1,
+            "rejected_attempts": 0,
+            "step": 8
+          },
+          {
+            "accepted_step_size": 1.0,
+            "displacement_mm": [
+              4.927986063574362
+            ],
+            "iterations": 3,
+            "load_factor": 7.530438623240599,
+            "load_n": 7530.438623240599,
+            "minimum_tangent_eigenvalue": 1472.5546307074603,
+            "normalized_arc_constraint_error": 3.725464381432175e-12,
+            "normalized_residual": 1.2198355165603325e-14,
+            "predictor_load_increment": 0.8294825466636527,
+            "predictor_orientation": 0.999998108048014,
+            "predictor_root_sign": 1,
+            "rejected_attempts": 0,
+            "step": 9
+          },
+          {
+            "accepted_step_size": 1.0,
+            "displacement_mm": [
+              5.491431534992587
+            ],
+            "iterations": 3,
+            "load_factor": 8.35659187823767,
+            "load_n": 8356.591878237668,
+            "minimum_tangent_eigenvalue": 1459.9550631792595,
+            "normalized_arc_constraint_error": 3.959055305813308e-12,
+            "normalized_residual": 8.402108419308311e-14,
+            "predictor_load_increment": 0.8272756447240559,
+            "predictor_orientation": 0.9999980500115423,
+            "predictor_root_sign": 1,
+            "rejected_attempts": 0,
+            "step": 10
+          },
+          {
+            "accepted_step_size": 1.0,
+            "displacement_mm": [
+              6.0582023924253345
+            ],
+            "iterations": 3,
+            "load_factor": 9.180467351333668,
+            "load_n": 9180.467351333667,
+            "minimum_tangent_eigenvalue": 1447.3112092054378,
+            "normalized_arc_constraint_error": 4.208189352539193e-12,
+            "normalized_residual": 2.357829190368084e-14,
+            "predictor_load_increment": 0.8250218393393656,
+            "predictor_orientation": 0.9999979898210323,
+            "predictor_root_sign": 1,
+            "rejected_attempts": 0,
+            "step": 11
+          },
+          {
+            "accepted_step_size": 1.0,
+            "displacement_mm": [
+              6.6283405658909365
+            ],
+            "iterations": 3,
+            "load_factor": 10.002016171040557,
+            "load_n": 10002.016171040557,
+            "minimum_tangent_eigenvalue": 1434.6227218811143,
+            "normalized_arc_constraint_error": 4.475086967659081e-12,
+            "normalized_residual": 3.910038886906468e-14,
+            "predictor_load_increment": 0.8227198296433679,
+            "predictor_orientation": 0.9999979273864135,
+            "predictor_root_sign": 1,
+            "rejected_attempts": 0,
+            "step": 12
+          },
+          {
+            "accepted_step_size": 1.0,
+            "displacement_mm": [
+              7.20188859985129
+            ],
+            "iterations": 3,
+            "load_factor": 10.821188102166724,
+            "load_n": 10821.188102166725,
+            "minimum_tangent_eigenvalue": 1421.8892546800842,
+            "normalized_arc_constraint_error": 4.760636329592671e-12,
+            "normalized_residual": 9.74951959152564e-15,
+            "predictor_load_increment": 0.8203682732371333,
+            "predictor_orientation": 0.9999978626136713,
+            "predictor_root_sign": 1,
+            "rejected_attempts": 0,
+            "step": 13
+          },
+          {
+            "accepted_step_size": 1.0,
+            "displacement_mm": [
+              7.778889655660354
+            ],
+            "iterations": 3,
+            "load_factor": 11.637931502262674,
+            "load_n": 11637.931502262674,
+            "minimum_tangent_eigenvalue": 1409.1104617650133,
+            "normalized_arc_constraint_error": 5.0675019735990645e-12,
+            "normalized_residual": 5.1265856329109034e-14,
+            "predictor_load_increment": 0.8179657848505172,
+            "predictor_orientation": 0.9999977954046728,
+            "predictor_root_sign": 1,
+            "rejected_attempts": 0,
+            "step": 14
+          },
+          {
+            "accepted_step_size": 1.0,
+            "displacement_mm": [
+              8.359387513297902
+            ],
+            "iterations": 3,
+            "load_factor": 12.452193276683904,
+            "load_n": 12452.193276683904,
+            "minimum_tangent_eigenvalue": 1396.285998321072,
+            "normalized_arc_constraint_error": 5.39213118599946e-12,
+            "normalized_residual": 1.8259729060660624e-14,
+            "predictor_load_increment": 0.8155109349726972,
+            "predictor_orientation": 0.9999977256570158,
+            "predictor_root_sign": 1,
+            "rejected_attempts": 0,
+            "step": 15
+          },
+          {
+            "accepted_step_size": 1.0,
+            "displacement_mm": [
+              8.943426572320178
+            ],
+            "iterations": 3,
+            "load_factor": 13.263918832239547,
+            "load_n": 13263.918832239548,
+            "minimum_tangent_eigenvalue": 1383.4155209146159,
+            "normalized_arc_constraint_error": 5.74296166178101e-12,
+            "normalized_residual": 1.4399506645659e-14,
+            "predictor_load_increment": 0.8130022484528613,
+            "predictor_orientation": 0.9999976532638504,
+            "predictor_root_sign": 1,
+            "rejected_attempts": 0,
+            "step": 16
+          },
+          {
+            "accepted_step_size": 1.0,
+            "displacement_mm": [
+              9.531051851949124
+            ],
+            "iterations": 3,
+            "load_factor": 14.073052029400015,
+            "load_n": 14073.052029400016,
+            "minimum_tangent_eigenvalue": 1370.498687878089,
+            "normalized_arc_constraint_error": 6.119327267128938e-12,
+            "normalized_residual": 2.946976840148417e-14,
+            "predictor_load_increment": 0.8104382030724162,
+            "predictor_orientation": 0.9999975781137183,
+            "predictor_root_sign": 1,
+            "rejected_attempts": 0,
+            "step": 17
+          },
+          {
+            "accepted_step_size": 1.0,
+            "displacement_mm": [
+              10.122308990217793
+            ],
+            "iterations": 3,
+            "load_factor": 14.879535133037571,
+            "load_n": 14879.53513303757,
+            "minimum_tangent_eigenvalue": 1357.535159723198,
+            "normalized_arc_constraint_error": 6.519007555993994e-12,
+            "normalized_residual": 2.065986648445071e-14,
+            "predictor_load_increment": 0.8078172280903104,
+            "predictor_orientation": 0.9999975000903669,
+            "predictor_root_sign": 1,
+            "rejected_attempts": 0,
+            "step": 18
+          },
+          {
+            "accepted_step_size": 1.0,
+            "displacement_mm": [
+              10.71724424208499
+            ],
+            "iterations": 3,
+            "load_factor": 15.683308761674805,
+            "load_n": 15683.308761674805,
+            "minimum_tangent_eigenvalue": 1344.5245995836572,
+            "normalized_arc_constraint_error": 6.951550446387955e-12,
+            "normalized_residual": 1.6585497911174197e-14,
+            "predictor_load_increment": 0.805137702763566,
+            "predictor_orientation": 0.9999974190725767,
+            "predictor_root_sign": 1,
+            "rejected_attempts": 0,
+            "step": 19
+          },
+          {
+            "accepted_step_size": 1.0,
+            "displacement_mm": [
+              11.315904476420377
+            ],
+            "iterations": 3,
+            "load_factor": 16.484311835222538,
+            "load_n": 16484.31183522254,
+            "minimum_tangent_eigenvalue": 1331.4666736897148,
+            "normalized_arc_constraint_error": 7.41562367068127e-12,
+            "normalized_residual": 3.023499564638248e-14,
+            "predictor_load_increment": 0.8023979548453456,
+            "predictor_orientation": 0.9999973349339937,
+            "predictor_root_sign": 1,
+            "rejected_attempts": 0,
+            "step": 20
+          },
+          {
+            "accepted_step_size": 1.0,
+            "displacement_mm": [
+              11.918337171760768
+            ],
+            "iterations": 3,
+            "load_factor": 17.282481521187133,
+            "load_n": 17282.481521187132,
+            "minimum_tangent_eigenvalue": 1318.3610518760845,
+            "normalized_arc_constraint_error": 7.909672916639465e-12,
+            "normalized_residual": 7.999036162718145e-15,
+            "predictor_load_increment": 0.7995962590634915,
+            "predictor_orientation": 0.9999972475429377,
+            "predictor_root_sign": 1,
+            "rejected_attempts": 0,
+            "step": 21
+          },
+          {
+            "accepted_step_size": 1.0,
+            "displacement_mm": [
+              12.52459041072755
+            ],
+            "iterations": 3,
+            "load_factor": 18.07775317933341,
+            "load_n": 18077.75317933341,
+            "minimum_tangent_eigenvalue": 1305.2074081253759,
+            "normalized_arc_constraint_error": 8.441469745434915e-12,
+            "normalized_residual": 3.803448292049793e-14,
+            "predictor_load_increment": 0.796730835582815,
+            "predictor_orientation": 0.99999715676223,
+            "predictor_root_sign": 1,
+            "rejected_attempts": 0,
+            "step": 22
+          },
+          {
+            "accepted_step_size": 1.0,
+            "displacement_mm": [
+              13.134712872988432
+            ],
+            "iterations": 3,
+            "load_factor": 18.87006030479281,
+            "load_n": 18870.06030479281,
+            "minimum_tangent_eigenvalue": 1292.0054211491279,
+            "normalized_arc_constraint_error": 9.017009361400596e-12,
+            "normalized_residual": 8.675597410652959e-15,
+            "predictor_load_increment": 0.7937998484550474,
+            "predictor_orientation": 0.9999970624490266,
+            "predictor_root_sign": 1,
+            "rejected_attempts": 0,
+            "step": 23
+          },
+          {
+            "accepted_step_size": 1.0,
+            "displacement_mm": [
+              13.748753826635578
+            ],
+            "iterations": 3,
+            "load_factor": 19.65933446961371,
+            "load_n": 19659.33446961371,
+            "minimum_tangent_eigenvalue": 1278.7547750086806,
+            "normalized_arc_constraint_error": 9.630074515598608e-12,
+            "normalized_residual": 1.5729331991413628e-14,
+            "predictor_load_increment": 0.7908014040609388,
+            "predictor_orientation": 0.9999969644546403,
+            "predictor_root_sign": 1,
+            "rejected_attempts": 0,
+            "step": 24
+          },
+          {
+            "accepted_step_size": 1.0,
+            "displacement_mm": [
+              14.366763117849308
+            ],
+            "iterations": 4,
+            "load_factor": 20.445505262745524,
+            "load_n": 20445.505262745522,
+            "minimum_tangent_eigenvalue": 1265.4551597782172,
+            "normalized_arc_constraint_error": 0.0,
+            "normalized_residual": 3.665468887317958e-14,
+            "predictor_load_increment": 0.7877335495496719,
+            "predictor_orientation": 0.9999968626243614,
+            "predictor_root_sign": 1,
+            "rejected_attempts": 0,
+            "step": 25
+          },
+          {
+            "accepted_step_size": 1.0,
+            "displacement_mm": [
+              14.988791158715447
+            ],
+            "iterations": 4,
+            "load_factor": 21.228500228486833,
+            "load_n": 21228.500228486835,
+            "minimum_tangent_eigenvalue": 1252.1062722519412,
+            "normalized_arc_constraint_error": 1.7763568394002505e-15,
+            "normalized_residual": 1.1139205309645033e-14,
+            "predictor_load_increment": 0.7845942712814892,
+            "predictor_orientation": 0.999996756792177,
+            "predictor_root_sign": 1,
+            "rejected_attempts": 0,
+            "step": 26
+          },
+          {
+            "accepted_step_size": 1.0,
+            "displacement_mm": [
+              15.614888913014534
+            ],
+            "iterations": 4,
+            "load_factor": 22.008244803371223,
+            "load_n": 22008.244803371224,
+            "minimum_tangent_eigenvalue": 1238.7078166988103,
+            "normalized_arc_constraint_error": 2.3314683517128287e-15,
+            "normalized_residual": 8.099735491863845e-15,
+            "predictor_load_increment": 0.7813814932801355,
+            "predictor_orientation": 0.9999966468008291,
+            "predictor_root_sign": 1,
+            "rejected_attempts": 0,
+            "step": 27
+          },
+          {
+            "accepted_step_size": 1.0,
+            "displacement_mm": [
+              16.245107879853222
+            ],
+            "iterations": 4,
+            "load_factor": 22.784662251550213,
+            "load_n": 22784.662251550213,
+            "minimum_tangent_eigenvalue": 1225.2595056666623,
+            "normalized_arc_constraint_error": 2.6645352591003757e-15,
+            "normalized_residual": 2.650486872747636e-14,
+            "predictor_load_increment": 0.7780930757029206,
+            "predictor_orientation": 0.9999965324718367,
+            "predictor_root_sign": 1,
+            "rejected_attempts": 0,
+            "step": 28
+          },
+          {
+            "accepted_step_size": 1.0,
+            "displacement_mm": [
+              16.879500074952823
+            ],
+            "iterations": 4,
+            "load_factor": 23.55767359868343,
+            "load_n": 23557.67359868343,
+            "minimum_tangent_eigenvalue": 1211.76106083865,
+            "normalized_arc_constraint_error": 0.0,
+            "normalized_residual": 8.493573592989458e-15,
+            "predictor_load_increment": 0.7747268133367988,
+            "predictor_orientation": 0.9999964136249523,
+            "predictor_root_sign": 1,
+            "rejected_attempts": 0,
+            "step": 29
+          },
+          {
+            "accepted_step_size": 1.0,
+            "displacement_mm": [
+              17.51811800940729
+            ],
+            "iterations": 4,
+            "load_factor": 24.327197564387625,
+            "load_n": 24327.197564387625,
+            "minimum_tangent_eigenvalue": 1198.212213945026,
+            "normalized_arc_constraint_error": 2.220446049250313e-16,
+            "normalized_residual": 1.929113556432962e-14,
+            "predictor_load_increment": 0.7712804341301496,
+            "predictor_orientation": 0.9999962900732295,
+            "predictor_root_sign": 1,
+            "rejected_attempts": 0,
+            "step": 30
+          },
+          {
+            "accepted_step_size": 1.0,
+            "displacement_mm": [
+              18.161014665731297
+            ],
+            "iterations": 4,
+            "load_factor": 25.093150493285613,
+            "load_n": 25093.15049328561,
+            "minimum_tangent_eigenvalue": 1184.612707733001,
+            "normalized_arc_constraint_error": 2.6645352591003757e-15,
+            "normalized_residual": 2.218178054740353e-14,
+            "predictor_load_increment": 0.7677515977711301,
+            "predictor_orientation": 0.9999961616229165,
+            "predictor_root_sign": 1,
+            "rejected_attempts": 0,
+            "step": 31
+          },
+          {
+            "accepted_step_size": 1.0,
+            "displacement_mm": [
+              18.808243470978795
+            ],
+            "iterations": 4,
+            "load_factor": 25.855446284732672,
+            "load_n": 25855.446284732672,
+            "minimum_tangent_eigenvalue": 1170.9622969977597,
+            "normalized_arc_constraint_error": 8.881784197001252e-16,
+            "normalized_residual": 7.316636343673293e-15,
+            "predictor_load_increment": 0.764137894324643,
+            "predictor_orientation": 0.9999960280734244,
+            "predictor_root_sign": 1,
+            "rejected_attempts": 0,
+            "step": 32
+          },
+          {
+            "accepted_step_size": 1.0,
+            "displacement_mm": [
+              19.45985826672514
+            ],
+            "iterations": 4,
+            "load_factor": 26.61399632129219,
+            "load_n": 26613.99632129219,
+            "minimum_tangent_eigenvalue": 1157.260749677765,
+            "normalized_arc_constraint_error": 2.220446049250313e-15,
+            "normalized_residual": 5.331073611183519e-15,
+            "predictor_load_increment": 0.7604368429414099,
+            "predictor_orientation": 0.9999958892172645,
+            "predictor_root_sign": 1,
+            "rejected_attempts": 0,
+            "step": 33
+          },
+          {
+            "accepted_step_size": 1.0,
+            "displacement_mm": [
+              20.1159132756855
+            ],
+            "iterations": 4,
+            "load_factor": 27.36870939605506,
+            "load_n": 27368.70939605506,
+            "minimum_tangent_eigenvalue": 1143.5078480176144,
+            "normalized_arc_constraint_error": 3.3306690738754696e-15,
+            "normalized_residual": 6.3803879172166036e-15,
+            "predictor_load_increment": 0.756645890654143,
+            "predictor_orientation": 0.9999957448400383,
+            "predictor_root_sign": 1,
+            "rejected_attempts": 0,
+            "step": 34
+          },
+          {
+            "accepted_step_size": 1.0,
+            "displacement_mm": [
+              20.776463064721057
+            ],
+            "iterations": 4,
+            "load_factor": 28.11949163892251,
+            "load_n": 28119.49163892251,
+            "minimum_tangent_eigenvalue": 1129.7033898015823,
+            "normalized_arc_constraint_error": 8.881784197001252e-16,
+            "normalized_residual": 1.0479431390805796e-14,
+            "predictor_load_increment": 0.7527624112774449,
+            "predictor_orientation": 0.9999955947205084,
+            "predictor_root_sign": 1,
+            "rejected_attempts": 0,
+            "step": 35
+          },
+          {
+            "accepted_step_size": 1.0,
+            "displacement_mm": [
+              21.441562503988386
+            ],
+            "iterations": 4,
+            "load_factor": 28.866246441977896,
+            "load_n": 28866.246441977895,
+            "minimum_tangent_eigenvalue": 1115.8471896612973,
+            "normalized_arc_constraint_error": 3.3306690738754696e-15,
+            "normalized_residual": 1.3106996668168434e-14,
+            "predictor_load_increment": 0.7487837044297705,
+            "predictor_orientation": 0.9999954386306267,
+            "predictor_root_sign": 1,
+            "rejected_attempts": 0,
+            "step": 36
+          },
+          {
+            "accepted_step_size": 1.0,
+            "displacement_mm": [
+              22.1112667219658
+            ],
+            "iterations": 4,
+            "load_factor": 29.608874384101853,
+            "load_n": 29608.87438410185,
+            "minimum_tangent_eigenvalue": 1101.9390804609477,
+            "normalized_arc_constraint_error": 3.3306690738754696e-15,
+            "normalized_residual": 1.4744142286118453e-14,
+            "predictor_load_increment": 0.7447069946977445,
+            "predictor_orientation": 0.9999952763357087,
+            "predictor_root_sign": 1,
+            "rejected_attempts": 0,
+            "step": 37
+          },
+          {
+            "accepted_step_size": 1.0,
+            "displacement_mm": [
+              22.785631056076642
+            ],
+            "iterations": 4,
+            "load_factor": 30.34727315501039,
+            "load_n": 30347.273155010393,
+            "minimum_tangent_eigenvalue": 1087.9789147633837,
+            "normalized_arc_constraint_error": 1.1102230246251565e-15,
+            "normalized_residual": 1.4265514922299758e-14,
+            "predictor_load_increment": 0.7405294309651274,
+            "predictor_orientation": 0.999995107594593,
+            "predictor_root_sign": 1,
+            "rejected_attempts": 0,
+            "step": 38
+          },
+          {
+            "accepted_step_size": 1.0,
+            "displacement_mm": [
+              23.46471099862134
+            ],
+            "iterations": 4,
+            "load_factor": 31.0813374789177,
+            "load_n": 31081.3374789177,
+            "minimum_tangent_eigenvalue": 1073.966566380569,
+            "normalized_arc_constraint_error": 1.3322676295501878e-15,
+            "normalized_residual": 2.5750350611618673e-15,
+            "predictor_load_increment": 0.7362480859308751,
+            "predictor_orientation": 0.9999949321599073,
+            "predictor_root_sign": 1,
+            "rejected_attempts": 0,
+            "step": 39
+          },
+          {
+            "accepted_step_size": 1.0,
+            "displacement_mm": [
+              24.148562137725246
+            ],
+            "iterations": 4,
+            "load_factor": 31.810959038047013,
+            "load_n": 31810.959038047014,
+            "minimum_tangent_eigenvalue": 1059.9019320118243,
+            "normalized_arc_constraint_error": 2.220446049250313e-15,
+            "normalized_residual": 1.1436243725756784e-16,
+            "predictor_load_increment": 0.7318599558430606,
+            "predictor_orientation": 0.9999947497783925,
+            "predictor_root_sign": 1,
+            "rejected_attempts": 0,
+            "step": 40
+          },
+          {
+            "accepted_step_size": 1.0,
+            "displacement_mm": [
+              24.837240092976597
+            ],
+            "iterations": 4,
+            "load_factor": 32.53602639626335,
+            "load_n": 32536.02639626335,
+            "minimum_tangent_eigenvalue": 1045.7849329733108,
+            "normalized_arc_constraint_error": 2.220446049250313e-15,
+            "normalized_residual": 8.497853609152582e-15,
+            "predictor_load_increment": 0.727361960477876,
+            "predictor_orientation": 0.9999945601913225,
+            "predictor_root_sign": 1,
+            "rejected_attempts": 0,
+            "step": 41
+          },
+          {
+            "accepted_step_size": 1.0,
+            "displacement_mm": [
+              25.530800445449064
+            ],
+            "iterations": 4,
+            "load_factor": 33.25642492310684,
+            "load_n": 33256.42492310684,
+            "minimum_tangent_eigenvalue": 1031.6155170217864,
+            "normalized_arc_constraint_error": 1.7763568394002505e-15,
+            "normalized_residual": 4.375670344005035e-16,
+            "predictor_load_increment": 0.7227509433955298,
+            "predictor_orientation": 0.999994363134993,
+            "predictor_root_sign": 1,
+            "rejected_attempts": 0,
+            "step": 42
+          },
+          {
+            "accepted_step_size": 1.0,
+            "displacement_mm": [
+              26.22929866176151
+            ],
+            "iterations": 4,
+            "load_factor": 33.97203671857162,
+            "load_n": 33972.036718571624,
+            "minimum_tangent_eigenvalue": 1017.3936602763678,
+            "normalized_arc_constraint_error": 1.2212453270876722e-15,
+            "normalized_residual": 2.355923915278955e-15,
+            "predictor_load_increment": 0.7180236725074471,
+            "predictor_orientation": 0.9999941583413634,
+            "predictor_root_sign": 1,
+            "rejected_attempts": 0,
+            "step": 43
+          },
+          {
+            "accepted_step_size": 1.0,
+            "displacement_mm": [
+              26.932790011852013
+            ],
+            "iterations": 4,
+            "load_factor": 34.68274053898336,
+            "load_n": 34682.74053898336,
+            "minimum_tangent_eigenvalue": 1003.1193692406509,
+            "normalized_arc_constraint_error": 3.774758283725532e-15,
+            "normalized_residual": 1.888075091818287e-15,
+            "predictor_load_increment": 0.7131768409922737,
+            "predictor_orientation": 0.9999939455387508,
+            "predictor_root_sign": 1,
+            "rejected_attempts": 0,
+            "step": 44
+          },
+          {
+            "accepted_step_size": 1.0,
+            "displacement_mm": [
+              27.641329480103806
+            ],
+            "iterations": 4,
+            "load_factor": 35.388411724401514,
+            "load_n": 35388.411724401514,
+            "minimum_tangent_eigenvalue": 988.7926829288139,
+            "normalized_arc_constraint_error": 3.4416913763379853e-15,
+            "normalized_residual": 3.0840424561211964e-15,
+            "predictor_load_increment": 0.7082070686007087,
+            "predictor_orientation": 0.9999937244527302,
+            "predictor_root_sign": 1,
+            "rejected_attempts": 0,
+            "step": 45
+          },
+          {
+            "accepted_step_size": 1.0,
+            "displacement_mm": [
+              28.35497166948874
+            ],
+            "iterations": 4,
+            "load_factor": 36.08892212798584,
+            "load_n": 36088.92212798584,
+            "minimum_tangent_eigenvalue": 974.413675097515,
+            "normalized_arc_constraint_error": 3.885780586188048e-15,
+            "normalized_residual": 1.814507462855764e-15,
+            "predictor_load_increment": 0.7031109033926959,
+            "predictor_orientation": 0.9999934948070986,
+            "predictor_root_sign": 1,
+            "rejected_attempts": 0,
+            "step": 46
+          },
+          {
+            "accepted_step_size": 1.0,
+            "displacement_mm": [
+              29.07377069836095
+            ],
+            "iterations": 4,
+            "load_factor": 36.78414004784433,
+            "load_n": 36784.14004784433,
+            "minimum_tangent_eigenvalue": 959.9824565866355,
+            "normalized_arc_constraint_error": 2.220446049250313e-16,
+            "normalized_residual": 8.703265445587854e-15,
+            "predictor_load_increment": 0.6978848239530461,
+            "predictor_orientation": 0.9999932563250693,
+            "predictor_root_sign": 1,
+            "rejected_attempts": 0,
+            "step": 47
+          },
+          {
+            "accepted_step_size": 1.0,
+            "displacement_mm": [
+              29.79778008955894
+            ],
+            "iterations": 4,
+            "load_factor": 37.473930161905926,
+            "load_n": 37473.930161905926,
+            "minimum_tangent_eigenvalue": 945.499177770087,
+            "normalized_arc_constraint_error": 5.995204332975845e-15,
+            "normalized_residual": 5.630654961987754e-15,
+            "predictor_load_increment": 0.6925252421352025,
+            "predictor_orientation": 0.9999930087305838,
+            "predictor_root_sign": 1,
+            "rejected_attempts": 0,
+            "step": 48
+          },
+          {
+            "accepted_step_size": 1.0,
+            "displacement_mm": [
+              30.52705265146122
+            ],
+            "iterations": 4,
+            "load_factor": 38.15815346643193,
+            "load_n": 38158.15346643193,
+            "minimum_tangent_eigenvalue": 930.9640311186565,
+            "normalized_arc_constraint_error": 4.440892098500626e-16,
+            "normalized_residual": 1.7161107804982584e-15,
+            "predictor_load_increment": 0.687028506385433,
+            "predictor_orientation": 0.9999927517498393,
+            "predictor_root_sign": 1,
+            "rejected_attempts": 0,
+            "step": 49
+          },
+          {
+            "accepted_step_size": 1.0,
+            "displacement_mm": [
+              31.261640350657025
+            ],
+            "iterations": 4,
+            "load_factor": 38.83666721882772,
+            "load_n": 38836.66721882772,
+            "minimum_tangent_eigenvalue": 916.3772538753728,
+            "normalized_arc_constraint_error": 2.220446049250313e-16,
+            "normalized_residual": 5.6204289414330304e-15,
+            "predictor_load_increment": 0.6813909057032039,
+            "predictor_orientation": 0.9999924851130357,
+            "predictor_root_sign": 1,
+            "rejected_attempts": 0,
+            "step": 50
+          },
+          {
+            "accepted_step_size": 1.0,
+            "displacement_mm": [
+              32.00159417589788
+            ],
+            "iterations": 4,
+            "load_factor": 39.50932488548397,
+            "load_n": 39509.32488548397,
+            "minimum_tangent_eigenvalue": 901.7391308439127,
+            "normalized_arc_constraint_error": 1.1102230246251565e-15,
+            "normalized_residual": 4.235633628548856e-15,
+            "predictor_load_increment": 0.6756086742960428,
+            "predictor_orientation": 0.9999922085562942,
+            "predictor_root_sign": 1,
+            "rejected_attempts": 0,
+            "step": 51
+          },
+          {
+            "accepted_step_size": 1.0,
+            "displacement_mm": [
+              32.74696399301957
+            ],
+            "iterations": 4,
+            "load_factor": 40.1759760954311,
+            "load_n": 40175.976095431106,
+            "minimum_tangent_eigenvalue": 887.0499972895595,
+            "normalized_arc_constraint_error": 4.440892098500626e-16,
+            "normalized_residual": 3.0787373814468266e-15,
+            "predictor_load_increment": 0.6696779969901806,
+            "predictor_orientation": 0.999991921823863,
+            "predictor_root_sign": 1,
+            "rejected_attempts": 0,
+            "step": 52
+          },
+          {
+            "accepted_step_size": 1.0,
+            "displacement_mm": [
+              33.49779839054464
+            ],
+            "iterations": 4,
+            "load_factor": 40.836466600656706,
+            "load_n": 40836.466600656706,
+            "minimum_tangent_eigenvalue": 872.3102419510612,
+            "normalized_arc_constraint_error": 4.218847493575595e-15,
+            "normalized_residual": 1.7817304531598283e-15,
+            "predictor_load_increment": 0.6635950154606174,
+            "predictor_orientation": 0.9999916246705427,
+            "predictor_root_sign": 1,
+            "rejected_attempts": 0,
+            "step": 53
+          },
+          {
+            "accepted_step_size": 1.0,
+            "displacement_mm": [
+              34.25414451569334
+            ],
+            "iterations": 4,
+            "load_factor": 41.490638244013816,
+            "load_n": 41490.63824401382,
+            "minimum_tangent_eigenvalue": 857.5203101614803,
+            "normalized_arc_constraint_error": 1.4432899320127035e-15,
+            "normalized_residual": 5.260915176618079e-15,
+            "predictor_load_increment": 0.6573558353462239,
+            "predictor_orientation": 0.9999913168644212,
+            "predictor_root_sign": 1,
+            "rejected_attempts": 0,
+            "step": 54
+          },
+          {
+            "accepted_step_size": 1.0,
+            "displacement_mm": [
+              35.016047900584034
+            ],
+            "iterations": 4,
+            "load_factor": 42.13832893569628,
+            "load_n": 42138.32893569628,
+            "minimum_tangent_eigenvalue": 842.6807070744687,
+            "normalized_arc_constraint_error": 4.218847493575595e-15,
+            "normalized_residual": 6.3887306052312655e-15,
+            "predictor_load_increment": 0.6509565343174207,
+            "predictor_orientation": 0.9999909981898203,
+            "predictor_root_sign": 1,
+            "rejected_attempts": 0,
+            "step": 55
+          },
+          {
+            "accepted_step_size": 1.0,
+            "displacement_mm": [
+              35.7835522784315
+            ],
+            "iterations": 4,
+            "load_factor": 42.7793726393429,
+            "load_n": 42779.3726393429,
+            "minimum_tangent_eigenvalue": 827.7920009911131,
+            "normalized_arc_constraint_error": 5.773159728050814e-15,
+            "normalized_residual": 6.9733201722357614e-15,
+            "predictor_load_increment": 0.644393171164793,
+            "predictor_orientation": 0.9999906684506357,
+            "predictor_root_sign": 1,
+            "rejected_attempts": 0,
+            "step": 56
+          },
+          {
+            "accepted_step_size": 1.0,
+            "displacement_mm": [
+              36.55669938961115
+            ],
+            "iterations": 4,
+            "load_factor": 43.41359936889202,
+            "load_n": 43413.59936889202,
+            "minimum_tangent_eigenvalue": 812.8548267817803,
+            "normalized_arc_constraint_error": 5.10702591327572e-15,
+            "normalized_residual": 6.368658516185743e-15,
+            "predictor_load_increment": 0.6376617959773028,
+            "predictor_orientation": 0.9999903274738862,
+            "predictor_root_sign": 1,
+            "rejected_attempts": 0,
+            "step": 57
+          },
+          {
+            "accepted_step_size": 1.0,
+            "displacement_mm": [
+              37.335528777515556
+            ],
+            "iterations": 4,
+            "load_factor": 44.04083519737796,
+            "load_n": 44040.83519737796,
+            "minimum_tangent_eigenvalue": 797.8698893949428,
+            "normalized_arc_constraint_error": 4.440892098500626e-15,
+            "normalized_residual": 5.617117790194969e-15,
+            "predictor_load_increment": 0.6307584614785137,
+            "predictor_orientation": 0.9999899751136567,
+            "predictor_root_sign": 1,
+            "rejected_attempts": 0,
+            "step": 58
+          },
+          {
+            "accepted_step_size": 1.0,
+            "displacement_mm": [
+              38.120077574199925
+            ],
+            "iterations": 4,
+            "load_factor": 44.660902278927296,
+            "load_n": 44660.90227892729,
+            "minimum_tangent_eigenvalue": 782.8379674440919,
+            "normalized_arc_constraint_error": 3.552713678800501e-15,
+            "normalized_residual": 2.606649572367999e-15,
+            "predictor_load_increment": 0.6236792355872603,
+            "predictor_orientation": 0.9999896112553202,
+            "predictor_root_sign": 1,
+            "rejected_attempts": 0,
+            "step": 59
+          },
+          {
+            "accepted_step_size": 1.0,
+            "displacement_mm": [
+              38.910380275896344
+            ],
+            "iterations": 4,
+            "load_factor": 45.273618885272626,
+            "load_n": 45273.618885272626,
+            "minimum_tangent_eigenvalue": 767.759916861495,
+            "normalized_arc_constraint_error": 2.886579864025407e-15,
+            "normalized_residual": 3.5356366787835025e-15,
+            "predictor_load_increment": 0.6164202152667793,
+            "predictor_orientation": 0.9999892358201097,
+            "predictor_root_sign": 1,
+            "rejected_attempts": 0,
+            "step": 60
+          },
+          {
+            "accepted_step_size": 1.0,
+            "displacement_mm": [
+              39.70646850857065
+            ],
+            "iterations": 4,
+            "load_factor": 45.87879945815769,
+            "load_n": 45878.799458157686,
+            "minimum_tangent_eigenvalue": 752.6366746058186,
+            "normalized_arc_constraint_error": 6.994405055138486e-15,
+            "normalized_residual": 3.647589455317862e-15,
+            "predictor_load_increment": 0.6089775417218977,
+            "predictor_orientation": 0.9999888487699466,
+            "predictor_root_sign": 1,
+            "rejected_attempts": 0,
+            "step": 61
+          },
+          {
+            "accepted_step_size": 1.0,
+            "displacement_mm": [
+              40.50837078379499
+            ],
+            "iterations": 4,
+            "load_factor": 46.47625467906552,
+            "load_n": 46476.25467906552,
+            "minimum_tangent_eigenvalue": 737.4692624082944,
+            "normalized_arc_constraint_error": 6.439293542825908e-15,
+            "normalized_residual": 5.479325265233245e-15,
+            "predictor_load_increment": 0.6013474169982264,
+            "predictor_orientation": 0.9999884501126877,
+            "predictor_root_sign": 1,
+            "rejected_attempts": 0,
+            "step": 62
+          },
+          {
+            "accepted_step_size": 1.0,
+            "displacement_mm": [
+              41.31611224533716
+            ],
+            "iterations": 4,
+            "load_factor": 47.06579155773022,
+            "load_n": 47065.79155773022,
+            "minimum_tangent_eigenvalue": 722.2587905400711,
+            "normalized_arc_constraint_error": 3.774758283725532e-15,
+            "normalized_residual": 3.710189013313662e-15,
+            "predictor_load_increment": 0.5935261220296107,
+            "predictor_orientation": 0.999988039907538,
+            "predictor_root_sign": 1,
+            "rejected_attempts": 0,
+            "step": 63
+          },
+          {
+            "accepted_step_size": 1.0,
+            "displacement_mm": [
+              42.12971440698987
+            ],
+            "iterations": 4,
+            "load_factor": 47.647213540935226,
+            "load_n": 47647.21354093523,
+            "minimum_tangent_eigenvalue": 707.0064615806061,
+            "normalized_arc_constraint_error": 3.1086244689504383e-15,
+            "normalized_residual": 2.1378670236624413e-15,
+            "predictor_load_increment": 0.5855100361706415,
+            "predictor_orientation": 0.999987618270813,
+            "predictor_root_sign": 1,
+            "rejected_attempts": 0,
+            "step": 64
+          },
+          {
+            "accepted_step_size": 1.0,
+            "displacement_mm": [
+              42.94919488230966
+            ],
+            "iterations": 4,
+            "load_factor": 48.22032064311565,
+            "load_n": 48220.32064311565,
+            "minimum_tangent_eigenvalue": 691.7135741646716,
+            "normalized_arc_constraint_error": 4.9960036108132044e-15,
+            "normalized_residual": 5.582924960562691e-15,
+            "predictor_load_increment": 0.5772956582390252,
+            "predictor_orientation": 0.9999871853818758,
+            "predictor_root_sign": 1,
+            "rejected_attempts": 0,
+            "step": 65
+          },
+          {
+            "accepted_step_size": 1.0,
+            "displacement_mm": [
+              43.77456710709689
+            ],
+            "iterations": 4,
+            "load_factor": 48.7849096002781,
+            "load_n": 48784.9096002781,
+            "minimum_tangent_eigenvalue": 676.3815266827082,
+            "normalized_arc_constraint_error": 4.440892098500626e-15,
+            "normalized_residual": 5.369170021155685e-15,
+            "predictor_load_increment": 0.568879629078543,
+            "predictor_orientation": 0.9999867414892893,
+            "predictor_root_sign": 1,
+            "rejected_attempts": 0,
+            "step": 66
+          },
+          {
+            "accepted_step_size": 1.0,
+            "displacement_mm": [
+              44.605840055607466
+            ],
+            "iterations": 4,
+            "load_factor": 49.340774048749616,
+            "load_n": 49340.77404874961,
+            "minimum_tangent_eigenvalue": 661.0118209067037,
+            "normalized_arc_constraint_error": 6.661338147750939e-15,
+            "normalized_residual": 2.064487405445342e-15,
+            "predictor_load_increment": 0.5602587556364271,
+            "predictor_orientation": 0.9999862869170995,
+            "predictor_root_sign": 1,
+            "rejected_attempts": 0,
+            "step": 67
+          },
+          {
+            "accepted_step_size": 1.0,
+            "displacement_mm": [
+              45.44301795167831
+            ],
+            "iterations": 4,
+            "load_factor": 49.887704730217024,
+            "load_n": 49887.704730217025,
+            "minimum_tangent_eigenvalue": 645.6060655106064,
+            "normalized_arc_constraint_error": 3.9968028886505635e-15,
+            "normalized_residual": 3.79201446512302e-15,
+            "predictor_load_increment": 0.551430036529561,
+            "predictor_orientation": 0.9999858220710813,
+            "predictor_root_sign": 1,
+            "rejected_attempts": 0,
+            "step": 68
+          },
+          {
+            "accepted_step_size": 1.0,
+            "displacement_mm": [
+              46.286099976135915
+            ],
+            "iterations": 4,
+            "load_factor": 50.4254897244633,
+            "load_n": 50425.489724463296,
+            "minimum_tangent_eigenvalue": 630.1659794518681,
+            "normalized_arc_constraint_error": 3.1086244689504383e-15,
+            "normalized_residual": 1.0388970956628274e-14,
+            "predictor_load_increment": 0.5423906890513389,
+            "predictor_orientation": 0.9999853474450613,
+            "predictor_root_sign": 1,
+            "rejected_attempts": 0,
+            "step": 69
+          },
+          {
+            "accepted_step_size": 1.0,
+            "displacement_mm": [
+              47.1350799720565
+            ],
+            "iterations": 4,
+            "load_factor": 50.95391471112335,
+            "load_n": 50953.914711123354,
+            "minimum_tangent_eigenvalue": 614.6933951777803,
+            "normalized_arc_constraint_error": 0.0,
+            "normalized_residual": 8.710487054457843e-15,
+            "predictor_load_increment": 0.5331381775459977,
+            "predictor_orientation": 0.9999848636270535,
+            "predictor_root_sign": 1,
+            "rejected_attempts": 0,
+            "step": 70
+          },
+          {
+            "accepted_step_size": 1.0,
+            "displacement_mm": [
+              47.98994614965604
+            ],
+            "iterations": 4,
+            "load_factor": 51.47276326166229,
+            "load_n": 51472.76326166229,
+            "minimum_tangent_eigenvalue": 599.1902616175283,
+            "normalized_arc_constraint_error": 4.440892098500626e-16,
+            "normalized_residual": 6.926418954478998e-15,
+            "predictor_load_increment": 0.5236702430490422,
+            "predictor_orientation": 0.9999843713051285,
+            "predictor_root_sign": 1,
+            "rejected_attempts": 0,
+            "step": 71
+          },
+          {
+            "accepted_step_size": 1.0,
+            "displacement_mm": [
+              48.8506807928031
+            ],
+            "iterations": 4,
+            "load_factor": 51.981817162626136,
+            "load_n": 51981.81716262614,
+            "minimum_tangent_eigenvalue": 583.6586469185362,
+            "normalized_arc_constraint_error": 2.220446049250313e-16,
+            "normalized_residual": 3.499280138389761e-15,
+            "predictor_load_increment": 0.5139849340614909,
+            "predictor_orientation": 0.9999838712729238,
+            "predictor_root_sign": 1,
+            "rejected_attempts": 0,
+            "step": 72
+          },
+          {
+            "accepted_step_size": 1.0,
+            "displacement_mm": [
+              49.717259969355055
+            ],
+            "iterations": 4,
+            "load_factor": 52.48085677104066,
+            "load_n": 52480.856771040664,
+            "minimum_tangent_eigenvalue": 568.1007408832955,
+            "normalized_arc_constraint_error": 4.440892098500626e-15,
+            "normalized_residual": 6.516090416712107e-15,
+            "predictor_load_increment": 0.5040806382923521,
+            "predictor_orientation": 0.999983364434631,
+            "predictor_root_sign": 1,
+            "rejected_attempts": 0,
+            "step": 73
+          },
+          {
+            "accepted_step_size": 1.0,
+            "displacement_mm": [
+              50.58965324773288
+            ],
+            "iterations": 4,
+            "load_factor": 52.9696614026075,
+            "load_n": 52969.6614026075,
+            "minimum_tangent_eigenvalue": 552.5188570607854,
+            "normalized_arc_constraint_error": 5.10702591327572e-15,
+            "normalized_residual": 2.747216962132689e-16,
+            "predictor_load_increment": 0.4939561151680359,
+            "predictor_orientation": 0.9999828518092958,
+            "predictor_root_sign": 1,
+            "rejected_attempts": 0,
+            "step": 74
+          },
+          {
+            "accepted_step_size": 1.0,
+            "displacement_mm": [
+              51.467823422352446
+            ],
+            "iterations": 4,
+            "load_factor": 53.44800975308929,
+            "load_n": 53448.00975308929,
+            "minimum_tangent_eigenvalue": 536.9154344454965,
+            "normalized_arc_constraint_error": 0.0,
+            "normalized_residual": 5.581391403714079e-15,
+            "predictor_load_increment": 0.4836105288698826,
+            "predictor_orientation": 0.9999823345342731,
+            "predictor_root_sign": 1,
+            "rejected_attempts": 0,
+            "step": 75
+          },
+          {
+            "accepted_step_size": 1.0,
+            "displacement_mm": [
+              52.35172625071819
+            ],
+            "iterations": 4,
+            "load_factor": 53.91568035298524,
+            "load_n": 53915.68035298524,
+            "minimum_tangent_eigenvalue": 521.2930387352905,
+            "normalized_arc_constraint_error": 1.9984014443252818e-15,
+            "normalized_residual": 3.3737669480139304e-15,
+            "predictor_load_increment": 0.4730434816226419,
+            "predictor_orientation": 0.9999818138676285,
+            "predictor_root_sign": 1,
+            "rejected_attempts": 0,
+            "step": 76
+          },
+          {
+            "accepted_step_size": 1.0,
+            "displacement_mm": [
+              53.24131020516622
+            ],
+            "iterations": 4,
+            "load_factor": 54.37245205524863,
+            "load_n": 54372.45205524863,
+            "minimum_tangent_eigenvalue": 505.6543630993636,
+            "normalized_arc_constraint_error": 2.1094237467877974e-15,
+            "normalized_residual": 4.148326542464865e-15,
+            "predictor_load_increment": 0.4622550469171425,
+            "predictor_orientation": 0.9999812911893683,
+            "predictor_root_sign": 1,
+            "rejected_attempts": 0,
+            "step": 77
+          },
+          {
+            "accepted_step_size": 1.0,
+            "displacement_mm": [
+              54.13651624238336
+            ],
+            "iterations": 4,
+            "load_factor": 54.818104555443554,
+            "load_n": 54818.104555443555,
+            "minimum_tangent_eigenvalue": 490.0022284075479,
+            "normalized_arc_constraint_error": 4.551914400963142e-15,
+            "normalized_residual": 7.0346422350611555e-15,
+            "predictor_load_increment": 0.45124580231198813,
+            "predictor_orientation": 0.9999807680012484,
+            "predictor_root_sign": 1,
+            "rejected_attempts": 0,
+            "step": 78
+          },
+          {
+            "accepted_step_size": 1.0,
+            "displacement_mm": [
+              55.03727759396124
+            ],
+            "iterations": 4,
+            "load_factor": 55.25241894330514,
+            "load_n": 55252.418943305136,
+            "minimum_tangent_eigenvalue": 474.3395828729741,
+            "normalized_arc_constraint_error": 1.2212453270876722e-15,
+            "normalized_residual": 7.901146505440061e-16,
+            "predictor_load_increment": 0.4400168614216593,
+            "predictor_orientation": 0.9999802459249685,
+            "predictor_root_sign": 1,
+            "rejected_attempts": 0,
+            "step": 79
+          },
+          {
+            "accepted_step_size": 1.0,
+            "displacement_mm": [
+              55.94351958131728
+            ],
+            "iterations": 4,
+            "load_factor": 55.675178284246265,
+            "load_n": 55675.17828424626,
+            "minimum_tangent_eigenvalue": 458.66950106221014,
+            "normalized_arc_constraint_error": 1.1102230246251565e-15,
+            "normalized_residual": 3.920575293196079e-16,
+            "predictor_load_increment": 0.42856990466354583,
+            "predictor_orientation": 0.9999797266986864,
+            "predictor_root_sign": 1,
+            "rejected_attempts": 0,
+            "step": 80
+          },
+          {
+            "accepted_step_size": 1.0,
+            "displacement_mm": [
+              56.855159458366124
+            ],
+            "iterations": 4,
+            "load_factor": 56.08616822886094,
+            "load_n": 56086.168228860945,
+            "minimum_tangent_eigenvalue": 442.99518222921125,
+            "normalized_arc_constraint_error": 2.220446049250313e-15,
+            "normalized_residual": 2.5945639875035517e-16,
+            "predictor_load_increment": 0.4169072083057799,
+            "predictor_orientation": 0.9999792121715257,
+            "predictor_root_sign": 1,
+            "rejected_attempts": 0,
+            "step": 81
+          },
+          {
+            "accepted_step_size": 1.0,
+            "displacement_mm": [
+              57.772106285306194
+            ],
+            "iterations": 4,
+            "load_factor": 56.48517764800357,
+            "load_n": 56485.17764800357,
+            "minimum_tangent_eigenvalue": 427.3199479337203,
+            "normalized_arc_constraint_error": 4.440892098500626e-16,
+            "normalized_residual": 1.0304944294625003e-15,
+            "predictor_load_increment": 0.4050316713317611,
+            "predictor_orientation": 0.9999787042961304,
+            "predictor_root_sign": 1,
+            "rejected_attempts": 0,
+            "step": 82
+          },
+          {
+            "accepted_step_size": 1.0,
+            "displacement_mm": [
+              58.69426083683348
+            ],
+            "iterations": 4,
+            "load_factor": 56.87199929049208,
+            "load_n": 56871.99929049208,
+            "minimum_tangent_eigenvalue": 411.64723890869413,
+            "normalized_arc_constraint_error": 5.88418203051333e-15,
+            "normalized_residual": 1.279356749359052e-16,
+            "predictor_load_increment": 0.3929468396187696,
+            "predictor_orientation": 0.9999782051189625,
+            "predictor_root_sign": 1,
+            "rejected_attempts": 0,
+            "step": 83
+          },
+          {
+            "accepted_step_size": 1.0,
+            "displacement_mm": [
+              59.62151554796616
+            ],
+            "iterations": 4,
+            "load_factor": 57.24643045997753,
+            "load_n": 57246.430459977535,
+            "minimum_tangent_eigenvalue": 395.9806111478046,
+            "normalized_arc_constraint_error": 4.440892098500626e-16,
+            "normalized_residual": 1.016791098515075e-15,
+            "predictor_load_increment": 0.3806569269166544,
+            "predictor_orientation": 0.9999777167684472,
+            "predictor_root_sign": 1,
+            "rejected_attempts": 0,
+            "step": 84
+          },
+          {
+            "accepted_step_size": 1.0,
+            "displacement_mm": [
+              60.553754500472
+            ],
+            "iterations": 4,
+            "load_factor": 57.608273707020786,
+            "load_n": 57608.27370702079,
+            "minimum_tangent_eigenvalue": 380.32373119047696,
+            "normalized_arc_constraint_error": 6.772360450213455e-15,
+            "normalized_residual": 3.662716433483467e-15,
+            "predictor_load_increment": 0.36816683211180334,
+            "predictor_orientation": 0.9999772414408785,
+            "predictor_root_sign": 1,
+            "rejected_attempts": 0,
+            "step": 85
+          },
+          {
+            "accepted_step_size": 1.0,
+            "displacement_mm": [
+              61.490853452642824
+            ],
+            "iterations": 4,
+            "load_factor": 57.95733753190149,
+            "load_n": 57957.33753190149,
+            "minimum_tangent_eigenvalue": 364.68037058998897,
+            "normalized_arc_constraint_error": 4.107825191113079e-15,
+            "normalized_residual": 1.1298589844919402e-15,
+            "predictor_load_increment": 0.35548215227077984,
+            "predictor_orientation": 0.9999767813840023,
+            "predictor_root_sign": 1,
+            "rejected_attempts": 0,
+            "step": 86
+          },
+          {
+            "accepted_step_size": 1.0,
+            "displacement_mm": [
+              62.432679914830906
+            ],
+            "iterations": 4,
+            "load_factor": 58.29343709322563,
+            "load_n": 58293.43709322563,
+            "minimum_tangent_eigenvalue": 349.0543995586553,
+            "normalized_arc_constraint_error": 1.4432899320127035e-15,
+            "normalized_residual": 8.737124767206837e-15,
+            "predictor_load_increment": 0.3426091909795558,
+            "predictor_orientation": 0.9999763388786158,
+            "predictor_root_sign": 1,
+            "rejected_attempts": 0,
+            "step": 87
+          },
+          {
+            "accepted_step_size": 1.0,
+            "displacement_mm": [
+              63.37909327276357
+            ],
+            "iterations": 4,
+            "load_factor": 58.6163949169838,
+            "load_n": 58616.3949169838,
+            "minimum_tangent_eigenvalue": 333.4497797942525,
+            "normalized_arc_constraint_error": 6.106226635438361e-15,
+            "normalized_residual": 3.7238511296138555e-15,
+            "predictor_load_increment": 0.32955496152812497,
+            "predictor_orientation": 0.9999759162181113,
+            "predictor_root_sign": 1,
+            "rejected_attempts": 0,
+            "step": 88
+          },
+          {
+            "accepted_step_size": 1.0,
+            "displacement_mm": [
+              64.32994496020343
+            ],
+            "iterations": 4,
+            "load_factor": 58.92604160030653,
+            "load_n": 58926.04160030653,
+            "minimum_tangent_eigenvalue": 317.870556502034,
+            "normalized_arc_constraint_error": 7.549516567451064e-15,
+            "normalized_residual": 7.161613611942388e-15,
+            "predictor_load_increment": 0.3163271845379729,
+            "predictor_orientation": 0.9999755156862239,
+            "predictor_root_sign": 1,
+            "rejected_attempts": 0,
+            "step": 89
+          },
+          {
+            "accepted_step_size": 1.0,
+            "displacement_mm": [
+              65.28507868198552
+            ],
+            "iterations": 4,
+            "load_factor": 59.22221650389341,
+            "load_n": 59222.2165038934,
+            "minimum_tangent_eigenvalue": 302.32084963739976,
+            "normalized_arc_constraint_error": 8.881784197001252e-16,
+            "normalized_residual": 5.0372019115817556e-15,
+            "predictor_load_increment": 0.30293427969036724,
+            "predictor_orientation": 0.9999751395334451,
+            "predictor_root_sign": 1,
+            "rejected_attempts": 0,
+            "step": 90
+          },
+          {
+            "accepted_step_size": 1.0,
+            "displacement_mm": [
+              66.24433068789477
+            ],
+            "iterations": 4,
+            "load_factor": 59.50476842683692,
+            "load_n": 59504.76842683692,
+            "minimum_tangent_eigenvalue": 286.8048444062715,
+            "normalized_arc_constraint_error": 5.329070518200751e-15,
+            "normalized_residual": 2.200953646535575e-15,
+            "predictor_load_increment": 0.2893853512868214,
+            "predictor_orientation": 0.9999747899521204,
+            "predictor_root_sign": 1,
+            "rejected_attempts": 0,
+            "step": 91
+          },
+          {
+            "accepted_step_size": 1.0,
+            "displacement_mm": [
+              67.20753009721638
+            ],
+            "iterations": 4,
+            "load_factor": 59.77355625744412,
+            "load_n": 59773.55625744412,
+            "minimum_tangent_eigenvalue": 271.32678107105954,
+            "normalized_arc_constraint_error": 1.2212453270876722e-14,
+            "normalized_residual": 5.355915810751162e-15,
+            "predictor_load_increment": 0.275690167459345,
+            "predictor_orientation": 0.9999744690510278,
+            "predictor_root_sign": 1,
+            "rejected_attempts": 0,
+            "step": 92
+          },
+          {
+            "accepted_step_size": 1.0,
+            "displacement_mm": [
+              68.17449927313457
+            ],
+            "iterations": 4,
+            "load_factor": 60.02844959361452,
+            "load_n": 60028.44959361452,
+            "minimum_tangent_eigenvalue": 255.89094412193185,
+            "normalized_arc_constraint_error": 1.2878587085651816e-14,
+            "normalized_residual": 7.272509281956268e-16,
+            "predictor_load_increment": 0.2618591329439881,
+            "predictor_orientation": 0.9999741788295687,
+            "predictor_root_sign": 1,
+            "rejected_attempts": 0,
+            "step": 93
+          },
+          {
+            "accepted_step_size": 1.0,
+            "displacement_mm": [
+              69.14505424547035
+            ],
+            "iterations": 4,
+            "load_factor": 60.26932932641559,
+            "load_n": 60269.32932641559,
+            "minimum_tangent_eigenvalue": 240.501650883646,
+            "normalized_arc_constraint_error": 1.3988810110276972e-14,
+            "normalized_residual": 4.225341800589839e-15,
+            "predictor_load_increment": 0.24790325543683558,
+            "predictor_orientation": 0.9999739211522233,
+            "predictor_root_sign": 1,
+            "rejected_attempts": 0,
+            "step": 94
+          },
+          {
+            "accepted_step_size": 1.0,
+            "displacement_mm": [
+              70.11900517955972
+            ],
+            "iterations": 4,
+            "load_factor": 60.49608818067806,
+            "load_n": 60496.08818067806,
+            "minimum_tangent_eigenvalue": 225.16323963911054,
+            "normalized_arc_constraint_error": 8.770761894538737e-15,
+            "normalized_residual": 1.3229869263113836e-15,
+            "predictor_load_increment": 0.2338341056629175,
+            "predictor_orientation": 0.9999736977239265,
+            "predictor_root_sign": 1,
+            "rejected_attempts": 0,
+            "step": 95
+          },
+          {
+            "accepted_step_size": 1.0,
+            "displacement_mm": [
+              71.09615688839098
+            ],
+            "iterations": 4,
+            "load_factor": 60.70863120674139,
+            "load_n": 60708.63120674139,
+            "minimum_tangent_eigenvalue": 209.88005735946658,
+            "normalized_arc_constraint_error": 4.218847493575595e-15,
+            "normalized_residual": 9.468186649819514e-15,
+            "predictor_load_increment": 0.21966377140433346,
+            "predictor_orientation": 0.9999735100664887,
+            "predictor_root_sign": 1,
+            "rejected_attempts": 0,
+            "step": 96
+          },
+          {
+            "accepted_step_size": 1.0,
+            "displacement_mm": [
+              72.07630938446086
+            ],
+            "iterations": 4,
+            "load_factor": 60.90687621789678,
+            "load_n": 60906.87621789678,
+            "minimum_tangent_eigenvalue": 194.65644713916245,
+            "normalized_arc_constraint_error": 1.2212453270876722e-14,
+            "normalized_residual": 0.0,
+            "predictor_load_increment": 0.20540480584898294,
+            "predictor_orientation": 0.9999733594972364,
+            "predictor_root_sign": 1,
+            "rejected_attempts": 0,
+            "step": 97
+          },
+          {
+            "accepted_step_size": 1.0,
+            "displacement_mm": [
+              73.0592584671932
+            ],
+            "iterations": 4,
+            "load_factor": 61.090754168602224,
+            "load_n": 61090.75416860222,
+            "minimum_tangent_eigenvalue": 179.49673544092306,
+            "normalized_arc_constraint_error": 4.3298697960381105e-15,
+            "normalized_residual": 6.193241531989301e-15,
+            "predictor_load_increment": 0.19107017073460594,
+            "predictor_orientation": 0.9999732471096919,
+            "predictor_root_sign": 1,
+            "rejected_attempts": 0,
+            "step": 98
+          },
+          {
+            "accepted_step_size": 1.0,
+            "displacement_mm": [
+              74.04479634120187
+            ],
+            "iterations": 4,
+            "load_factor": 61.2602094691817,
+            "load_n": 61260.209469181704,
+            "minimum_tangent_eigenvalue": 164.40521926058338,
+            "normalized_arc_constraint_error": 1.176836406102666e-14,
+            "normalized_residual": 7.482594879538515e-15,
+            "predictor_load_increment": 0.17667317486904968,
+            "predictor_orientation": 0.9999731737573453,
+            "predictor_root_sign": 1,
+            "rejected_attempts": 0,
+            "step": 99
+          },
+          {
+            "accepted_step_size": 1.0,
+            "displacement_mm": [
+              75.03271226019447
+            ],
+            "iterations": 4,
+            "load_factor": 61.41520023342593,
+            "load_n": 61415.20023342593,
+            "minimum_tangent_eigenvalue": 149.38615332476957,
+            "normalized_arc_constraint_error": 4.440892098500626e-16,
+            "normalized_residual": 2.724847016539365e-15,
+            "predictor_load_increment": 0.1622274087043751,
+            "predictor_orientation": 0.9999731400406092,
+            "predictor_root_sign": 1,
+            "rejected_attempts": 0,
+            "step": 100
+          },
+          {
+            "accepted_step_size": 1.0,
+            "displacement_mm": [
+              76.02279319090694
+            ],
+            "iterations": 4,
+            "load_factor": 61.55569845633115,
+            "load_n": 61555.69845633115,
+            "minimum_tangent_eigenvalue": 134.4437374359535,
+            "normalized_arc_constraint_error": 1.1546319456101628e-14,
+            "normalized_residual": 2.600426467836972e-15,
+            "predictor_load_increment": 0.14774667572592892,
+            "predictor_orientation": 0.9999731462973304,
+            "predictor_root_sign": 1,
+            "rejected_attempts": 0,
+            "step": 101
+          },
+          {
+            "accepted_step_size": 1.0,
+            "displacement_mm": [
+              77.01482449115656
+            ],
+            "iterations": 4,
+            "load_factor": 61.68169012004367,
+            "load_n": 61681.69012004367,
+            "minimum_tangent_eigenvalue": 119.58210407803182,
+            "normalized_arc_constraint_error": 3.1086244689504383e-15,
+            "normalized_residual": 1.0616378766568803e-15,
+            "predictor_load_increment": 0.13324492148568165,
+            "predictor_orientation": 0.999973192597269,
+            "predictor_root_sign": 1,
+            "rejected_attempts": 0,
+            "step": 102
+          },
+          {
+            "accepted_step_size": 1.0,
+            "displacement_mm": [
+              78.00859059589567
+            ],
+            "iterations": 4,
+            "load_factor": 61.79317522699374,
+            "load_n": 61793.17522699374,
+            "minimum_tangent_eigenvalue": 104.80530639329295,
+            "normalized_arc_constraint_error": 9.992007221626409e-15,
+            "normalized_residual": 4.003396135147443e-15,
+            "predictor_load_increment": 0.11873616115833155,
+            "predictor_orientation": 0.99997327874053,
+            "predictor_root_sign": 1,
+            "rejected_attempts": 0,
+            "step": 103
+          },
+          {
+            "accepted_step_size": 1.0,
+            "displacement_mm": [
+              79.00387570505823
+            ],
+            "iterations": 4,
+            "load_factor": 61.89016776010455,
+            "load_n": 61890.16776010455,
+            "minimum_tangent_eigenvalue": 90.11730663631121,
+            "normalized_arc_constraint_error": 6.5503158452884236e-15,
+            "normalized_residual": 1.7634362316772467e-15,
+            "predictor_load_increment": 0.10423440652912506,
+            "predictor_orientation": 0.9999734042600117,
+            "predictor_root_sign": 1,
+            "rejected_attempts": 0,
+            "step": 104
+          },
+          {
+            "accepted_step_size": 1.0,
+            "displacement_mm": [
+              80.00046446700964
+            ],
+            "iterations": 4,
+            "load_factor": 61.97269557088476,
+            "load_n": 61972.69557088476,
+            "minimum_tangent_eigenvalue": 75.5219652039341,
+            "normalized_arc_constraint_error": 8.881784197001252e-16,
+            "normalized_residual": 7.866192613692208e-15,
+            "predictor_load_increment": 0.08975359333096429,
+            "predictor_orientation": 0.9999735684279575,
+            "predictor_root_sign": 1,
+            "rejected_attempts": 0,
+            "step": 105
+          },
+          {
+            "accepted_step_size": 1.0,
+            "displacement_mm": [
+              80.99814265154048
+            ],
+            "iterations": 4,
+            "load_factor": 62.04080019709499,
+            "load_n": 62040.80019709499,
+            "minimum_tangent_eigenvalue": 61.023030331932524,
+            "normalized_arc_constraint_error": 1.0436096431476471e-14,
+            "normalized_residual": 3.752863324041569e-15,
+            "predictor_load_increment": 0.07530750983672707,
+            "predictor_orientation": 0.9999737702662942,
+            "predictor_root_sign": 1,
+            "rejected_attempts": 0,
+            "step": 106
+          },
+          {
+            "accepted_step_size": 1.0,
+            "displacement_mm": [
+              81.99669780657952
+            ],
+            "iterations": 4,
+            "load_factor": 62.09453661254069,
+            "load_n": 62094.536612540694,
+            "minimum_tangent_eigenvalue": 46.624128539185826,
+            "normalized_arc_constraint_error": 2.220446049250313e-16,
+            "normalized_residual": 1.5232813407497357e-15,
+            "predictor_load_increment": 0.060909727580043496,
+            "predictor_orientation": 0.9999740085604889,
+            "predictor_root_sign": 1,
+            "rejected_attempts": 0,
+            "step": 107
+          },
+          {
+            "accepted_step_size": 1.0,
+            "displacement_mm": [
+              82.99591989313494
+            ],
+            "iterations": 4,
+            "load_factor": 62.13397291231428,
+            "load_n": 62133.972912314275,
+            "minimum_tangent_eigenvalue": 32.328755888974925,
+            "normalized_arc_constraint_error": 3.3306690738754696e-16,
+            "normalized_residual": 4.332741318581143e-15,
+            "predictor_load_increment": 0.04657353502619121,
+            "predictor_orientation": 0.9999742818767228,
+            "predictor_root_sign": 1,
+            "rejected_attempts": 0,
+            "step": 108
+          },
+          {
+            "accepted_step_size": 1.0,
+            "displacement_mm": [
+              83.9956018933923
+            ],
+            "iterations": 4,
+            "load_factor": 62.15918993754395,
+            "load_n": 62159.189937543946,
+            "minimum_tangent_eigenvalue": 18.140270125210673,
+            "normalized_arc_constraint_error": 1.5543122344752192e-15,
+            "normalized_residual": 4.0968763710127754e-15,
+            "predictor_load_increment": 0.032311874945469735,
+            "predictor_orientation": 0.9999745885817904,
+            "predictor_root_sign": 1,
+            "rejected_attempts": 0,
+            "step": 109
+          },
+          {
+            "accepted_step_size": 1.0,
+            "displacement_mm": [
+              84.99554038739443
+            ],
+            "iterations": 4,
+            "load_factor": 62.17028084430396,
+            "load_n": 62170.28084430396,
+            "minimum_tangent_eigenvalue": 4.06188372849809,
+            "normalized_arc_constraint_error": 6.994405055138486e-15,
+            "normalized_residual": 1.4043927449653878e-15,
+            "predictor_load_increment": 0.018137286157734845,
+            "predictor_orientation": 0.9999749268653468,
+            "predictor_root_sign": 1,
+            "rejected_attempts": 0,
+            "step": 110
+          },
+          {
+            "accepted_step_size": 1.0,
+            "displacement_mm": [
+              85.99553609428351
+            ],
+            "iterations": 4,
+            "load_factor": 62.16735062188557,
+            "load_n": 62167.35062188557,
+            "minimum_tangent_eigenvalue": -9.90334207578294,
+            "normalized_arc_constraint_error": 1.354472090042691e-14,
+            "normalized_residual": 2.34076490035333e-15,
+            "predictor_load_increment": 0.0040618502206071685,
+            "predictor_orientation": 0.999975294763944,
+            "predictor_root_sign": 1,
+            "rejected_attempts": 0,
+            "step": 111
+          },
+          {
+            "accepted_step_size": 1.0,
+            "displacement_mm": [
+              86.99539437468827
+            ],
+            "iterations": 4,
+            "load_factor": 62.15051556601926,
+            "load_n": 62150.51556601926,
+            "minimum_tangent_eigenvalue": -23.75250233830002,
+            "normalized_arc_constraint_error": 2.9976021664879227e-15,
+            "normalized_residual": 2.107259060726241e-15,
+            "predictor_load_increment": -0.009902856470501226,
+            "predictor_orientation": -0.9999756901862993,
+            "predictor_root_sign": -1,
+            "rejected_attempts": 0,
+            "step": 112
+          },
+          {
+            "accepted_step_size": 1.0,
+            "displacement_mm": [
+              87.9949256914701
+            ],
+            "iterations": 4,
+            "load_factor": 62.11990271296085,
+            "load_n": 62119.90271296085,
+            "minimum_tangent_eigenvalue": -37.48285242911055,
+            "normalized_arc_constraint_error": 1.1879386363489175e-14,
+            "normalized_residual": 3.982339766778514e-15,
+            "predictor_load_increment": -0.023745804812507883,
+            "predictor_orientation": -0.9999761109392186,
+            "predictor_root_sign": -1,
+            "rejected_attempts": 0,
+            "step": 113
+          },
+          {
+            "accepted_step_size": 1.0,
+            "displacement_mm": [
+              88.99394602668733
+            ],
+            "iterations": 4,
+            "load_factor": 62.07564924052686,
+            "load_n": 62075.64924052686,
+            "minimum_tangent_eigenvalue": -51.091811109344675,
+            "normalized_arc_constraint_error": 1.7763568394002505e-15,
+            "normalized_residual": 3.2819119202080023e-15,
+            "predictor_load_increment": -0.03745654910890588,
+            "predictor_orientation": -0.9999765547538039,
+            "predictor_root_sign": -1,
+            "rejected_attempts": 0,
+            "step": 114
+          },
+          {
+            "accepted_step_size": 1.0,
+            "displacement_mm": [
+              89.99227725328176
+            ],
+            "iterations": 4,
+            "load_factor": 62.01790184226106,
+            "load_n": 62017.90184226106,
+            "minimum_tangent_eigenvalue": -64.57696264819239,
+            "normalized_arc_constraint_error": 8.881784197001252e-15,
+            "normalized_residual": 2.8156867219491826e-15,
+            "predictor_load_increment": -0.05102525703299878,
+            "predictor_orientation": -0.9999770193111921,
+            "predictor_root_sign": -1,
+            "rejected_attempts": 0,
+            "step": 115
+          },
+          {
+            "accepted_step_size": 1.0,
+            "displacement_mm": [
+              90.98974746062088
+            ],
+            "iterations": 4,
+            "load_factor": 61.946816080881916,
+            "load_n": 61946.816080881916,
+            "minimum_tangent_eigenvalue": -77.93605801309549,
+            "normalized_arc_constraint_error": 4.440892098500626e-16,
+            "normalized_residual": 2.3490981698505532e-15,
+            "predictor_load_increment": -0.06444273341148572,
+            "predictor_orientation": -0.9999775022675077,
+            "predictor_root_sign": -1,
+            "rejected_attempts": 0,
+            "step": 116
+          },
+          {
+            "accepted_step_size": 1.0,
+            "displacement_mm": [
+              91.98619123363108
+            ],
+            "iterations": 4,
+            "load_factor": 61.862555727042164,
+            "load_n": 61862.55572704216,
+            "minimum_tangent_eigenvalue": -91.16701516970528,
+            "normalized_arc_constraint_error": 1.5543122344752192e-15,
+            "normalized_residual": 3.528446664709747e-16,
+            "predictor_load_increment": -0.07770043790034376,
+            "predictor_orientation": -0.9999780012776595,
+            "predictor_root_sign": -1,
+            "rejected_attempts": 0,
+            "step": 117
+          },
+          {
+            "accepted_step_size": 1.0,
+            "displacement_mm": [
+              92.98144988582209
+            ],
+            "iterations": 4,
+            "load_factor": 61.76529208923792,
+            "load_n": 61765.29208923792,
+            "minimum_tangent_eigenvalue": -104.26791853689069,
+            "normalized_arc_constraint_error": 1.432187701766452e-14,
+            "normalized_residual": 2.3560020095658812e-15,
+            "predictor_load_increment": -0.0907904967155847,
+            "predictor_orientation": -0.9999785140175761,
+            "predictor_root_sign": -1,
+            "rejected_attempts": 0,
+            "step": 118
+          },
+          {
+            "accepted_step_size": 1.0,
+            "displacement_mm": [
+              93.97537164701954
+            ],
+            "iterations": 4,
+            "load_factor": 61.65520334041152,
+            "load_n": 61655.20334041152,
+            "minimum_tangent_eigenvalue": -117.23701764832798,
+            "normalized_arc_constraint_error": 1.3988810110276972e-14,
+            "normalized_residual": 1.0620939511966544e-15,
+            "predictor_load_increment": -0.10370570866292794,
+            "predictor_orientation": -0.9999790382044971,
+            "predictor_root_sign": -1,
+            "rejected_attempts": 0,
+            "step": 119
+          },
+          {
+            "accepted_step_size": 1.0,
+            "displacement_mm": [
+              94.96781180708682
+            ],
+            "iterations": 4,
+            "load_factor": 61.532473846459844,
+            "load_n": 61532.47384645984,
+            "minimum_tangent_eigenvalue": -130.0727250780092,
+            "normalized_arc_constraint_error": 7.216449660063518e-15,
+            "normalized_residual": 1.300703982026271e-15,
+            "predictor_load_increment": -0.11643954577910755,
+            "predictor_orientation": -0.9999795716153749,
+            "predictor_root_sign": -1,
+            "rejected_attempts": 0,
+            "step": 120
+          },
+          {
+            "accepted_step_size": 1.0,
+            "displacement_mm": [
+              95.95863281732316
+            ],
+            "iterations": 4,
+            "load_factor": 61.397293501460155,
+            "load_n": 61397.29350146015,
+            "minimum_tangent_eigenvalue": -142.7736136909035,
+            "normalized_arc_constraint_error": 7.327471962526033e-15,
+            "normalized_residual": 4.740246482695779e-16,
+            "predictor_load_increment": -0.1289861489548056,
+            "predictor_orientation": -0.9999801121028559,
+            "predictor_root_sign": -1,
+            "rejected_attempts": 0,
+            "step": 121
+          },
+          {
+            "accepted_step_size": 1.0,
+            "displacement_mm": [
+              96.94770435157037
+            ],
+            "iterations": 4,
+            "load_factor": 61.24985707400111,
+            "load_n": 61249.85707400111,
+            "minimum_tangent_eigenvalue": -155.33841328307653,
+            "normalized_arc_constraint_error": 6.661338147750939e-16,
+            "normalized_residual": 6.058362517891706e-15,
+            "predictor_load_increment": -0.14134031895339055,
+            "predictor_orientation": -0.9999806576092908,
+            "predictor_root_sign": -1,
+            "rejected_attempts": 0,
+            "step": 122
+          },
+          {
+            "accepted_step_size": 1.0,
+            "displacement_mm": [
+              97.93490332934331
+            ],
+            "iterations": 4,
+            "load_factor": 61.090363568540674,
+            "load_n": 61090.36356854068,
+            "minimum_tangent_eigenvalue": -167.76600667695558,
+            "normalized_arc_constraint_error": 1.2878587085651816e-14,
+            "normalized_residual": 1.786523402996315e-15,
+            "predictor_load_increment": -0.15349750327196637,
+            "predictor_orientation": -0.999981206178086,
+            "predictor_root_sign": -1,
+            "rejected_attempts": 0,
+            "step": 123
+          },
+          {
+            "accepted_step_size": 1.0,
+            "displacement_mm": [
+              98.92011390352222
+            ],
+            "iterations": 4,
+            "load_factor": 60.91901560524354,
+            "load_n": 60919.015605243534,
+            "minimum_tangent_eigenvalue": -180.0554253383321,
+            "normalized_arc_constraint_error": 9.547918011776346e-15,
+            "normalized_residual": 4.777462368290243e-15,
+            "predictor_load_increment": -0.16545377931133778,
+            "predictor_orientation": -0.9999817559630946,
+            "predictor_root_sign": -1,
+            "rejected_attempts": 0,
+            "step": 124
+          },
+          {
+            "accepted_step_size": 1.0,
+            "displacement_mm": [
+              99.90322741531011
+            ],
+            "iterations": 4,
+            "load_factor": 60.73601882128248,
+            "load_n": 60736.01882128248,
+            "minimum_tangent_eigenvalue": -192.20584458040466,
+            "normalized_arc_constraint_error": 1.1324274851176597e-14,
+            "normalized_residual": 4.4324675365526736e-15,
+            "predictor_load_increment": -0.17720583433129536,
+            "predictor_orientation": -0.9999823052355982,
+            "predictor_root_sign": -1,
+            "rejected_attempts": 0,
+            "step": 125
+          },
+          {
+            "accepted_step_size": 1.0,
+            "displacement_mm": [
+              100.88414231926454
+            ],
+            "iterations": 4,
+            "load_factor": 60.54158129609744,
+            "load_n": 60541.58129609744,
+            "minimum_tangent_eigenvalue": -204.216578420147,
+            "normalized_arc_constraint_error": 6.8833827526759706e-15,
+            "normalized_residual": 0.0,
+            "predictor_load_increment": -0.18875094266641068,
+            "predictor_orientation": -0.9999828523893257,
+            "predictor_root_sign": -1,
+            "rejected_attempts": 0,
+            "step": 126
+          },
+          {
+            "accepted_step_size": 1.0,
+            "displacement_mm": [
+              101.86276408127307
+            ],
+            "iterations": 4,
+            "load_factor": 60.33591300266524,
+            "load_n": 60335.913002665235,
+            "minimum_tangent_eigenvalue": -216.08707414847197,
+            "normalized_arc_constraint_error": 5.662137425588298e-15,
+            "normalized_residual": 8.441357852169092e-16,
+            "predictor_load_increment": -0.20008694066972665,
+            "predictor_orientation": -0.9999833959434814,
+            "predictor_root_sign": -1,
+            "rejected_attempts": 0,
+            "step": 127
+          },
+          {
+            "accepted_step_size": 1.0,
+            "displacement_mm": [
+              102.83900505235202
+            ],
+            "iterations": 4,
+            "load_factor": 60.11922528638481,
+            "load_n": 60119.22528638481,
+            "minimum_tangent_eigenvalue": -227.8169066742547,
+            "normalized_arc_constraint_error": 1.1102230246251565e-16,
+            "normalized_residual": 3.0256367990121168e-15,
+            "predictor_load_increment": -0.21121219983363454,
+            "predictor_orientation": -0.9999839345440261,
+            "predictor_root_sign": -1,
+            "rejected_attempts": 0,
+            "step": 128
+          },
+          {
+            "accepted_step_size": 1.0,
+            "displacement_mm": [
+              103.81278432111829
+            ],
+            "iterations": 4,
+            "load_factor": 59.89173037276903,
+            "load_n": 59891.73037276903,
+            "minimum_tangent_eigenvalue": -239.4057726982169,
+            "normalized_arc_constraint_error": 1.199040866595169e-14,
+            "normalized_residual": 3.0371294872002835e-15,
+            "predictor_load_increment": -0.22212559851598937,
+            "predictor_orientation": -0.9999844669633686,
+            "predictor_root_sign": -1,
+            "rejected_attempts": 0,
+            "step": 129
+          },
+          {
+            "accepted_step_size": 1.0,
+            "displacement_mm": [
+              104.78402754771939
+            ],
+            "iterations": 4,
+            "load_factor": 59.653640904750205,
+            "load_n": 59653.6409047502,
+            "minimum_tangent_eigenvalue": -250.8534847691732,
+            "normalized_arc_constraint_error": 1.0880185641326534e-14,
+            "normalized_residual": 1.4636406101282646e-15,
+            "predictor_load_increment": -0.2328264926714633,
+            "predictor_orientation": -0.9999849920986197,
+            "predictor_root_sign": -1,
+            "rejected_attempts": 0,
+            "step": 130
+          },
+          {
+            "accepted_step_size": 1.0,
+            "displacement_mm": [
+              105.75266678191282
+            ],
+            "iterations": 4,
+            "load_factor": 59.40516951005627,
+            "load_n": 59405.169510056265,
+            "minimum_tangent_eigenvalue": -262.15996527115203,
+            "normalized_arc_constraint_error": 1.1213252548714081e-14,
+            "normalized_residual": 1.3472823058348306e-15,
+            "predictor_load_increment": -0.24331468595746591,
+            "predictor_orientation": -0.999985508968689,
+            "predictor_root_sign": -1,
+            "rejected_attempts": 0,
+            "step": 131
+          },
+          {
+            "accepted_step_size": 1.0,
+            "displacement_mm": [
+              106.71864026786429
+            ],
+            "iterations": 4,
+            "load_factor": 59.146528398786685,
+            "load_n": 59146.528398786686,
+            "minimum_tangent_eigenvalue": -273.32524038587115,
+            "normalized_arc_constraint_error": 8.770761894538737e-15,
+            "normalized_residual": 4.920632071675501e-15,
+            "predictor_load_increment": -0.2535903995507186,
+            "predictor_orientation": -0.9999860167103412,
+            "predictor_root_sign": -1,
+            "rejected_attempts": 0,
+            "step": 132
+          },
+          {
+            "accepted_step_size": 1.0,
+            "displacement_mm": [
+              107.68189223809995
+            ],
+            "iterations": 4,
+            "load_factor": 58.87792899104887,
+            "load_n": 58877.928991048866,
+            "minimum_tangent_eigenvalue": -284.34943407044886,
+            "normalized_arc_constraint_error": 1.2545520178264269e-14,
+            "normalized_residual": 4.448771867475565e-15,
+            "predictor_load_increment": -0.2636542419761025,
+            "predictor_orientation": -0.9999865145734657,
+            "predictor_root_sign": -1,
+            "rejected_attempts": 0,
+            "step": 133
+          },
+          {
+            "accepted_step_size": 1.0,
+            "displacement_mm": [
+              108.6423726988901
+            ],
+            "iterations": 4,
+            "load_factor": 58.59958157424686,
+            "load_n": 58599.58157424686,
+            "minimum_tangent_eigenvalue": -295.2327620864167,
+            "normalized_arc_constraint_error": 1.1324274851176597e-14,
+            "normalized_residual": 1.2416398579509719e-15,
+            "predictor_load_increment": -0.2735071792140624,
+            "predictor_orientation": -0.9999870019155487,
+            "predictor_root_sign": -1,
+            "rejected_attempts": 0,
+            "step": 134
+          },
+          {
+            "accepted_step_size": 1.0,
+            "displacement_mm": [
+              109.60003720918338
+            ],
+            "iterations": 4,
+            "load_factor": 58.3116949894175,
+            "load_n": 58311.6949894175,
+            "minimum_tangent_eigenvalue": -305.97552611167583,
+            "normalized_arc_constraint_error": 8.215650382226158e-15,
+            "normalized_residual": 2.869870703579946e-15,
+            "predictor_load_increment": -0.2831505053185781,
+            "predictor_orientation": -0.9999874781958336,
+            "predictor_root_sign": -1,
+            "rejected_attempts": 0,
+            "step": 135
+          },
+          {
+            "accepted_step_size": 1.0,
+            "displacement_mm": [
+              110.55484665503968
+            ],
+            "iterations": 4,
+            "load_factor": 58.01447634581721,
+            "load_n": 58014.47634581721,
+            "minimum_tangent_eigenvalue": -316.5781079628214,
+            "normalized_arc_constraint_error": 7.327471962526033e-15,
+            "normalized_residual": 1.6304111480824253e-15,
+            "predictor_load_increment": -0.2925858137438119,
+            "predictor_orientation": -0.9999879429689327,
+            "predictor_root_sign": -1,
+            "rejected_attempts": 0,
+            "step": 136
+          }
+        ],
+        "finest_run_settings": {
+          "beta": 0.001,
+          "constraint_tolerance": 1e-11,
+          "cutback_factor": 0.5,
+          "growth_factor": 1.15,
+          "max_iterations": 30,
+          "max_steps": 136,
+          "maximum_cutbacks": 10,
+          "maximum_step_size": 1.0,
+          "minimum_step_size": 0.03125,
+          "residual_tolerance": 1e-11,
+          "step_size": 1.0
+        },
+        "imperfection_definition": "none; perfect-geometry GNA shallow arch",
+        "max_normalized_arc_constraint_error": 9.630074515598608e-12,
+        "max_normalized_residual": 3.5114724804684785e-13,
+        "minimum_tangent_n_per_mm": -316.67431836210164,
+        "negative_tangent_found": true,
+        "step_sensitivity": [
+          {
+            "beta": 0.001,
+            "committed_steps": 34,
+            "max_normalized_arc_constraint_error": 1.0880185641326534e-14,
+            "max_normalized_residual": 1.0439672182078145e-13,
+            "nearest_peak_load_kn": 62.150348322294974,
+            "nearest_peak_w_mm": 87.00242113705235,
+            "path_max_w_mm": 110.56355562439954,
+            "peak_load_relative_error": 0.00033007892371486483,
+            "peak_w_relative_error": 0.020130792596952763,
+            "rejected_attempts": 0,
+            "step_size": 4.0
+          },
+          {
+            "beta": 0.001,
+            "committed_steps": 68,
+            "max_normalized_arc_constraint_error": 6.994405055138486e-15,
+            "max_normalized_residual": 3.5114724804684785e-13,
+            "nearest_peak_load_kn": 62.17028634359377,
+            "nearest_peak_w_mm": 84.99689744287883,
+            "path_max_w_mm": 110.55658817768409,
+            "peak_load_relative_error": 9.38176406528234e-06,
+            "peak_w_relative_error": 0.0033846044341983594,
+            "rejected_attempts": 0,
+            "step_size": 2.0
+          },
+          {
+            "beta": 0.001,
+            "committed_steps": 136,
+            "max_normalized_arc_constraint_error": 9.630074515598608e-12,
+            "max_normalized_residual": 2.0966460675598884e-13,
+            "nearest_peak_load_kn": 62.17028084430396,
+            "nearest_peak_w_mm": 84.99554038739443,
+            "path_max_w_mm": 110.55484665503968,
+            "peak_load_relative_error": 9.470218511052056e-06,
+            "peak_w_relative_error": 0.003400516337209926,
+            "rejected_attempts": 0,
+            "step_size": 1.0
+          }
+        ]
+      },
+      "evidence": "The complete finest-step history, predictor roots, step sizes, residuals and tangent eigenvalues are retained; convergence still does not prove physical stability, uniqueness or reachability.",
+      "passed": true,
+      "reference": {
+        "branch_stability_claim": false,
+        "equilibrium_and_constraint_converged": true,
+        "path_crosses_limit": true
+      },
+      "scope": "reference_math_core",
+      "status": "REFERENCE_CORE_PASS",
+      "test_id": "V21",
+      "title": "Spherical arc length and branch evidence"
+    },
+    {
+      "analysis_level": "all levels",
+      "computed": {
+        "LBA_is_design_strength": false,
+        "routes": {
+          "ideal_critical_mode": "LBA",
+          "imperfect_geometric_limit_load": "GNIA",
+          "imperfect_plastic_residual_stress_limit_load": "GMNIA",
+          "perfect_postbuckling_path": "GNA"
+        }
+      },
+      "evidence": "A linear eigenvalue is an ideal neutral multiplier, not a code design strength or an imperfection-reduced limit load.",
+      "passed": true,
+      "reference": {
+        "LBA_is_design_strength": false,
+        "routes": {
+          "ideal_critical_mode": "LBA",
+          "imperfect_geometric_limit_load": "GNIA",
+          "imperfect_plastic_residual_stress_limit_load": "GMNIA",
+          "perfect_postbuckling_path": "GNA"
+        }
+      },
+      "scope": "reference_math_core",
+      "status": "REFERENCE_CORE_PASS",
+      "test_id": "V22",
+      "title": "Analysis-level conclusion boundary"
+    }
+  ],
+  "summary": {
+    "all_reference_checks_passed": true,
+    "production_fe_gate_claimed": false,
+    "reference_checks_passed": 13,
+    "reference_checks_total": 13,
+    "status_counts": {
+      "ANALYTICAL_PASS": 6,
+      "REFERENCE_CORE_PASS": 7
+    }
+  }
+}
+

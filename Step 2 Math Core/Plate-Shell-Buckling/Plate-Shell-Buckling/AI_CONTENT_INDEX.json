@@ -1,0 +1,254 @@
+{
+  "schema_version": "1.0",
+  "package_id": "plate-shell-buckling-weeks-10-14-ai-guide",
+  "package_title": "Plate–Shell Buckling 第 10–14 周 AI 知识包",
+  "created_date": "2026-08-29",
+  "language": ["zh-CN", "zh-TW-reference-pdfs", "en-technical-terms"],
+  "scope": {
+    "week_range": "10-14",
+    "stage_ids": ["06 Plate/Shell Buckling", "07 Shell Instability Research"],
+    "workflow": [
+      "prebuckling equilibrium",
+      "geometric stiffness",
+      "generalized eigenvalue buckling",
+      "buckling mode filtering and tracking",
+      "initial imperfection mapping",
+      "nonlinear post-buckling path following"
+    ],
+    "included": [
+      "LBA mathematical and implementation contract",
+      "plate and shell analytical benchmarks",
+      "mode normalization MAC and repeated-mode handling",
+      "mode-shaped local and combined imperfection rules",
+      "Koiter imperfection sensitivity",
+      "GNA GNIA GMNIA analysis-level boundary",
+      "arc-length and branch evidence",
+      "verification V10 through V22",
+      "two complete reference PDFs",
+      "source and week mapping"
+    ],
+    "excluded": [
+      "production buckling solver implementation",
+      "commercial solver input decks",
+      "experimental datasets",
+      "universal shell element formulation",
+      "universal design knockdown factors",
+      "proof that a software implementation passed the theoretical benchmarks",
+      "complete material contact residual-stress and manufacturing-tolerance models"
+    ]
+  },
+  "canonical_source": {
+    "document_id": "A01",
+    "path": "01_核心算法/核心算法与实现顺序.md",
+    "rule": "Use A01 for the package-level prestress, geometric stiffness, eigenmode, imperfection and post-buckling contract; use R01 and R02 for full derivations."
+  },
+  "sign_conventions": {
+    "equilibrium": "r(q,lambda) = f_int(q) - lambda f_ref = 0",
+    "initial_stress_form": "(K_M + lambda K_sigma_ref) phi = 0; compression usually weakens through negative K_sigma_ref",
+    "positive_weakening_form": "K_M phi = lambda K_G phi with K_G = -K_sigma_ref",
+    "rule": "Never mix the two forms or take absolute eigenvalues without resolving the sign convention."
+  },
+  "analysis_levels": [
+    {
+      "id": "LBA",
+      "name": "linear buckling analysis",
+      "can_answer": ["ideal critical multiplier", "ideal buckling mode", "mesh and boundary sensitivity"],
+      "cannot_answer": ["imperfection-reduced limit load", "post-buckling path", "design strength"]
+    },
+    {
+      "id": "GNA",
+      "name": "geometrically nonlinear analysis of perfect geometry",
+      "can_answer": ["perfect-geometry path", "limit point", "candidate bifurcation"],
+      "cannot_answer": ["manufacturing imperfection scatter", "material yielding"]
+    },
+    {
+      "id": "GNIA",
+      "name": "geometrically nonlinear analysis with imperfection",
+      "can_answer": ["imperfection sensitivity", "imperfection-reduced path and limit load"],
+      "cannot_answer": ["plasticity and residual-stress effects"]
+    },
+    {
+      "id": "GMNIA",
+      "name": "geometrically and materially nonlinear analysis with imperfection",
+      "can_answer": ["engineering path within the specified material imperfection and boundary model"],
+      "cannot_answer": ["unmodeled contact", "imperfection statistics", "model uncertainty"]
+    }
+  ],
+  "default_reading_sequence": ["G02", "G01", "A01", "L01", "V01", "M01"],
+  "documents": [
+    {
+      "id": "G00",
+      "path": "README.md",
+      "category": "navigation",
+      "priority": 1,
+      "summary": "Scope, week 10-14 mapping, package tree, shortest reading path and completion boundary.",
+      "keywords": ["scope", "week mapping", "navigation", "completion boundary"]
+    },
+    {
+      "id": "G01",
+      "path": "AI_USAGE.md",
+      "category": "ai-instructions",
+      "priority": 1,
+      "summary": "Task routing, sign conventions, mode and imperfection rules, analysis levels and prohibited inference.",
+      "keywords": ["AI usage", "sign convention", "LBA", "GNA", "GNIA", "GMNIA", "prohibited inference"]
+    },
+    {
+      "id": "G02",
+      "path": "AGENTS.md",
+      "category": "agent-instructions",
+      "priority": 1,
+      "summary": "Folder-scoped rules for prestress, geometric stiffness, eigenmodes, imperfection and validation gates.",
+      "keywords": ["AGENTS", "scope", "geometric stiffness", "verification gate"]
+    },
+    {
+      "id": "G03",
+      "path": "CONTENT_INDEX.md",
+      "category": "human-readable-index",
+      "priority": 1,
+      "summary": "Human-readable file routing, algorithm chapters, verification pairing, PDF pages and search keywords.",
+      "keywords": ["content index", "routing", "verification pair", "PDF page"]
+    },
+    {
+      "id": "A01",
+      "path": "01_核心算法/核心算法与实现顺序.md",
+      "category": "core-algorithm",
+      "priority": 1,
+      "summary": "Second variation, prebuckling equilibrium, geometric stiffness, generalized eigenproblem, mode handling, imperfections, arc length, pseudocode and evidence contract.",
+      "keywords": ["prestress", "geometric stiffness", "generalized eigenvalue", "buckling mode", "MAC", "imperfection", "arc length"]
+    },
+    {
+      "id": "L01",
+      "path": "02_算法局限/算法局限与适用边界.md",
+      "category": "limitations",
+      "priority": 1,
+      "summary": "Applicability boundaries, sign and mesh risks, classical-shell limits, imperfection and post-buckling limitations, analysis-level upgrade gates.",
+      "keywords": ["limitation", "boundary condition", "nonconservative load", "mode degeneracy", "design boundary"]
+    },
+    {
+      "id": "Q01",
+      "path": "03_验证题目与答案/验证题目.md",
+      "category": "verification-questions",
+      "priority": 1,
+      "summary": "Independent V10-V22 questions for LBA, modes, imperfection, Koiter reduction and post-buckling.",
+      "keywords": ["verification question", "plate buckling", "cylindrical shell", "imperfection", "arc length"]
+    },
+    {
+      "id": "S01",
+      "path": "03_验证题目与答案/配套答案.md",
+      "category": "verification-solutions",
+      "priority": 1,
+      "summary": "Paired analytical, numerical and evidence-based answers for V10-V22.",
+      "keywords": ["answer", "reference value", "buckling coefficient", "limit point", "analysis level"]
+    },
+    {
+      "id": "V01",
+      "path": "03_验证题目与答案/验证矩阵.md",
+      "category": "verification-plan",
+      "priority": 1,
+      "summary": "Test matrix with expected values, tolerances, evidence, week gates and implementation metadata.",
+      "keywords": ["test matrix", "acceptance gate", "tolerance", "evidence", "mesh convergence"]
+    },
+    {
+      "id": "R00",
+      "path": "04_完整参考/README.md",
+      "category": "reference-navigation",
+      "priority": 2,
+      "summary": "Navigation and use boundaries for the two bundled reference PDFs.",
+      "keywords": ["reference", "reading route", "PDF QA"]
+    },
+    {
+      "id": "R01",
+      "path": "04_完整参考/Plate_Shell_Buckling_完整數學推導與例題_繁中.pdf",
+      "category": "derived-reference-pdf",
+      "priority": 2,
+      "summary": "Complete linear plate-shell buckling derivation with FE geometric stiffness and six examples.",
+      "page_routes": [
+        {"topic": "stability and second variation", "pdf_pages": "5"},
+        {"topic": "plate buckling equations and analytical modes", "pdf_pages": "5-10"},
+        {"topic": "cylindrical and spherical shells", "pdf_pages": "11-14"},
+        {"topic": "FE geometric stiffness and generalized eigenproblem", "pdf_pages": "14-15"},
+        {"topic": "worked examples and limitations", "pdf_pages": "16-19"}
+      ],
+      "keywords": ["Plate Shell Buckling", "second variation", "geometric stiffness", "Rayleigh quotient", "worked examples"]
+    },
+    {
+      "id": "R02",
+      "path": "04_完整参考/Shell_Instability_Research_完整數學邏輯推導與例題_繁中.pdf",
+      "category": "derived-reference-pdf",
+      "priority": 2,
+      "summary": "Complete shell instability derivation with Koiter asymptotics, imperfections, arc length and six examples.",
+      "page_routes": [
+        {"topic": "limit point and bifurcation", "pdf_pages": "5-8"},
+        {"topic": "Koiter reduction and post-buckling", "pdf_pages": "9-12"},
+        {"topic": "imperfection sensitivity", "pdf_pages": "13-16"},
+        {"topic": "shallow shell cylinder and sphere", "pdf_pages": "17-22"},
+        {"topic": "FE arc length branch switching and research gates", "pdf_pages": "23-30"}
+      ],
+      "keywords": ["Shell Instability", "Koiter", "imperfection sensitivity", "post-buckling", "arc length"]
+    },
+    {
+      "id": "M01",
+      "path": "05_来源映射/主题与来源映射.md",
+      "category": "provenance",
+      "priority": 2,
+      "summary": "Workspace sources, learning-plan scope, original-book page routes and synthesis boundaries.",
+      "keywords": ["source mapping", "provenance", "Timoshenko", "Koiter", "de Borst"]
+    },
+    {
+      "id": "M02",
+      "path": "05_来源映射/第10-14周主题映射.jsonl",
+      "category": "machine-readable-week-map",
+      "priority": 2,
+      "summary": "Five machine-readable records mapping weeks 10-14 to documents, tests, PDF pages, keywords and boundaries.",
+      "keywords": ["JSONL", "week 10", "week 14", "topic map"]
+    },
+    {
+      "id": "C00",
+      "path": "06_生成脚本/README.md",
+      "category": "script-navigation",
+      "priority": 3,
+      "summary": "Script origins, dependencies, moved-path limitations and PDF reproduction status.",
+      "keywords": ["generator", "dependency", "reproduce", "PDF QA"]
+    },
+    {
+      "id": "C01",
+      "path": "06_生成脚本/generate_plate_shell_buckling_pdf.py",
+      "category": "source-script-copy",
+      "priority": 3,
+      "summary": "Reference copy of the script that generated R01.",
+      "keywords": ["ReportLab", "Plate Shell Buckling", "PDF generator"]
+    },
+    {
+      "id": "C02",
+      "path": "06_生成脚本/generate_shell_instability_research_pdf.py",
+      "category": "source-script-copy",
+      "priority": 3,
+      "summary": "Reference copy of the script that generated R02; depends on C01 styles and an external math-rendering environment.",
+      "keywords": ["ReportLab", "Matplotlib", "Shell Instability", "PDF generator"]
+    }
+  ],
+  "verification_pairs": [
+    {"test_id": "V10", "question_document": "Q01", "solution_document": "S01", "topic": "equilibrium stability and bifurcation"},
+    {"test_id": "V11", "question_document": "Q01", "solution_document": "S01", "topic": "prebuckling equilibrium and geometric stiffness"},
+    {"test_id": "V12", "question_document": "Q01", "solution_document": "S01", "topic": "two-DOF generalized eigenproblem"},
+    {"test_id": "V13", "question_document": "Q01", "solution_document": "S01", "topic": "uniaxial simply supported rectangular plate"},
+    {"test_id": "V14", "question_document": "Q01", "solution_document": "S01", "topic": "biaxial simply supported square plate"},
+    {"test_id": "V15", "question_document": "Q01", "solution_document": "S01", "topic": "shear plate modal coupling"},
+    {"test_id": "V16", "question_document": "Q01", "solution_document": "S01", "topic": "axially compressed cylindrical shell"},
+    {"test_id": "V17", "question_document": "Q01", "solution_document": "S01", "topic": "normalization sign MAC and repeated modes"},
+    {"test_id": "V18", "question_document": "Q01", "solution_document": "S01", "topic": "mode-to-imperfection mapping"},
+    {"test_id": "V19", "question_document": "Q01", "solution_document": "S01", "topic": "Koiter two-thirds imperfection law"},
+    {"test_id": "V20", "question_document": "Q01", "solution_document": "S01", "topic": "shallow two-bar arch limit point"},
+    {"test_id": "V21", "question_document": "Q01", "solution_document": "S01", "topic": "arc length and branch evidence"},
+    {"test_id": "V22", "question_document": "Q01", "solution_document": "S01", "topic": "LBA GNA GNIA GMNIA conclusion boundary"}
+  ],
+  "routing": [
+    {"intent": "implement linear eigenvalue buckling", "read": ["G01", "A01", "V01", "R01"]},
+    {"intent": "derive or debug geometric stiffness", "read": ["A01", "L01", "Q01", "S01", "R01"]},
+    {"intent": "debug negative or spurious modes", "read": ["G01", "A01", "L01", "V01"]},
+    {"intent": "map eigenmode to initial imperfection", "read": ["G01", "A01", "Q01", "S01", "R02"]},
+    {"intent": "run nonlinear post-buckling", "read": ["A01", "L01", "V01", "R02"]},
+    {"intent": "make design-strength claim", "read": ["L01", "M01"], "warning": "This package does not define code-compliant design strength or universal knockdown factors."},
+    {"intent": "claim implementation passed", "read": ["V01"], "warning": "Theoretical answers are not run evidence; attach model, version, inputs, tolerances and logs."}
+  ]
+}

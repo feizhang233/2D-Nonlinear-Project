@@ -1,0 +1,26 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "step2-math-core"
+version = "0.1.0"
+description = "Unified adapter boundary for the Step 2 nonlinear shell math cores"
+readme = "README.md"
+requires-python = ">=3.11"
+dependencies = ["numpy>=1.26"]
+
+[project.scripts]
+step2-math-core = "step2_math_core.__main__:main"
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["step2_math_core*"]
+
+[tool.ruff]
+line-length = 100
+target-version = "py311"
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "UP", "B"]
+

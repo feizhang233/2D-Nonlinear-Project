@@ -1,0 +1,57 @@
+{
+  "schema_version": "1.0.0",
+  "interface_package": "step2_math_core",
+  "interface_version": "0.1.0",
+  "documentation": "INTERFACE.md",
+  "organization_policy": "non-destructive canonical-path registry",
+  "website_api": {
+    "catalog": "GET /api/v1/math-cores",
+    "describe": "GET /api/v1/math-cores/{core_id}",
+    "execute": "POST /api/v1/math-cores/execute",
+    "max_parameter_values": 10000,
+    "max_parameter_depth": 12
+  },
+  "cores": [
+    {
+      "core_id": "plate_shell_buckling",
+      "title": "Plate-Shell Buckling",
+      "canonical_root": "Plate-Shell-Buckling/Plate-Shell-Buckling",
+      "python_root": "Plate-Shell-Buckling/Plate-Shell-Buckling/python_math_core",
+      "python_package": "plate_shell_buckling_core",
+      "verification_ids": "V10-V22",
+      "verification_entry": "plate_shell_buckling_core.verification.run_validation_suite"
+    },
+    {
+      "core_id": "shell_instability",
+      "title": "Shell Instability Research",
+      "canonical_root": "Shell-Instability-Research_Math-Core-Guide/Shell-Instability-Research_Math-Core-Guide",
+      "python_root": "Shell-Instability-Research_Math-Core-Guide/Shell-Instability-Research_Math-Core-Guide/09_Python数学核心",
+      "python_package": "shell_instability_math",
+      "verification_ids": "V00-V10",
+      "verification_entry": "run_validation_problems.calculate"
+    },
+    {
+      "core_id": "constitutive_nonlinearity",
+      "title": "Constitutive Nonlinearity",
+      "canonical_root": "Constitutive Nonlinearity/Constitutive-Nonlinearity_Weeks10-14_Core-Guide",
+      "python_root": "Constitutive Nonlinearity/Constitutive-Nonlinearity_Weeks10-14_Core-Guide/04_可复现算例",
+      "python_package": "reference_material_point",
+      "verification_ids": "V00-V11",
+      "verification_entry": "reference_material_point.run_reference_checks"
+    },
+    {
+      "core_id": "general_nonlinear_shell",
+      "title": "General Nonlinear Shell",
+      "canonical_root": "General Nonlinear Shell/4_General-Nonlinear-Shell_16-24周",
+      "python_root": "General Nonlinear Shell/4_General-Nonlinear-Shell_16-24周/08_Python数学核心",
+      "python_package": "general_nonlinear_shell_math",
+      "verification_ids": "V00-V14",
+      "verification_entry": "general_nonlinear_shell_math.verification.run_all_verifications"
+    }
+  ],
+  "shared_exercise_copies": {
+    "directory_name": "四项目数学核心演算",
+    "status": "preserved source mirrors",
+    "rule": "Do not import these Markdown copies as executable cores; use each canonical_root and PACKAGE_INDEX.json for routing."
+  }
+}

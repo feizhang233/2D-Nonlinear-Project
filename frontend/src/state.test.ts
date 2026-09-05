@@ -15,6 +15,7 @@ const record = {
 describe('studioReducer result revision safety', () => {
   it('keeps results while edits are staged and invalidates them only after Apply', () => {
     let state = initialStudioState()
+    state = studioReducer(state, { type: 'analysisStarted', family: 'frame' })
     state = studioReducer(state, { type: 'analysisSucceeded', family: 'frame', record, revision: 0 })
     expect(activeWorkspace(state).record).toBe(record)
     const changed = structuredClone(activeWorkspace(state).model)
@@ -48,6 +49,22 @@ describe('studioReducer result revision safety', () => {
     state = studioReducer(state, { type: 'draftCancelled' })
     expect(editingModel(activeWorkspace(state)).name).toBe('Shallow arch limit-point demo')
     expect(activeWorkspace(state).modelRevision).toBe(0)
+  })
+
+  it('ignores terminal responses received after cancellation even at the same revision', () => {
+    let state = studioReducer(initialStudioState(), { type: 'analysisStarted', family: 'frame' })
+    state = studioReducer(state, { type: 'analysisCancelled', family: 'frame' })
+    expect(studioReducer(state, { type: 'analysisSucceeded', family: 'frame', record, revision: 0 })).toBe(state)
+    expect(studioReducer(state, { type: 'analysisProgressed', family: 'frame', record, revision: 0 })).toBe(state)
+    expect(state.mode).toBe('model')
+  })
+
+  it('does not navigate the active workspace when another family finishes', () => {
+    let state = studioReducer(initialStudioState(), { type: 'analysisStarted', family: 'frame' })
+    state = studioReducer(state, { type: 'workspaceChanged', family: 'plate' })
+    state = studioReducer(state, { type: 'analysisSucceeded', family: 'frame', record, revision: 0 })
+    expect(state.mode).toBe('model')
+    expect(state.workspaces.frame.record).toBe(record)
   })
 
   it('preserves independent documents when switching workspaces', () => {

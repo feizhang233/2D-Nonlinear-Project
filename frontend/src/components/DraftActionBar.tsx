@@ -14,14 +14,14 @@ interface DraftActionBarProps {
 
 export function DraftActionBar({ dirty, busy = false, onApply, onCancel }: DraftActionBarProps) {
   return (
-    <Box sx={{ flexShrink: 0, borderTop: '1px solid', borderColor: dirty ? 'warning.main' : 'divider', bgcolor: dirty ? 'background.paper' : 'background.containerLow', p: 1.25 }}>
+    <Box sx={{ flexShrink: 0, borderTop: '1px solid', borderColor: dirty ? 'warning.main' : 'divider', bgcolor: dirty ? 'background.paper' : 'background.containerLow', px: 2, py: 0.75 }}>
       <Stack direction="row" spacing={1} useFlexGap sx={{ alignItems: 'center', flexWrap: 'wrap' }}>
         <EditNoteRoundedIcon color={dirty ? 'warning' : 'disabled'} />
         <Box sx={{ minWidth: 150, flex: 1 }}>
-          <Typography variant="body2" sx={{ fontWeight: 700 }}>
+          <Typography component="span" variant="body2" sx={{ fontWeight: 700 }}>
             {dirty ? 'Unapplied changes' : 'Committed model'}
           </Typography>
-          <Typography variant="caption" color="text.secondary" noWrap sx={{ display: 'block' }}>
+          <Typography variant="caption" color="text.secondary" noWrap sx={{ ml: 1.5 }}>
             {dirty ? 'Review the form or canvas changes, then apply or cancel them.' : 'New form and canvas edits will be staged here.'}
           </Typography>
         </Box>

@@ -1,0 +1,15 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "plate-shell-buckling-core"
+version = "0.1.0"
+description = "Auditable Python reference math core for plate and shell buckling"
+requires-python = ">=3.11"
+dependencies = ["numpy>=1.26"]
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["plate_shell_buckling_core*"]
+

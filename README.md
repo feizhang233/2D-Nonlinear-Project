@@ -70,6 +70,7 @@ Open in the browser:
 | Results | Deformation, reactions, element response, convergence history, failures, and load-displacement paths |
 | Identity and models | HttpOnly sessions, user-isolated SQLite history, and a no-save guest mode |
 | API and scripting | Versioned validation, meshing, synchronous/asynchronous analysis, cancellation, and an importable Python core |
+| Step 2 Math Core | Bounded browser/API access to buckling, instability, constitutive, and general-shell reference operations |
 
 ---
 
@@ -185,6 +186,9 @@ The default synchronous API limit is 1 MiB per request and 10,000 degrees of fre
 | `GET` | `/health` | Service, version, execution modes, and limits |
 | `POST` | `/api/v1/models/validate` | Validate a versioned model and report execution eligibility |
 | `POST` | `/api/v1/meshes` | Generate a named-boundary Q4 surface mesh with Gmsh |
+| `GET` | `/api/v1/math-cores` | List Step 2 cores, operations, contracts, examples, and HTTP limits |
+| `GET` | `/api/v1/math-cores/{core_id}` | Read one Step 2 core contract |
+| `POST` | `/api/v1/math-cores/execute` | Execute one bounded reference operation through the stable envelope |
 | `POST` | `/api/v1/analyses` | Run or queue an analysis |
 | `GET` | `/api/v1/analyses/{analysis_id}` | Read status, result, history, and diagnostics |
 | `DELETE` | `/api/v1/analyses/{analysis_id}` | Request cooperative cancellation |
@@ -196,6 +200,8 @@ The default synchronous API limit is 1 MiB per request and 10,000 degrees of fre
 | `DELETE` | `/api/v1/models/{entry_id}` | Delete one user-owned history entry |
 
 Validation, meshing, and analysis remain available to guests. Saved-model endpoints require a signed-in session and enforce ownership on every operation. Model history retains up to 24 snapshots per account.
+
+Math Core operations are also available to guests. Their results are reference evidence only and never mutate the active model, staged edits, solver run, or Results workspace. The HTTP bridge limits parameters to 10,000 values and 12 nesting levels in addition to the global 1 MiB request limit; operation-level failures retain the stable `MathCoreResponse` error envelope. See [`Step 2 Math Core/INTERFACE.md`](Step%202%20Math%20Core/INTERFACE.md) for the complete contract.
 
 ---
 

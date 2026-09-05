@@ -1,0 +1,22 @@
+{
+  "schema_version": "1.0.0",
+  "request_id": "material-step-0001",
+  "core": "constitutive_nonlinearity",
+  "operation": "material_update",
+  "parameters": {
+    "model": "combined_1d",
+    "total_strain": 0.002,
+    "committed_state": {
+      "plastic_strain": 0.0,
+      "alpha": 0.0,
+      "backstress": 0.0
+    },
+    "material": {
+      "E": 210000.0,
+      "sigma_y0": 250.0,
+      "H_iso": 1000.0,
+      "H_kin": 0.0
+    }
+  }
+}
+

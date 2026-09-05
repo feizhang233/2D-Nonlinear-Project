@@ -724,6 +724,19 @@
         "title": "FailureRecord",
         "type": "object"
       },
+      "HTTPValidationError": {
+        "properties": {
+          "detail": {
+            "items": {
+              "$ref": "#/components/schemas/ValidationError"
+            },
+            "title": "Detail",
+            "type": "array"
+          }
+        },
+        "title": "HTTPValidationError",
+        "type": "object"
+      },
       "HealthResponse": {
         "additionalProperties": false,
         "properties": {
@@ -1050,6 +1063,321 @@
           "model"
         ],
         "title": "MaterialInput",
+        "type": "object"
+      },
+      "MathCoreCatalog": {
+        "additionalProperties": false,
+        "properties": {
+          "adapter_version": {
+            "title": "Adapter Version",
+            "type": "string"
+          },
+          "cores": {
+            "items": {
+              "$ref": "#/components/schemas/MathCoreMetadata"
+            },
+            "title": "Cores",
+            "type": "array"
+          },
+          "limits": {
+            "$ref": "#/components/schemas/MathCoreLimits"
+          },
+          "schema_version": {
+            "const": "1.0.0",
+            "default": "1.0.0",
+            "title": "Schema Version",
+            "type": "string"
+          }
+        },
+        "required": [
+          "adapter_version",
+          "limits",
+          "cores"
+        ],
+        "title": "MathCoreCatalog",
+        "type": "object"
+      },
+      "MathCoreExecutionError": {
+        "additionalProperties": false,
+        "properties": {
+          "code": {
+            "title": "Code",
+            "type": "string"
+          },
+          "details": {
+            "additionalProperties": {
+              "$ref": "#/components/schemas/JsonValue"
+            },
+            "title": "Details",
+            "type": "object"
+          },
+          "message": {
+            "title": "Message",
+            "type": "string"
+          }
+        },
+        "required": [
+          "code",
+          "message"
+        ],
+        "title": "MathCoreExecutionError",
+        "type": "object"
+      },
+      "MathCoreLimits": {
+        "additionalProperties": false,
+        "properties": {
+          "max_parameter_depth": {
+            "minimum": 1.0,
+            "title": "Max Parameter Depth",
+            "type": "integer"
+          },
+          "max_parameter_values": {
+            "minimum": 1.0,
+            "title": "Max Parameter Values",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "max_parameter_values",
+          "max_parameter_depth"
+        ],
+        "title": "MathCoreLimits",
+        "type": "object"
+      },
+      "MathCoreMetadata": {
+        "additionalProperties": false,
+        "properties": {
+          "core_id": {
+            "title": "Core Id",
+            "type": "string"
+          },
+          "limitations": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Limitations",
+            "type": "array"
+          },
+          "operations": {
+            "items": {
+              "$ref": "#/components/schemas/MathCoreOperationSpec"
+            },
+            "title": "Operations",
+            "type": "array"
+          },
+          "residual_convention": {
+            "title": "Residual Convention",
+            "type": "string"
+          },
+          "scope": {
+            "title": "Scope",
+            "type": "string"
+          },
+          "source_path": {
+            "title": "Source Path",
+            "type": "string"
+          },
+          "state_protocol": {
+            "title": "State Protocol",
+            "type": "string"
+          },
+          "title": {
+            "title": "Title",
+            "type": "string"
+          },
+          "verification_ids": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Verification Ids",
+            "type": "array"
+          },
+          "verification_meaning": {
+            "title": "Verification Meaning",
+            "type": "string"
+          },
+          "version": {
+            "title": "Version",
+            "type": "string"
+          }
+        },
+        "required": [
+          "core_id",
+          "title",
+          "version",
+          "source_path",
+          "scope",
+          "residual_convention",
+          "state_protocol",
+          "verification_ids",
+          "verification_meaning",
+          "limitations",
+          "operations"
+        ],
+        "title": "MathCoreMetadata",
+        "type": "object"
+      },
+      "MathCoreOperationSpec": {
+        "additionalProperties": false,
+        "properties": {
+          "example_parameters": {
+            "additionalProperties": {
+              "$ref": "#/components/schemas/JsonValue"
+            },
+            "title": "Example Parameters",
+            "type": "object"
+          },
+          "name": {
+            "title": "Name",
+            "type": "string"
+          },
+          "optional_parameters": {
+            "default": [],
+            "items": {
+              "type": "string"
+            },
+            "title": "Optional Parameters",
+            "type": "array"
+          },
+          "required_parameters": {
+            "default": [],
+            "items": {
+              "type": "string"
+            },
+            "title": "Required Parameters",
+            "type": "array"
+          },
+          "summary": {
+            "title": "Summary",
+            "type": "string"
+          }
+        },
+        "required": [
+          "name",
+          "summary"
+        ],
+        "title": "MathCoreOperationSpec",
+        "type": "object"
+      },
+      "MathCoreRequest": {
+        "additionalProperties": false,
+        "properties": {
+          "core": {
+            "maxLength": 80,
+            "minLength": 1,
+            "title": "Core",
+            "type": "string"
+          },
+          "operation": {
+            "maxLength": 80,
+            "minLength": 1,
+            "title": "Operation",
+            "type": "string"
+          },
+          "parameters": {
+            "additionalProperties": {
+              "$ref": "#/components/schemas/JsonValue"
+            },
+            "title": "Parameters",
+            "type": "object"
+          },
+          "request_id": {
+            "anyOf": [
+              {
+                "maxLength": 160,
+                "minLength": 1,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Request Id"
+          },
+          "schema_version": {
+            "const": "1.0.0",
+            "default": "1.0.0",
+            "title": "Schema Version",
+            "type": "string"
+          }
+        },
+        "required": [
+          "core",
+          "operation"
+        ],
+        "title": "MathCoreRequest",
+        "type": "object"
+      },
+      "MathCoreResponse": {
+        "additionalProperties": false,
+        "properties": {
+          "core": {
+            "title": "Core",
+            "type": "string"
+          },
+          "data": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/JsonValue"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "diagnostics": {
+            "additionalProperties": {
+              "$ref": "#/components/schemas/JsonValue"
+            },
+            "title": "Diagnostics",
+            "type": "object"
+          },
+          "error": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/MathCoreExecutionError"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "operation": {
+            "title": "Operation",
+            "type": "string"
+          },
+          "request_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Request Id"
+          },
+          "schema_version": {
+            "const": "1.0.0",
+            "default": "1.0.0",
+            "title": "Schema Version",
+            "type": "string"
+          },
+          "status": {
+            "enum": [
+              "ok",
+              "error"
+            ],
+            "title": "Status",
+            "type": "string"
+          }
+        },
+        "required": [
+          "core",
+          "operation",
+          "status"
+        ],
+        "title": "MathCoreResponse",
         "type": "object"
       },
       "MeshBoundary": {
@@ -1962,6 +2290,46 @@
         ],
         "title": "UnitMetadata",
         "type": "object"
+      },
+      "ValidationError": {
+        "properties": {
+          "ctx": {
+            "title": "Context",
+            "type": "object"
+          },
+          "input": {
+            "title": "Input"
+          },
+          "loc": {
+            "items": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "integer"
+                }
+              ]
+            },
+            "title": "Location",
+            "type": "array"
+          },
+          "msg": {
+            "title": "Message",
+            "type": "string"
+          },
+          "type": {
+            "title": "Error Type",
+            "type": "string"
+          }
+        },
+        "required": [
+          "loc",
+          "msg",
+          "type"
+        ],
+        "title": "ValidationError",
+        "type": "object"
       }
     }
   },
@@ -2331,6 +2699,200 @@
         "summary": "Current Session",
         "tags": [
           "iam"
+        ]
+      }
+    },
+    "/api/v1/math-cores": {
+      "get": {
+        "operationId": "get_math_cores_api_v1_math_cores_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MathCoreCatalog"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "413": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorResponse"
+                }
+              }
+            },
+            "description": "Request Entity Too Large"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorResponse"
+                }
+              }
+            },
+            "description": "Unprocessable Entity"
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorResponse"
+                }
+              }
+            },
+            "description": "Internal Server Error"
+          },
+          "503": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorResponse"
+                }
+              }
+            },
+            "description": "Service Unavailable"
+          }
+        },
+        "summary": "Get Math Cores",
+        "tags": [
+          "math cores"
+        ]
+      }
+    },
+    "/api/v1/math-cores/execute": {
+      "post": {
+        "operationId": "run_math_core_api_v1_math_cores_execute_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/MathCoreRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MathCoreResponse"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "413": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorResponse"
+                }
+              }
+            },
+            "description": "Request Entity Too Large"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorResponse"
+                }
+              }
+            },
+            "description": "Unprocessable Entity"
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorResponse"
+                }
+              }
+            },
+            "description": "Internal Server Error"
+          },
+          "503": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorResponse"
+                }
+              }
+            },
+            "description": "Service Unavailable"
+          }
+        },
+        "summary": "Run Math Core",
+        "tags": [
+          "math cores"
+        ]
+      }
+    },
+    "/api/v1/math-cores/{core_id}": {
+      "get": {
+        "operationId": "get_math_core_api_v1_math_cores__core_id__get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "core_id",
+            "required": true,
+            "schema": {
+              "title": "Core Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MathCoreMetadata"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorResponse"
+                }
+              }
+            },
+            "description": "Not Found"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          },
+          "503": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorResponse"
+                }
+              }
+            },
+            "description": "Service Unavailable"
+          }
+        },
+        "summary": "Get Math Core",
+        "tags": [
+          "math cores"
         ]
       }
     },

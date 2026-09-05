@@ -20,7 +20,7 @@ export function displacementByNode(model: ModelInput, result: SolveResult | null
   const values = new Map<string, DofValues>()
   model.nodes.forEach((node) => values.set(node.id, emptyDofValues(dofs)))
   const finalStep = result?.steps.at(-1)
-  if (step && step !== finalStep && Array.isArray(step.response.displacement)) {
+  if (step && (step !== finalStep || !getRawField(result, 'displacement')?.records.length) && Array.isArray(step.response.displacement)) {
     const vector = step.response.displacement as number[]
     model.nodes.forEach((node, nodeIndex) => {
       const record = emptyDofValues(dofs)

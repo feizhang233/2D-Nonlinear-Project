@@ -4,6 +4,7 @@ import ChevronLeftRoundedIcon from '@mui/icons-material/ChevronLeftRounded'
 import ChevronRightRoundedIcon from '@mui/icons-material/ChevronRightRounded'
 import CodeRoundedIcon from '@mui/icons-material/CodeRounded'
 import DownloadRoundedIcon from '@mui/icons-material/DownloadRounded'
+import FunctionsRoundedIcon from '@mui/icons-material/FunctionsRounded'
 import HelpOutlineRoundedIcon from '@mui/icons-material/HelpOutlineRounded'
 import HistoryRoundedIcon from '@mui/icons-material/HistoryRounded'
 import LogoutRoundedIcon from '@mui/icons-material/LogoutRounded'
@@ -24,7 +25,6 @@ import IconButton from '@mui/material/IconButton'
 import LinearProgress from '@mui/material/LinearProgress'
 import Menu from '@mui/material/Menu'
 import MenuItem from '@mui/material/MenuItem'
-import Paper from '@mui/material/Paper'
 import Snackbar from '@mui/material/Snackbar'
 import Stack from '@mui/material/Stack'
 import Tab from '@mui/material/Tab'
@@ -36,6 +36,7 @@ import Tooltip from '@mui/material/Tooltip'
 import Typography from '@mui/material/Typography'
 import { useCallback, useEffect, useMemo, useReducer, useRef, useState, type ChangeEvent, type MouseEvent } from 'react'
 import { cancelAnalysis, generateSurfaceMesh, getAnalysis, runAnalysis, StudioApiError, validateModel } from './api'
+import { waitForPoll } from './asyncTasks'
 import { AnalysisPanel } from './components/AnalysisPanel'
 import { AuthDialog, type AuthDialogMode } from './components/AuthDialog'
 import { DraftActionBar } from './components/DraftActionBar'
@@ -43,6 +44,7 @@ import { GeometryPanel } from './components/GeometryPanel'
 import { GettingStartedDialog } from './components/GettingStartedDialog'
 import { ModelCanvas } from './components/ModelCanvas'
 import { ModelHistoryDialog } from './components/ModelHistoryDialog'
+import { MathCoreDialog } from './components/MathCoreDialog'
 import { ModelNavigator } from './components/ModelNavigator'
 import { PropertyPanel } from './components/PropertyPanel'
 import { ResultsWorkspace } from './components/ResultsWorkspace'
@@ -94,14 +96,6 @@ const isRestartBundle = (value: unknown): value is RestartBundle => {
     && isModelDocument(record.model) && isAnalysisRestart(record.restart)
 }
 
-const waitForPoll = (signal: AbortSignal, milliseconds = 120) => new Promise<void>((resolve, reject) => {
-  const timeout = window.setTimeout(resolve, milliseconds)
-  signal.addEventListener('abort', () => {
-    window.clearTimeout(timeout)
-    reject(new DOMException('analysis polling aborted', 'AbortError'))
-  }, { once: true })
-})
-
 export default function App() {
   const [state, dispatch] = useReducer(studioReducer, undefined, initialStudioState)
   const workspace = activeWorkspace(state)
@@ -110,6 +104,8 @@ export default function App() {
   const hasDraft = workspaceHasDraft(workspace)
   const [toast, setToast] = useState<Toast | null>(null)
   const [meshing, setMeshing] = useState(false)
+  const [meshError, setMeshError] = useState<string | null>(null)
+  const [cancelling, setCancelling] = useState(false)
   const [workflowExpanded, setWorkflowExpanded] = useState(true)
   const [propertiesCollapsed, setPropertiesCollapsed] = useState(false)
   const [guideOpen, setGuideOpen] = useState(() => {
@@ -125,6 +121,7 @@ export default function App() {
   const [authMode, setAuthMode] = useState<AuthDialogMode>('login')
   const [authReason, setAuthReason] = useState<'save' | 'history' | null>(null)
   const [historyOpen, setHistoryOpen] = useState(false)
+  const [mathCoreOpen, setMathCoreOpen] = useState(false)
   const [cadTool, setCadTool] = useState<CadTool>('select')
   const [placement, setPlacement] = useState<PlacementState>(null)
   const [pendingMember, setPendingMember] = useState<string | null>(null)
@@ -161,15 +158,25 @@ export default function App() {
   }, [])
 
   const stopActiveTasks = useCallback((family: ModelFamily, cancelRunning: boolean) => {
-    if (analysisIdRef.current) void cancelAnalysis(analysisIdRef.current).catch(() => undefined)
+    if (analysisIdRef.current) void cancelAnalysis(analysisIdRef.current).catch((error: unknown) => {
+      showMessage(`The previous analysis could not be cancelled: ${error instanceof Error ? error.message : 'connection failed'}. Server completion is unknown.`, 'warning')
+    })
     analysisIdRef.current = null
     abortRef.current?.abort()
     abortRef.current = null
     meshAbortRef.current?.abort()
     meshAbortRef.current = null
     setMeshing(false)
+    setMeshError(null)
+    setCancelling(false)
     fileReadTokenRef.current += 1
     if (cancelRunning) dispatch({ type: 'analysisCancelled', family })
+  }, [showMessage])
+
+  useEffect(() => () => {
+    abortRef.current?.abort()
+    meshAbortRef.current?.abort()
+    if (analysisIdRef.current) void cancelAnalysis(analysisIdRef.current).catch(() => undefined)
   }, [])
 
   const replaceDocument = useCallback((nextModel: ModelInput, selection?: Selection, restart: AnalysisRestart | null = null, nextRunOptions?: RunOptions) => {
@@ -189,6 +196,7 @@ export default function App() {
 
   const applyDraft = useCallback(() => {
     if (!hasDraft || meshing) return
+    fileReadTokenRef.current += 1
     resetEditTools()
     dispatch({ type: 'draftApplied' })
     setToast({ severity: 'success', message: 'Changes applied to the committed model' })
@@ -199,6 +207,7 @@ export default function App() {
     meshAbortRef.current?.abort()
     meshAbortRef.current = null
     setMeshing(false)
+    fileReadTokenRef.current += 1
     resetEditTools()
     dispatch({ type: 'draftCancelled' })
     setToast({ severity: 'info', message: 'Unapplied changes discarded' })
@@ -218,10 +227,13 @@ export default function App() {
     const action = pendingNavigationRef.current
     pendingNavigationRef.current = null
     setUnsavedDialogOpen(false)
+    meshAbortRef.current?.abort()
+    meshAbortRef.current = null
+    setMeshing(false)
     if (apply) dispatch({ type: 'draftApplied' })
     else dispatch({ type: 'draftCancelled' })
     resetEditTools()
-    window.setTimeout(() => action?.(), 0)
+    action?.()
   }
 
   const openWorkspace = (family: ModelFamily) => {
@@ -284,6 +296,7 @@ export default function App() {
     const controller = new AbortController()
     meshAbortRef.current = controller
     setMeshing(true)
+    setMeshError(null)
     try {
       const response = await generateSurfaceMesh(model, meshSizeForModel(model), controller.signal)
       if (controller.signal.aborted || meshAbortRef.current !== controller) return
@@ -299,7 +312,7 @@ export default function App() {
       if (meshAbortRef.current !== controller) return
       meshAbortRef.current = null
       setMeshing(false)
-      setToast({ severity: 'error', message: error instanceof Error ? error.message : 'Gmsh mesh generation failed' })
+      setMeshError(error instanceof Error ? error.message : 'Gmsh mesh generation failed')
     }
   }, [model, stageModelChange])
 
@@ -342,6 +355,8 @@ export default function App() {
   }
 
   const handleRun = useCallback(async () => {
+    if (abortRef.current || meshing) return
+    setCancelling(false)
     if (hasDraft) {
       setToast({ severity: 'warning', message: 'Apply or cancel staged changes before running the analysis.' })
       return
@@ -354,7 +369,6 @@ export default function App() {
     }
     if (analysisIdRef.current) void cancelAnalysis(analysisIdRef.current).catch(() => undefined)
     analysisIdRef.current = null
-    abortRef.current?.abort()
     const controller = new AbortController()
     abortRef.current = controller
     const family = state.activeFamily
@@ -364,11 +378,22 @@ export default function App() {
       const validation = await validateModel(workspace.model, controller.signal)
       if (!validation.valid || !validation.execution_eligible) {
         const first = validation.errors?.[0]
-        throw new StudioApiError(first ? `${first.json_path}: ${first.message}` : 'The model did not pass analysis validation', 'MODEL_VALIDATION_FAILED')
+        throw new StudioApiError(first ? `${first.json_path}: ${first.message}` : validation.limit_error?.message ?? 'The model did not pass analysis validation', validation.limit_error?.code ?? 'MODEL_VALIDATION_FAILED')
       }
-      let record = await runAnalysis(workspace.model, workspace.runOptions, workspace.restart, controller.signal)
+      if (controller.signal.aborted || abortRef.current !== controller) return
+      // Keep the submission response so a cancellation during POST can cancel the created job.
+      let record = await runAnalysis(workspace.model, workspace.runOptions, workspace.restart)
+      if (controller.signal.aborted || abortRef.current !== controller) {
+        if (record.status === 'queued' || record.status === 'running') {
+          await cancelAnalysis(record.analysis_id).catch((error: unknown) => {
+            setToast({ severity: 'error', message: `The previous job could not be cancelled: ${error instanceof Error ? error.message : 'connection failed'}. Server completion is unknown.` })
+          })
+        }
+        return
+      }
       analysisIdRef.current = record.analysis_id
       while (record.status === 'queued' || record.status === 'running') {
+        if (controller.signal.aborted || abortRef.current !== controller) return
         dispatch({ type: 'analysisProgressed', family, record, revision })
         await waitForPoll(controller.signal)
         record = await getAnalysis(record.analysis_id, controller.signal)
@@ -376,12 +401,13 @@ export default function App() {
       if (controller.signal.aborted || abortRef.current !== controller) return
       abortRef.current = null
       analysisIdRef.current = null
+      setCancelling(false)
       if (record.status === 'succeeded') {
         dispatch({ type: 'analysisSucceeded', family, record, revision })
         const acceptedSteps = record.progress.accepted_steps
         setToast({ severity: 'success', message: `Analysis complete: ${acceptedSteps} accepted ${acceptedSteps === 1 ? 'step' : 'steps'}` })
       } else if (record.status === 'cancelled') {
-        dispatch({ type: 'analysisCancelled', family })
+        dispatch({ type: 'analysisCancelled', family, record })
         setToast({ severity: 'info', message: 'Analysis cancelled; uncommitted trial output was discarded' })
       } else {
         dispatch({ type: 'analysisFailed', family, message: record.error?.message ?? 'Nonlinear analysis failed', record, revision })
@@ -391,24 +417,43 @@ export default function App() {
       if (controller.signal.aborted || (error instanceof DOMException && error.name === 'AbortError')) return
       if (abortRef.current !== controller) return
       abortRef.current = null
+      setCancelling(false)
       const message = error instanceof Error ? error.message : 'The analysis request could not be completed'
       dispatch({ type: 'analysisFailed', family, message, revision })
       setToast({ severity: 'error', message })
     }
-  }, [hasDraft, state.activeFamily, workspace])
+  }, [hasDraft, meshing, state.activeFamily, workspace])
 
-  const handleCancel = useCallback(() => {
+  const handleCancel = useCallback(async () => {
+    if (cancelling) return
     const analysisId = analysisIdRef.current
-    if (analysisId) void cancelAnalysis(analysisId).catch(() => undefined)
-    analysisIdRef.current = null
-    abortRef.current?.abort()
-    abortRef.current = null
-    dispatch({ type: 'analysisCancelled', family: state.activeFamily })
-    setToast({ severity: 'info', message: 'Cancellation requested' })
-  }, [state.activeFamily])
+    const controller = abortRef.current
+    if (!analysisId) {
+      controller?.abort()
+      abortRef.current = null
+      dispatch({ type: 'analysisCancelled', family: state.activeFamily })
+      setToast({ severity: 'info', message: 'Cancellation requested; any pending submission will be cancelled when acknowledged.' })
+      return
+    }
+    setCancelling(true)
+    try {
+      await cancelAnalysis(analysisId)
+      if (abortRef.current !== controller) return
+      setToast({ severity: 'info', message: 'Cancellation requested. Waiting for the solver to stop.' })
+      // Keep polling until the API confirms a terminal status and preserves accepted evidence.
+    } catch (error) {
+      if (abortRef.current !== controller) return
+      setCancelling(false)
+      setToast({ severity: 'error', message: `Cancellation was not confirmed: ${error instanceof Error ? error.message : 'connection failed'}. The solve is still being monitored; retry Cancel.` })
+    }
+  }, [cancelling, state.activeFamily])
 
   useEffect(() => {
     const onKeyDown = (event: KeyboardEvent) => {
+      if (event.defaultPrevented || event.isComposing || event.repeat) return
+      if (mathCoreOpen || authOpen || historyOpen || guideOpen || unsavedDialogOpen || menuAnchor || accountAnchor) return
+      const target = event.target as HTMLElement | null
+      if (target?.closest('input, textarea, select, [contenteditable=true], [role=combobox], [role=dialog]')) return
       if (event.key === 'Escape') {
         setPlacement(null)
         setCadTool('select')
@@ -417,12 +462,12 @@ export default function App() {
       }
       if (!(event.metaKey || event.ctrlKey) || event.key !== 'Enter') return
       event.preventDefault()
-      if (workspace.analysisState === 'running') handleCancel()
+      if (workspace.analysisState === 'running') void handleCancel()
       else void handleRun()
     }
     window.addEventListener('keydown', onKeyDown)
     return () => window.removeEventListener('keydown', onKeyDown)
-  }, [handleCancel, handleRun, workspace.analysisState])
+  }, [handleCancel, handleRun, mathCoreOpen, authOpen, historyOpen, guideOpen, unsavedDialogOpen, menuAnchor, accountAnchor, workspace.analysisState])
 
   const handleFile = async (event: ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0]
@@ -449,6 +494,12 @@ export default function App() {
           step_control: { ...defaults.analysis.step_control, ...importedModel.analysis.step_control },
           line_search: { ...defaults.analysis.line_search, ...importedModel.analysis.line_search },
         },
+      }
+      const validation = await validateModel(normalized)
+      if (fileReadTokenRef.current !== readToken) return
+      if (!validation.valid) {
+        const first = validation.errors?.[0]
+        throw new Error(first ? `${first.json_path}: ${first.message}` : 'The imported model failed schema validation.')
       }
       requestNavigation(`the imported ${MODEL_FAMILIES[normalized.model_family].label} model`, () => {
         replaceDocument(normalized, { kind: 'model' }, importedRestart, defaultRunOptions(normalized.model_family))
@@ -490,7 +541,9 @@ export default function App() {
   }
 
   const currentStatus = workspace.analysisState === 'running'
-    ? { label: 'Running', color: 'primary' as const }
+    ? { label: cancelling ? 'Stopping' : 'Running', color: 'primary' as const }
+    : workspace.record?.status === 'cancelled'
+      ? { label: 'Cancelled', color: 'warning' as const }
     : workspace.analysisState === 'succeeded'
       ? { label: 'Results current', color: 'success' as const }
       : workspace.analysisState === 'failed'
@@ -516,6 +569,8 @@ export default function App() {
             : 'model'
 
   const openWorkflowStep = (step: WorkflowStep) => {
+    setPropertiesCollapsed(false)
+    resetEditTools()
     dispatch({ type: 'modeChanged', mode: 'model' })
     if (step === 'solve') {
       dispatch({ type: 'inspectorTabChanged', tab: 'analysis' })
@@ -538,7 +593,11 @@ export default function App() {
   }
 
   const draftFamilies = useMemo(() => new Set(MODEL_FAMILY_ORDER.filter((item) => workspaceHasDraft(state.workspaces[item]))), [state.workspaces])
-  const resultFamilies = useMemo(() => new Set(MODEL_FAMILY_ORDER.filter((item) => Boolean(state.workspaces[item].record))), [state.workspaces])
+  const resultFamilies = useMemo(() => new Set(MODEL_FAMILY_ORDER.filter((item) => state.workspaces[item].record?.status === 'succeeded')), [state.workspaces])
+  const selectEntity = (selection: Selection) => {
+    setPropertiesCollapsed(false)
+    dispatch({ type: 'selectionChanged', selection })
+  }
   const resultsAvailable = Boolean(workspace.record) || workspace.analysisState !== 'idle' || workspace.resultInvalidated
 
   const changeMode = (mode: StudioMode) => {
@@ -551,15 +610,15 @@ export default function App() {
   }
 
   return (
-    <Box sx={{ height: '100vh', minWidth: 1120, display: 'flex', flexDirection: 'column', bgcolor: 'background.default' }}>
+    <Box sx={{ height: '100dvh', minWidth: 1120, display: 'flex', flexDirection: 'column', bgcolor: 'background.default' }}>
       <AppBar position="static" sx={{ zIndex: 4, bgcolor: 'background.paper', borderBottom: '1px solid', borderColor: 'divider' }}>
-        <Toolbar disableGutters sx={{ px: 2, gap: 1 }}>
-          <Box sx={{ width: 40, height: 40, borderRadius: 2.5, display: 'grid', placeItems: 'center', bgcolor: 'primary.main', color: 'primary.contrastText' }}>
+        <Toolbar disableGutters sx={{ px: 2, gap: 0.75, bgcolor: '#17343b', color: '#f4f9f7', '& .MuiIconButton-root, & .MuiButton-text': { color: '#d3e3de' }, '& .MuiButton-outlined': { color: '#e8f2ef', borderColor: '#536d71' } }}>
+          <Box sx={{ width: 32, height: 32, borderRadius: 1, display: 'grid', placeItems: 'center', bgcolor: 'primary.main', color: 'primary.contrastText' }}>
             <AccountTreeRoundedIcon />
           </Box>
           <Box sx={{ width: 190, flexShrink: 0 }}>
             <Typography variant="h6">Nonlinear Studio</Typography>
-            <Typography variant="caption" color="text.secondary">Nonlinear FEM workspaces</Typography>
+            <Typography variant="caption" noWrap sx={{ display: 'block', color: '#b8ceca', letterSpacing: 0.8, fontSize: 8 }}>STRUCTURAL ANALYSIS WORKBENCH</Typography>
           </Box>
           <ToggleButtonGroup exclusive size="small" value={state.mode} onChange={(_, mode: StudioMode | null) => mode && changeMode(mode)} aria-label="Workbench mode">
             <ToggleButton value="model">Model</ToggleButton>
@@ -570,6 +629,9 @@ export default function App() {
           <Tooltip title="Import model JSON"><IconButton aria-label="Import" onClick={() => fileInputRef.current?.click()}><UploadFileRoundedIcon /></IconButton></Tooltip>
           <Tooltip title={hasDraft ? 'Apply or cancel changes before exporting' : 'Export committed model'}>
             <span><IconButton aria-label="Export" disabled={hasDraft} onClick={exportModel}><DownloadRoundedIcon /></IconButton></span>
+          </Tooltip>
+          <Tooltip title={workspace.analysisState === 'running' ? 'Math Core tools are unavailable during analysis' : 'Open Step 2 Math Core reference tools'}>
+            <span><IconButton aria-label="Math Core" disabled={workspace.analysisState === 'running'} onClick={() => setMathCoreOpen(true)}><FunctionsRoundedIcon /></IconButton></span>
           </Tooltip>
           <Button variant="text" startIcon={modelHistory.saving ? <CircularProgress size={17} /> : <SaveRoundedIcon />} disabled={modelHistory.saving || identity.loading || hasDraft} onClick={saveCurrentModel}>
             {modelHistory.saving ? 'Saving…' : 'Save'}
@@ -610,31 +672,32 @@ export default function App() {
                 color={workspace.analysisState === 'running' ? 'error' : 'primary'}
                 variant="contained"
                 size="large"
-                disabled={(hasDraft || meshing) && workspace.analysisState !== 'running'}
+                sx={{ minWidth: 148 }}
+                disabled={cancelling || ((hasDraft || meshing) && workspace.analysisState !== 'running')}
                 startIcon={workspace.analysisState === 'running' ? <StopCircleRoundedIcon /> : <PlayArrowRoundedIcon />}
                 onClick={workspace.analysisState === 'running' ? handleCancel : handleRun}
               >
-                {workspace.analysisState === 'running' ? 'Cancel' : 'Run analysis'}
+                {workspace.analysisState === 'running' ? cancelling ? 'Stopping…' : 'Cancel' : 'Run analysis'}
               </Button>
             </span>
           </Tooltip>
         </Toolbar>
-        <Stack direction="row" sx={{ alignItems: 'stretch', bgcolor: 'background.containerLow', borderTop: '1px solid', borderColor: 'divider', minHeight: 64 }}>
+        <Stack direction="row" sx={{ alignItems: 'stretch', bgcolor: 'background.containerLow', borderTop: '1px solid', borderColor: 'divider', minHeight: 54 }}>
           <WorkspaceSwitcher activeFamily={state.activeFamily} draftFamilies={draftFamilies} resultFamilies={resultFamilies} onChange={openWorkspace} />
           <Stack direction="row" spacing={1} sx={{ flex: 1, minWidth: 0, px: 1.5, alignItems: 'center' }}>
             <Box sx={{ minWidth: 150, flex: 1 }}>
-              <Typography variant="body2" noWrap sx={{ fontWeight: 700 }}>{workspace.model.name}</Typography>
+              <Typography variant="body2" noWrap sx={{ fontWeight: 700 }}>{model.name}</Typography>
               <Typography variant="caption" color="text.secondary" noWrap sx={{ display: 'block' }}>
                 {family.label} workspace · {CONTROL_LABELS[model.analysis.control_method]}
               </Typography>
             </Box>
             <Chip size="small" variant="outlined" label={`rev ${workspace.modelRevision}`} />
-            <Chip size="small" variant="outlined" label={dofsForModel(model).join(' / ')} />
+            <Chip size="small" variant="outlined" label={dofsForModel(model).join(' / ')} sx={{ display: { xs: 'none', xl: 'inline-flex' } }} />
             <Chip size="small" color={currentStatus.color} label={currentStatus.label} />
             {workspace.restart && <Chip size="small" color="info" variant="outlined" label={`Restart ${String(workspace.restart.committed_state.step_index ?? '—')}`} />}
           </Stack>
         </Stack>
-        {workspace.analysisState === 'running' && <LinearProgress />}
+        <Box sx={{ height: 3, bgcolor: 'background.container' }}>{workspace.analysisState === 'running' && <LinearProgress />}</Box>
       </AppBar>
 
       {state.mode === 'model' ? (
@@ -647,54 +710,56 @@ export default function App() {
             onStepChange={openWorkflowStep}
             onExpandedChange={setWorkflowExpanded}
           />
-          <Box sx={{ flex: 1, minHeight: 0, display: 'flex', gap: 1.25, p: 1.25 }}>
-            <Paper
-              component="aside"
-              aria-label="Model tree and forms workspace"
-              sx={{
-                width: propertiesCollapsed ? 308 : 640,
-                minWidth: propertiesCollapsed ? 308 : 640,
-                minHeight: 0,
-                overflow: 'hidden',
-                display: 'flex',
-                flexDirection: 'column',
-                border: '1px solid',
-                borderColor: 'divider',
-                transition: 'width 180ms ease, min-width 180ms ease',
-              }}
-            >
-              <Box sx={{ flex: 1, minHeight: 0, overflow: 'hidden', display: 'flex' }}>
-                <Box sx={{ width: 260, minWidth: 260, overflow: 'hidden', display: 'flex', flexDirection: 'column', borderRight: '1px solid', borderColor: 'divider' }}>
+          <Box sx={{ flex: 1, minHeight: 0, display: 'flex' }}>
+            <Box component="aside" aria-label="Model navigator" sx={{ width: 240, minWidth: 240, minHeight: 0, display: 'flex', flexDirection: 'column', bgcolor: 'background.paper', borderRight: '1px solid', borderColor: 'divider' }}>
                   <GeometryPanel
                     model={model}
                     selection={workspace.selection}
                     cadTool={cadTool}
                     onCadToolChange={(tool) => { setCadTool(tool); setPlacement(null); setPendingMember(null) }}
-                    onSelection={(selection) => dispatch({ type: 'selectionChanged', selection })}
+                    onSelection={selectEntity}
                     onModelChange={stageModelChange}
                   />
                   <Box sx={{ flex: 1, minHeight: 0, overflow: 'hidden' }}>
                     <ModelNavigator
                       model={model}
                       selection={workspace.selection}
-                      onSelection={(selection) => dispatch({ type: 'selectionChanged', selection })}
+                      onSelection={selectEntity}
                       onModelChange={stageModelChange}
                       onEntityDoubleClick={() => setPropertiesCollapsed(true)}
                     />
                   </Box>
-                </Box>
-
+            </Box>
+            <Box component="main" aria-label="Model editing canvas" sx={{ flex: 1, minWidth: 0, minHeight: 0, overflow: 'hidden' }}>
+              <ModelCanvas
+                key={`${state.activeFamily}-${model.model_id}`}
+                model={model}
+                result={null}
+                selectedStep={0}
+                view="model"
+                selection={workspace.selection}
+                cadTool={cadTool}
+                placement={placement}
+                pendingMember={pendingMember}
+                onViewChange={() => undefined}
+                onSelection={selectEntity}
+                onModelChange={stageModelChange}
+                onPlace={handlePlace}
+                onPendingMember={setPendingMember}
+              />
+            </Box>
+            <Box component="aside" aria-label="Model properties" sx={{ width: propertiesCollapsed ? 40 : 312, minWidth: propertiesCollapsed ? 40 : 312, display: 'flex', minHeight: 0, bgcolor: 'background.paper', borderLeft: '1px solid', borderColor: 'divider' }}>
                 {propertiesCollapsed ? (
                   <Button
                     aria-label="Expand Properties"
                     onClick={() => setPropertiesCollapsed(false)}
-                    sx={{ width: 48, minWidth: 48, height: '100%', borderRadius: 0, px: 0, py: 1.5, flexDirection: 'column', justifyContent: 'flex-start', gap: 1, color: 'text.secondary' }}
+                    sx={{ width: 40, minWidth: 40, height: '100%', borderRadius: 0, px: 0, py: 1.5, flexDirection: 'column', justifyContent: 'flex-start', gap: 1, color: 'text.secondary' }}
                   >
                     <ChevronRightRoundedIcon />
                     <Typography variant="caption" sx={{ fontWeight: 700, writingMode: 'vertical-rl', transform: 'rotate(180deg)', letterSpacing: 0.8 }}>Properties</Typography>
                   </Button>
                 ) : (
-                  <Box sx={{ width: 380, minWidth: 0, display: 'flex', flexDirection: 'column', minHeight: 0, bgcolor: 'background.paper' }}>
+                  <Box sx={{ width: 312, minWidth: 0, display: 'flex', flexDirection: 'column', minHeight: 0, bgcolor: 'background.paper' }}>
                     <Box sx={{ display: 'flex', alignItems: 'center', borderBottom: '1px solid', borderColor: 'divider' }}>
                       <Tabs value={workspace.inspectorTab} onChange={(_, tab: 'properties' | 'analysis') => dispatch({ type: 'inspectorTabChanged', tab })} variant="fullWidth" aria-label="Model forms" sx={{ minHeight: 48, pl: 1, flex: 1 }}>
                         <Tab value="properties" icon={<CodeRoundedIcon />} iconPosition="start" label="Properties" />
@@ -702,7 +767,7 @@ export default function App() {
                       </Tabs>
                       <Tooltip title="Collapse Properties"><IconButton aria-label="Collapse Properties" size="small" onClick={() => setPropertiesCollapsed(true)} sx={{ mr: 0.75 }}><ChevronLeftRoundedIcon /></IconButton></Tooltip>
                     </Box>
-                    <Box sx={{ p: 2, overflow: 'auto', flex: 1, scrollbarGutter: 'stable' }}>
+                    <Box sx={{ p: 1.75, overflow: 'auto', flex: 1, scrollbarGutter: 'stable' }}>
                       {workspace.inspectorTab === 'properties'
                         ? <PropertyPanel
                             model={model}
@@ -719,34 +784,20 @@ export default function App() {
                             model={model}
                             runOptions={runOptions}
                             onModelChange={stageModelChange}
-                            onRunOptionsChange={(options) => dispatch({ type: 'runOptionsDraftChanged', options })}
+                            onRunOptionsChange={(options) => {
+                              if (workspace.analysisState === 'running') stopActiveTasks(state.activeFamily, true)
+                              fileReadTokenRef.current += 1
+                              dispatch({ type: 'runOptionsDraftChanged', options })
+                            }}
                           />}
                     </Box>
+                    {meshError && <Alert severity="error" onClose={() => setMeshError(null)} sx={{ m: 1 }}>{meshError}</Alert>}
                     {workspace.resultInvalidated && <Alert severity="warning" square sx={{ borderTop: '1px solid', borderColor: 'warning.light' }}>Applied model changes invalidated the previous results.</Alert>}
                   </Box>
                 )}
-              </Box>
-              <DraftActionBar dirty={hasDraft} busy={meshing} onApply={applyDraft} onCancel={cancelDraft} />
-            </Paper>
-
-            <Paper component="main" aria-label="Model editing canvas" sx={{ flex: 1, minWidth: 0, minHeight: 0, overflow: 'hidden', border: '1px solid', borderColor: 'divider' }}>
-              <ModelCanvas
-                model={model}
-                result={null}
-                selectedStep={0}
-                view="model"
-                selection={workspace.selection}
-                cadTool={cadTool}
-                placement={placement}
-                pendingMember={pendingMember}
-                onViewChange={() => undefined}
-                onSelection={(selection) => dispatch({ type: 'selectionChanged', selection })}
-                onModelChange={stageModelChange}
-                onPlace={handlePlace}
-                onPendingMember={setPendingMember}
-              />
-            </Paper>
+            </Box>
           </Box>
+          <DraftActionBar dirty={hasDraft} busy={meshing} onApply={applyDraft} onCancel={cancelDraft} />
         </>
       ) : (
         <ResultsWorkspace
@@ -762,7 +813,7 @@ export default function App() {
           onResultTabChange={(tab) => dispatch({ type: 'resultTabChanged', tab })}
           onResultViewChange={(view) => dispatch({ type: 'resultViewChanged', view })}
           onStepChange={(step) => dispatch({ type: 'stepChanged', step })}
-          onSelection={(selection) => dispatch({ type: 'selectionChanged', selection })}
+          onSelection={selectEntity}
         />
       )}
 
@@ -784,6 +835,7 @@ export default function App() {
         onOpenStep={openWorkflowStep}
         onChooseFamily={openWorkspace}
       />
+      <MathCoreDialog open={mathCoreOpen} onClose={() => setMathCoreOpen(false)} />
       <AuthDialog
         open={authOpen}
         initialMode={authMode}

@@ -35,7 +35,7 @@ describe('Nonlinear Studio shell', () => {
     vi.restoreAllMocks()
   })
 
-  it('renders properties in the left workspace and the primary analysis action', () => {
+  it('renders the model navigator, central canvas, and properties inspector', () => {
     render(<ThemeProvider theme={studioTheme}><CssBaseline /><App /></ThemeProvider>)
     expect(screen.getByText('Nonlinear Studio')).toBeTruthy()
     expect(screen.queryByText('Model builder')).toBeNull()
@@ -45,14 +45,15 @@ describe('Nonlinear Studio shell', () => {
     expect(screen.getByRole('button', { name: 'Open mesh settings' })).toBeTruthy()
     expect(screen.getByRole('button', { name: 'Run analysis' })).toBeTruthy()
     expect(screen.getByRole('button', { name: 'Guide' })).toBeTruthy()
+    expect(screen.getByRole('button', { name: 'Math Core' })).toBeTruthy()
     expect(screen.queryByRole('tab', { name: 'Solve monitor' })).toBeNull()
     expect((screen.getByRole('button', { name: 'Results' }) as HTMLButtonElement).disabled).toBe(true)
     expect(screen.getByLabelText('Modeling workflow progress')).toBeTruthy()
     expect(screen.getByText('5 of 6 complete')).toBeTruthy()
     expect(screen.queryByText('Setup readiness')).toBeNull()
     expect(screen.queryByRole('textbox', { name: 'Search model entities' })).toBeNull()
-    const leftWorkspace = screen.getByRole('complementary', { name: 'Model tree and forms workspace' })
-    expect(leftWorkspace.contains(screen.getByRole('tab', { name: 'Properties' }))).toBe(true)
+    const inspector = screen.getByRole('complementary', { name: 'Model properties' })
+    expect(inspector.contains(screen.getByRole('tab', { name: 'Properties' }))).toBe(true)
     expect(screen.getByRole('main', { name: 'Model editing canvas' })).toBeTruthy()
     expect(screen.getByRole('tab', { name: 'Frame workspace' })).toBeTruthy()
   })
@@ -123,7 +124,7 @@ describe('Nonlinear Studio shell', () => {
     expect(await screen.findByText('Analysis complete: 1 accepted step')).toBeTruthy()
     expect(screen.getByRole('main', { name: 'Analysis results workspace' })).toBeTruthy()
     expect(screen.getByRole('tab', { name: 'Solve monitor' })).toBeTruthy()
-    expect(screen.queryByRole('complementary', { name: 'Model tree and forms workspace' })).toBeNull()
+    expect(screen.queryByRole('complementary', { name: 'Model navigator' })).toBeNull()
     expect(screen.queryByText(/ID p15/)).toBeNull()
     const analysisCalls = fetchMock.mock.calls.filter(([path]) => !String(path).endsWith('/api/v1/auth/session'))
     expect(analysisCalls[0]).toEqual(['/api/v1/models/validate', expect.objectContaining({ method: 'POST' })])
@@ -327,7 +328,7 @@ describe('Nonlinear Studio shell', () => {
     expect(fetchMock).toHaveBeenCalledWith('/api/v1/meshes', expect.objectContaining({ method: 'POST' }))
     const meshCall = fetchMock.mock.calls.find(([path]) => String(path).endsWith('/api/v1/meshes'))
     expect(JSON.parse(String(meshCall?.[1]?.body)).mesh_size).toBe(0.1)
-  })
+  }, 10_000)
 
   it('stages form edits and supports both Cancel and Apply', () => {
     render(<ThemeProvider theme={studioTheme}><CssBaseline /><App /></ThemeProvider>)

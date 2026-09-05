@@ -20,6 +20,15 @@ from nonlinear_api.iam_store import (
     DuplicateEmailError,
     IdentityStore,
 )
+from nonlinear_api.math_cores import (
+    MAX_PARAMETER_DEPTH,
+    MAX_PARAMETER_VALUES,
+    MathCoreBridgeError,
+    describe_math_core,
+    execute_math_core,
+    interface_version,
+    list_math_cores,
+)
 from nonlinear_api.meshing import SurfaceMeshError, generate_surface_mesh
 from nonlinear_api.middleware import RequestSizeLimitMiddleware
 from nonlinear_api.schemas import (
@@ -32,6 +41,11 @@ from nonlinear_api.schemas import (
     AuthUser,
     HealthResponse,
     LoginRequest,
+    MathCoreCatalog,
+    MathCoreLimits,
+    MathCoreMetadata,
+    MathCoreRequest,
+    MathCoreResponse,
     ModelValidationResponse,
     RegisterRequest,
     SavedModel,
@@ -368,6 +382,76 @@ def create_app(
                 ),
             ) from error
 
+    def math_core_problem(error: MathCoreBridgeError, *, status_code: int) -> ApiProblem:
+        return ApiProblem(
+            status_code=status_code,
+            error=ApiErrorDetail(
+                category=(
+                    ApiErrorCategory.INPUT
+                    if error.code != "MATH_CORE_UNAVAILABLE"
+                    else ApiErrorCategory.SERVER
+                ),
+                code=error.code,
+                message=error.message,
+                details=error.details,
+            ),
+        )
+
+    @app.get(
+        "/api/v1/math-cores",
+        response_model=MathCoreCatalog,
+        responses={503: {"model": ApiErrorResponse}, **error_responses},
+        tags=["math cores"],
+    )
+    def get_math_cores() -> MathCoreCatalog:
+        try:
+            schema_version, adapter_version = interface_version()
+            return MathCoreCatalog(
+                schema_version=schema_version,
+                adapter_version=adapter_version,
+                limits=MathCoreLimits(
+                    max_parameter_values=MAX_PARAMETER_VALUES,
+                    max_parameter_depth=MAX_PARAMETER_DEPTH,
+                ),
+                cores=tuple(
+                    MathCoreMetadata.model_validate(core) for core in list_math_cores()
+                ),
+            )
+        except MathCoreBridgeError as error:
+            raise math_core_problem(error, status_code=503) from error
+
+    @app.get(
+        "/api/v1/math-cores/{core_id}",
+        response_model=MathCoreMetadata,
+        responses={404: {"model": ApiErrorResponse}, 503: {"model": ApiErrorResponse}},
+        tags=["math cores"],
+    )
+    def get_math_core(core_id: str) -> MathCoreMetadata:
+        try:
+            return MathCoreMetadata.model_validate(describe_math_core(core_id))
+        except MathCoreBridgeError as error:
+            status_code = 404 if error.code == "UNKNOWN_CORE" else 503
+            raise math_core_problem(error, status_code=status_code) from error
+
+    @app.post(
+        "/api/v1/math-cores/execute",
+        response_model=MathCoreResponse,
+        responses={
+            413: {"model": ApiErrorResponse},
+            503: {"model": ApiErrorResponse},
+            **error_responses,
+        },
+        tags=["math cores"],
+    )
+    def run_math_core(payload: MathCoreRequest) -> MathCoreResponse:
+        try:
+            return MathCoreResponse.model_validate(
+                execute_math_core(payload.model_dump(mode="json"))
+            )
+        except MathCoreBridgeError as error:
+            status_code = 413 if error.code == "MATH_CORE_INPUT_LIMIT_EXCEEDED" else 503
+            raise math_core_problem(error, status_code=status_code) from error
+
     @app.post(
         "/api/v1/analyses",
         response_model=AnalysisRecord,
@@ -417,15 +501,21 @@ def create_app(
         def spa_fallback(full_path: str) -> FileResponse | JSONResponse:
             """Serve SPA assets or index.html; keep API 404s as JSON."""
             if full_path.startswith("api/") or full_path in {
+                "api",
                 "docs",
                 "redoc",
                 "openapi.json",
                 "health",
             }:
                 return JSONResponse({"detail": "Not Found"}, status_code=404)
-            candidate = dist / full_path
+            candidate = (dist / full_path).resolve()
+            if not candidate.is_relative_to(dist.resolve()):
+                return JSONResponse({"detail": "Not Found"}, status_code=404)
             if candidate.is_file():
                 return FileResponse(candidate)
+            # A missing asset is a 404, never a 200 HTML document pretending to be JS/JSON.
+            if candidate.suffix:
+                return JSONResponse({"detail": "Not Found"}, status_code=404)
             return FileResponse(dist / "index.html")
 
     return app

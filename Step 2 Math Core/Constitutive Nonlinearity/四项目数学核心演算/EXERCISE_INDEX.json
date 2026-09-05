@@ -1,0 +1,69 @@
+{
+  "schema_version": "1.0",
+  "title": "四项目数学核心演算",
+  "language": "zh-CN",
+  "format": "question_then_fully_worked_solution",
+  "steps": [
+    {
+      "step": 1,
+      "project": "Plate-Shell-Buckling",
+      "file": "Step1_Plate-Shell-Buckling_演算题.md",
+      "source_package": "Shell-Instability-Research_Math-Core-Guide/04_完整参考/Plate_Shell_Buckling_完整數學推導與例題_繁中.pdf",
+      "math_chain": [
+        "plate bending stiffness",
+        "integer half-wave search",
+        "critical membrane force and stress",
+        "Rayleigh quotient",
+        "generalized eigenbuckling"
+      ],
+      "scope": "perfect linear-elastic simply-supported plate plus an independent synthetic normalized two-DOF eigenproblem; no FE mapping is claimed"
+    },
+    {
+      "step": 2,
+      "project": "Shell-Instability-Research_Math-Core",
+      "file": "Step2_Shell-Instability-Research_演算题.md",
+      "source_package": "Shell-Instability-Research_Math-Core-Guide",
+      "residual_convention": "R = f_int - p f_ref",
+      "math_chain": [
+        "linear eigenbuckling",
+        "tangent singularity",
+        "left-null-vector classification",
+        "subcritical Koiter reduction",
+        "limit point",
+        "spherical arc length"
+      ],
+      "scope": "conservative symmetric single-mode teaching normal form"
+    },
+    {
+      "step": 3,
+      "project": "Constitutive Nonlinearity",
+      "file": "Step3_Constitutive-Nonlinearity_演算题.md",
+      "source_package": "Constitutive-Nonlinearity_Weeks10-14_Core-Guide",
+      "math_chain": [
+        "elastic predictor",
+        "J2 yield check",
+        "radial return",
+        "consistent algorithmic tangent",
+        "directional derivative",
+        "trial commit rollback"
+      ],
+      "scope": "small-strain rate-independent associative J2 plasticity with linear isotropic hardening"
+    },
+    {
+      "step": 4,
+      "project": "General Nonlinear Shell",
+      "file": "Step4_General-Nonlinear-Shell_演算题.md",
+      "source_package": "4_General-Nonlinear-Shell_16-24周",
+      "residual_convention": "r = f_ext - f_int",
+      "math_chain": [
+        "SO(3) rotation update",
+        "TL objectivity and work conjugacy",
+        "internal and follower generalized forces",
+        "material geometric and load tangents",
+        "Newton iteration",
+        "trial commit rollback"
+      ],
+      "scope": "one-mode teaching reduction; not a production shell element or GMNIA claim"
+    }
+  ]
+}

@@ -1,0 +1,850 @@
+{
+  "schema_version": "1.1",
+  "residual_convention": "r = f_ext - f_int",
+  "tangent_convention": "K_t = d(f_int)/dq - d(f_ext)/dq",
+  "rotation_increment": "spatial increment, left multiplication",
+  "runtime": {
+    "math_core_version": "0.2.0",
+    "python_version": "3.12.7",
+    "python_implementation": "CPython",
+    "python_executable": "/Users/zhangfei/Documents/Codex/2D-Nonlinear-Project/.venv/bin/python",
+    "numpy_version": "2.5.2",
+    "linear_algebra_api": "numpy.linalg",
+    "blas_backend": "accelerate",
+    "platform": "macOS-27.0-arm64-arm-64bit",
+    "source_revision": "unavailable: workspace is not a Git checkout"
+  },
+  "summary": {
+    "status_counts": {
+      "VERIFIED": 8,
+      "PARTIAL": 3,
+      "NOT_RUN": 2,
+      "REFERENCE_ONLY": 1,
+      "AUDIT_RESULT": 1
+    },
+    "completed_individual_checks": [
+      "V00",
+      "V02",
+      "V03",
+      "V06",
+      "V07",
+      "V08",
+      "V11",
+      "V12",
+      "V14"
+    ],
+    "passed_stage_gates": [],
+    "stage_gates": {
+      "G0": {
+        "name": "有限转动壳运动学",
+        "status": "NOT_PASSED",
+        "required_checks": [
+          "V00",
+          "V01",
+          "V02",
+          "V03"
+        ],
+        "incomplete_checks": [
+          "V01"
+        ],
+        "unmet_external_requirements": []
+      },
+      "G1": {
+        "name": "弹性壳残量/切线",
+        "status": "NOT_PASSED",
+        "required_checks": [
+          "V04",
+          "V06",
+          "V08"
+        ],
+        "incomplete_checks": [
+          "V04"
+        ],
+        "unmet_external_requirements": [
+          "真实壳单元全切线方向差分"
+        ]
+      },
+      "G2": {
+        "name": "随动力分析",
+        "status": "NOT_PASSED",
+        "required_checks": [
+          "V05"
+        ],
+        "incomplete_checks": [
+          "V05"
+        ],
+        "unmet_external_requirements": [
+          "真实受载壳面网格方向差分"
+        ]
+      },
+      "G3": {
+        "name": "材料非线性壳",
+        "status": "NOT_PASSED",
+        "required_checks": [
+          "V07",
+          "V08",
+          "V12"
+        ],
+        "incomplete_checks": [],
+        "unmet_external_requirements": [
+          "真实壳截面厚度积分点收敛"
+        ]
+      },
+      "G4": {
+        "name": "薄壳与曲壳单元",
+        "status": "NOT_PASSED",
+        "required_checks": [
+          "V01",
+          "V04",
+          "V09",
+          "V10"
+        ],
+        "incomplete_checks": [
+          "V01",
+          "V04",
+          "V09",
+          "V10"
+        ],
+        "unmet_external_requirements": []
+      },
+      "G5": {
+        "name": "snap-through/后屈曲",
+        "status": "NOT_PASSED",
+        "required_checks": [
+          "V04",
+          "V05",
+          "V10",
+          "V11",
+          "V12"
+        ],
+        "incomplete_checks": [
+          "V04",
+          "V05",
+          "V10"
+        ],
+        "unmet_external_requirements": []
+      },
+      "G6": {
+        "name": "系统参考解",
+        "status": "NOT_PASSED",
+        "required_checks": [
+          "V13"
+        ],
+        "incomplete_checks": [
+          "V13"
+        ],
+        "unmet_external_requirements": [
+          "保存数字化来源和误差定义"
+        ]
+      },
+      "G7": {
+        "name": "GNIA/GMNIA 结论",
+        "status": "NOT_PASSED",
+        "required_checks": [
+          "V00",
+          "V01",
+          "V02",
+          "V03",
+          "V04",
+          "V05",
+          "V06",
+          "V07",
+          "V08",
+          "V09",
+          "V10",
+          "V11",
+          "V12",
+          "V13",
+          "V14"
+        ],
+        "incomplete_checks": [
+          "V01",
+          "V04",
+          "V05",
+          "V09",
+          "V10",
+          "V13"
+        ],
+        "unmet_external_requirements": [
+          "真实模型网格/步长/缺陷/边界/材料敏感性矩阵"
+        ]
+      }
+    },
+    "not_run": [
+      "V09",
+      "V13"
+    ],
+    "failed": [],
+    "scope_statement": "This is a verification-oriented L0 math core. It is not a production nonlinear shell element, a V13 system solver, or a GMNIA design implementation."
+  },
+  "records": [
+    {
+      "test_id": "V00",
+      "title": "SO(3) 指数更新",
+      "status": "VERIFIED",
+      "verified_scope": "数学单元：空间增量左乘、Rodrigues 公式与小角度稳定分支",
+      "individual_check_complete": true,
+      "computed": {
+        "rotation": [
+          [
+            1.1102230246251565e-16,
+            -1.0,
+            0.0
+          ],
+          [
+            1.0,
+            1.1102230246251565e-16,
+            0.0
+          ],
+          [
+            0.0,
+            0.0,
+            1.0
+          ]
+        ],
+        "director_1": [
+          1.1102230246251565e-16,
+          1.0,
+          0.0
+        ],
+        "orthogonality_error": 0.0,
+        "determinant": 1.0,
+        "director_norm": 1.0,
+        "additive_update": [
+          1.0,
+          1.5707963267948966,
+          0.0
+        ],
+        "additive_update_norm": 1.8620958891185866
+      },
+      "acceptance": "d1=(0,1,0)，R^T R=I，detR=1，||d1||=1。",
+      "limitations": []
+    },
+    {
+      "test_id": "V01",
+      "title": "有限刚体运动零应变",
+      "status": "PARTIAL",
+      "verified_scope": "Q4 中心点退化壳运动学与客观应变诊断",
+      "individual_check_complete": false,
+      "computed": {
+        "deformation_gradient": [
+          [
+            -0.4999999999999998,
+            -0.8660254037844386,
+            0.0
+          ],
+          [
+            0.8660254037844388,
+            -0.5,
+            0.0
+          ],
+          [
+            0.0,
+            0.0,
+            1.0
+          ]
+        ],
+        "green_lagrange_norm": 2.0396099332657776e-16,
+        "membrane_strain": [
+          0.0,
+          -5.551115123125783e-17,
+          -2.7755575615628914e-16
+        ],
+        "transverse_shear_strain": [
+          0.0,
+          0.0
+        ],
+        "thickness_strain": 0.0,
+        "deformation_jacobian": 1.0,
+        "reference_signed_area_jacobian": 0.25,
+        "current_signed_area_jacobian": 0.25,
+        "director_norm_error": 0.0,
+        "director_interpolation_norm_before_normalisation": 1.0,
+        "director_gradient_change_norm": 0.0,
+        "area_jacobian_ratio": 1.0
+      },
+      "acceptance": "运动学量达到舍入误差级。",
+      "limitations": [
+        "尚无真实壳单元内力、弯曲能与应变能计算，因此 V01 壳单元门槛只完成运动学部分。"
+      ]
+    },
+    {
+      "test_id": "V02",
+      "title": "小应变为何不客观",
+      "status": "VERIFIED",
+      "verified_scope": "连续体运动学",
+      "individual_check_complete": true,
+      "computed": {
+        "green_lagrange": [
+          [
+            0.0,
+            0.0,
+            0.0
+          ],
+          [
+            0.0,
+            0.0,
+            0.0
+          ],
+          [
+            0.0,
+            0.0,
+            0.0
+          ]
+        ],
+        "small_strain": [
+          [
+            -0.9999999999999999,
+            0.0,
+            0.0
+          ],
+          [
+            0.0,
+            -0.9999999999999999,
+            0.0
+          ],
+          [
+            0.0,
+            0.0,
+            0.0
+          ]
+        ]
+      },
+      "acceptance": "E=0；小应变=diag(-1,-1,0)。",
+      "limitations": []
+    },
+    {
+      "test_id": "V03",
+      "title": "TL/UL 应力转换",
+      "status": "VERIFIED",
+      "verified_scope": "功共轭构形转换",
+      "individual_check_complete": true,
+      "computed": {
+        "J": 1.08,
+        "cauchy_stress_MPa": [
+          [
+            133.33333333333331,
+            0.0,
+            0.0
+          ],
+          [
+            0.0,
+            37.5,
+            0.0
+          ],
+          [
+            0.0,
+            0.0,
+            0.0
+          ]
+        ]
+      },
+      "acceptance": "J=1.08；sigma=diag(133.333333,37.5,0) MPa。",
+      "limitations": []
+    },
+    {
+      "test_id": "V04",
+      "title": "总切线方向差分",
+      "status": "PARTIAL",
+      "verified_scope": "代数残量、规范负号和多步长中心差分",
+      "individual_check_complete": false,
+      "computed": {
+        "tangent": [
+          [
+            0.9400000000000001,
+            0.2
+          ],
+          [
+            0.2,
+            2.01
+          ]
+        ],
+        "K_times_p": [
+          0.202,
+          -0.744
+        ],
+        "scan": [
+          {
+            "h": 0.01,
+            "finite_difference": [
+              0.2020009000000017,
+              -0.7440021333333338
+            ],
+            "relative_error": 2.3154073326298383e-06
+          },
+          {
+            "h": 0.001,
+            "finite_difference": [
+              0.20200000900000292,
+              -0.7440000213333325
+            ],
+            "relative_error": 2.315407372032245e-08
+          },
+          {
+            "h": 0.0001,
+            "finite_difference": [
+              0.20200000008990804,
+              -0.7440000002131852
+            ],
+            "relative_error": 2.3136854298195295e-10
+          },
+          {
+            "h": 1e-05,
+            "finite_difference": [
+              0.20200000000053506,
+              -0.7440000000039081
+            ],
+            "relative_error": 3.944551585881383e-12
+          },
+          {
+            "h": 1e-06,
+            "finite_difference": [
+              0.20200000000469842,
+              -0.7439999999830915
+            ],
+            "relative_error": 1.7549118348696e-11
+          },
+          {
+            "h": 1e-07,
+            "finite_difference": [
+              0.20200000006020957,
+              -0.7440000002190139
+            ],
+            "relative_error": 2.2713935676011102e-10
+          },
+          {
+            "h": 1e-08,
+            "finite_difference": [
+              0.2019999986724308,
+              -0.7439999977210121
+            ],
+            "relative_error": 2.637465796473447e-09
+          }
+        ],
+        "minimum_relative_error": 3.944551585881383e-12
+      },
+      "acceptance": "Kp=(0.202,-0.744)，中心差分出现二阶区和舍入误差谷值。",
+      "limitations": [
+        "这只验证代数基准；真实壳单元仍须把材料、几何、旋转、稳定化和外载切线放入同一次差分。"
+      ]
+    },
+    {
+      "test_id": "V05",
+      "title": "二维随形压力载荷切线",
+      "status": "PARTIAL",
+      "verified_scope": "两节点受压线的位形相关外力和非对称导数",
+      "individual_check_complete": false,
+      "computed": {
+        "nodal_force": [
+          0.0,
+          3.0,
+          0.0,
+          3.0
+        ],
+        "load_tangent": [
+          [
+            -0.0,
+            1.5,
+            0.0,
+            -1.5
+          ],
+          [
+            -1.5,
+            -0.0,
+            1.5,
+            0.0
+          ],
+          [
+            -0.0,
+            1.5,
+            0.0,
+            -1.5
+          ],
+          [
+            -1.5,
+            -0.0,
+            1.5,
+            0.0
+          ]
+        ],
+        "derivative_wrt_x2_y": [
+          -1.5,
+          0.0,
+          -1.5,
+          0.0
+        ],
+        "central_difference": [
+          -1.5,
+          0.0,
+          -1.5,
+          0.0
+        ],
+        "is_symmetric": false
+      },
+      "acceptance": "每节点力=(0,3)，对 x2_y 的导数=(-1.5,0)。",
+      "limitations": [
+        "V05 完整门槛还需要真实受载壳面及其旋转/面积线性化。"
+      ]
+    },
+    {
+      "test_id": "V06",
+      "title": "线弹性纯弯曲厚度积分",
+      "status": "VERIFIED",
+      "verified_scope": "单位宽度截面 Gauss 厚度积分",
+      "individual_check_complete": true,
+      "computed": {
+        "surface_stress_bottom_MPa": -210.0,
+        "surface_stress_top_MPa": 210.0,
+        "membrane_force_N_per_mm": 0.0,
+        "bending_moment_N": 139.99999999999997,
+        "strain_energy_N_per_mm": 0.07,
+        "one_point_bending_moment_N": 0.0
+      },
+      "acceptance": "表面应力 ±210 MPa，N=0，M=140 N；两点精确而一点失败。",
+      "limitations": []
+    },
+    {
+      "test_id": "V07",
+      "title": "一维弹塑性材料点",
+      "status": "VERIFIED",
+      "verified_scope": "双线性各向同性硬化返回映射与不可变 committed 状态",
+      "individual_check_complete": true,
+      "computed": {
+        "trial_stress_MPa": 400.0,
+        "plastic_multiplier": 0.0007462686567164179,
+        "updated_stress_MPa": 250.7462686567164,
+        "plastic_strain": 0.0007462686567164179,
+        "algorithmic_tangent_MPa": 995.0248756218906,
+        "committed_unchanged": true
+      },
+      "acceptance": "sigma=250.746269 MPa；Calg=995.024876 MPa；试算不污染 committed。",
+      "limitations": []
+    },
+    {
+      "test_id": "V08",
+      "title": "平面应力静力凝聚",
+      "status": "VERIFIED",
+      "verified_scope": "一致切线 Schur 补",
+      "individual_check_complete": true,
+      "computed": {
+        "condensed_tangent": 92.0,
+        "incorrect_deleted_value": 100.0,
+        "overestimate_percent_relative_to_correct": 8.695652173913038
+      },
+      "acceptance": "凝聚切线=92；直接删除厚度分量会得到错误的 100。",
+      "limitations": []
+    },
+    {
+      "test_id": "V09",
+      "title": "薄壳锁死与稳定化扫描",
+      "status": "NOT_RUN",
+      "verified_scope": "验证规格已路由，未执行壳单元扫描",
+      "individual_check_complete": false,
+      "computed": {
+        "required_thickness_ratios": [
+          0.1,
+          0.01,
+          0.001,
+          0.0001
+        ],
+        "required_meshes": [
+          "regular",
+          "distorted"
+        ],
+        "required_formulations": [
+          "full_integration",
+          "MITC_or_assumed_strain"
+        ],
+        "required_metrics": [
+          "normalised displacement or energy error",
+          "membrane bending shear and stabilisation energy ratios",
+          "smallest non-rigid eigenvalue and zero-mode count",
+          "mesh and thickness-limit convergence"
+        ]
+      },
+      "acceptance": "只有实际低阶壳单元、网格与稳定化参数扫描后才能通过。",
+      "limitations": [
+        "当前目录没有可运行的非线性壳单元实现或题目输入网格。"
+      ]
+    },
+    {
+      "test_id": "V10",
+      "title": "大转动纯弯曲条带",
+      "status": "REFERENCE_ONLY",
+      "verified_scope": "Euler-Bernoulli 极限的解析参考值",
+      "individual_check_complete": false,
+      "computed": {
+        "chosen_length": 10.0,
+        "chosen_EI": 2.0,
+        "curvature": 0.3141592653589793,
+        "end_rotation": 3.141592653589793,
+        "end_point": [
+          0.0,
+          6.366197723675814
+        ],
+        "strain_energy": 0.9869604401089358
+      },
+      "acceptance": "解析值 theta=pi，端点=(0,2L/pi)，U=pi^2 EI/(2L)。",
+      "limitations": [
+        "尚未把该参考值施加到真实 Reissner-Mindlin 壳条带。"
+      ]
+    },
+    {
+      "test_id": "V11",
+      "title": "球形弧长跨越极限点",
+      "status": "VERIFIED",
+      "verified_scope": "一自由度球形弧长预测-校正",
+      "individual_check_complete": true,
+      "computed": {
+        "predictor": [
+          0.5970142500145332,
+          0.3992535625036333
+        ],
+        "corrected": [
+          0.5995912433545614,
+          0.3840323998523396
+        ],
+        "theoretical_limit_point": [
+          0.5773502691896258,
+          0.3849001794597505
+        ],
+        "crossed_limit_point": true,
+        "iterations": 5,
+        "final_equilibrium_residual": 0.0,
+        "final_arc_length_residual": 1.0408340855860843e-17
+      },
+      "acceptance": "校正交点约为 (0.5995912434,0.3840323999)，位于理论极限点后段。",
+      "limitations": []
+    },
+    {
+      "test_id": "V12",
+      "title": "失败步回滚",
+      "status": "VERIFIED",
+      "verified_scope": "完整 L0 状态快照、trial 缓存清理和干净重试历史对比",
+      "individual_check_complete": true,
+      "computed": {
+        "before_sha256": "e3c58d1b08635752540bb6688987d5b4818d21419f464a524c6f9827e16688d2",
+        "after_sha256": "e3c58d1b08635752540bb6688987d5b4818d21419f464a524c6f9827e16688d2",
+        "retry_sha256": "e3c58d1b08635752540bb6688987d5b4818d21419f464a524c6f9827e16688d2",
+        "committed_unchanged_during_trial": true,
+        "trial_caches_cleared": true,
+        "clean_restart_history_matches": true,
+        "retry_history": [
+          {
+            "iteration": 1,
+            "committed_sha256": "e3c58d1b08635752540bb6688987d5b4818d21419f464a524c6f9827e16688d2",
+            "load_factor": 1.08,
+            "thickness": 1.992,
+            "plastic_strain": [
+              0.00108,
+              0.00216
+            ],
+            "hardening": [
+              10.08,
+              20.16
+            ],
+            "plane_stress_unknowns": [
+              -8.000000000000001e-06,
+              -1.6000000000000003e-05
+            ],
+            "trial_stress": [
+              260.0,
+              265.0
+            ],
+            "plastic_multiplier": [
+              8e-05,
+              0.00016
+            ],
+            "trial_energy_increment": 0.0064
+          },
+          {
+            "iteration": 2,
+            "committed_sha256": "e3c58d1b08635752540bb6688987d5b4818d21419f464a524c6f9827e16688d2",
+            "load_factor": 1.02,
+            "thickness": 1.998,
+            "plastic_strain": [
+              0.00102,
+              0.00204
+            ],
+            "hardening": [
+              10.02,
+              20.04
+            ],
+            "plane_stress_unknowns": [
+              -2.0000000000000003e-06,
+              -4.000000000000001e-06
+            ],
+            "trial_stress": [
+              270.0,
+              275.0
+            ],
+            "plastic_multiplier": [
+              2e-05,
+              4e-05
+            ],
+            "trial_energy_increment": 0.0004
+          },
+          {
+            "iteration": 3,
+            "committed_sha256": "e3c58d1b08635752540bb6688987d5b4818d21419f464a524c6f9827e16688d2",
+            "load_factor": 1.005,
+            "thickness": 1.9995,
+            "plastic_strain": [
+              0.001005,
+              0.00201
+            ],
+            "hardening": [
+              10.005,
+              20.01
+            ],
+            "plane_stress_unknowns": [
+              -5.000000000000001e-07,
+              -1.0000000000000002e-06
+            ],
+            "trial_stress": [
+              280.0,
+              285.0
+            ],
+            "plastic_multiplier": [
+              5e-06,
+              1e-05
+            ],
+            "trial_energy_increment": 2.5e-05
+          }
+        ],
+        "restored_state": {
+          "active_flags": [
+            false,
+            false
+          ],
+          "director": [
+            "0x0.0p+0",
+            "0x0.0p+0",
+            "0x1.0000000000000p+0"
+          ],
+          "energy_accumulator": "0x0.0p+0",
+          "hardening": [
+            "0x1.4000000000000p+3",
+            "0x1.4000000000000p+4"
+          ],
+          "load_factor": "0x1.0000000000000p+0",
+          "local_basis": [
+            [
+              "0x1.0000000000000p+0",
+              "0x0.0p+0",
+              "0x0.0p+0"
+            ],
+            [
+              "0x0.0p+0",
+              "0x1.0000000000000p+0",
+              "0x0.0p+0"
+            ],
+            [
+              "0x0.0p+0",
+              "0x0.0p+0",
+              "0x1.0000000000000p+0"
+            ]
+          ],
+          "nodal_coordinates": [
+            [
+              "0x0.0p+0",
+              "0x0.0p+0",
+              "0x0.0p+0"
+            ]
+          ],
+          "plane_stress_unknowns": [
+            "0x0.0p+0",
+            "0x0.0p+0"
+          ],
+          "plastic_strain": [
+            "0x1.0624dd2f1a9fcp-10",
+            "0x1.0624dd2f1a9fcp-9"
+          ],
+          "rotation": [
+            [
+              "0x1.0000000000000p+0",
+              "0x0.0p+0",
+              "0x0.0p+0"
+            ],
+            [
+              "0x0.0p+0",
+              "0x1.0000000000000p+0",
+              "0x0.0p+0"
+            ],
+            [
+              "0x0.0p+0",
+              "0x0.0p+0",
+              "0x1.0000000000000p+0"
+            ]
+          ],
+          "stabilization_history": [
+            "0x0.0p+0",
+            "0x0.0p+0"
+          ],
+          "thickness": "0x1.0000000000000p+1"
+        }
+      },
+      "acceptance": "强制污染全部 trial 字段后，快照哈希、缓存清理和干净重试历史完全一致。",
+      "limitations": [
+        "该题的 L0 事务已完成；接入真实壳求解器后仍需用真实全局迭代重复同一验收。"
+      ]
+    },
+    {
+      "test_id": "V13",
+      "title": "大变形弹塑性方板系统基准",
+      "status": "NOT_RUN",
+      "verified_scope": "输入规格已提取，系统演算未执行",
+      "individual_check_complete": false,
+      "computed": {
+        "geometry_mm": [
+          1000.0,
+          1000.0,
+          1.0
+        ],
+        "material_MPa": {
+          "E": 200000.0,
+          "E_T": 2000.0,
+          "sigma_y": 200.0,
+          "nu": 0.3
+        },
+        "missing_evidence": [
+          "selected nonlinear MITC shell element",
+          "unambiguous simply-supported constraints and mesh",
+          "local plane-stress/thickness update",
+          "digitised reference curves from source page 311",
+          "mesh, thickness-point, step and tolerance convergence",
+          "surface and midsurface effective-stress comparison"
+        ]
+      },
+      "acceptance": "必须完成参考曲线数字化和真实壳系统收敛研究；不得用曲线形状相似替代。",
+      "limitations": [
+        "资料明确说明原书只有图形曲线，没有可直接读取的完整数值表。"
+      ]
+    },
+    {
+      "test_id": "V14",
+      "title": "GMNIA 证据审查",
+      "status": "AUDIT_RESULT",
+      "verified_scope": "对题设报告的证据充分性审查",
+      "individual_check_complete": true,
+      "computed": {
+        "claim_accepted": false,
+        "missing_evidence_categories": [
+          "运动学、有限转动和客观性 V00-V03",
+          "残量以及材料/几何/旋转/稳定化/外载完整切线 V04-V05",
+          "厚度积分、平面应力、材料返回与回滚 V06-V08/V12",
+          "dead/follower 载荷定义、受载区、边界刚度与反力平衡",
+          "锁死、稳定化、网格、畸变与零能模态 V09",
+          "弧长尺度、根选择、临界点分类、分支身份 V10-V11",
+          "多缺陷形状/符号/幅值、残余应力、材料和边界敏感性",
+          "版本化输入、日志、文献/实验对照以及 GNIA/GMNIA 结论边界"
+        ],
+        "verdict": "0.72 只能是待复核的单次模型输出，不能据此证明通用非线性壳实现正确或作为可靠承载力。"
+      },
+      "acceptance": "正确审查结果是拒绝现有结论，并补齐八类证据。",
+      "limitations": [
+        "本记录完成的是证据审查，不是 GMNIA 数值验证。"
+      ]
+    }
+  ]
+}

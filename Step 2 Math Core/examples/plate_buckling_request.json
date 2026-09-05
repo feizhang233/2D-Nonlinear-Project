@@ -1,0 +1,11 @@
+{
+  "schema_version": "1.0.0",
+  "request_id": "lba-0001",
+  "core": "plate_shell_buckling",
+  "operation": "linear_buckling",
+  "parameters": {
+    "material_stiffness": [[12.0, -2.0], [-2.0, 6.0]],
+    "geometric_stiffness": [[1.0, 0.2], [0.2, 0.5]]
+  }
+}
+

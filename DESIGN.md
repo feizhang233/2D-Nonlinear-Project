@@ -3,37 +3,37 @@ version: alpha
 name: "Nonlinear Studio"
 description: "A compact CAE workbench that keeps nonlinear model state, solver progress, and numerical evidence visibly connected."
 colors:
-  primary: "#4563b5"
-  primary-dark: "#30498f"
-  primary-light: "#7890d4"
-  secondary: "#008b8b"
+  primary: "#0f766e"
+  primary-dark: "#115e59"
+  primary-light: "#4aa69d"
+  secondary: "#256b8b"
   success: "#138a63"
   warning: "#b76a00"
-  danger: "#c43d4b"
-  canvas: "#fbfcff"
-  background: "#f4f5f8"
+  danger: "#bd4552"
+  canvas: "#fafcfb"
+  background: "#edf1f1"
   surface: "#ffffff"
-  surface-container-low: "#f1f2f6"
-  surface-container: "#ebeef5"
-  surface-container-high: "#e5e9f2"
-  text: "#202431"
-  text-muted: "#626977"
-  divider: "#d9dde6"
+  surface-container-low: "#f2f5f4"
+  surface-container: "#eaf0ee"
+  surface-container-high: "#e0e9e6"
+  text: "#20323a"
+  text-muted: "#5e7077"
+  divider: "#d8e2df"
 typography:
   sans:
-    fontFamily: "Roboto, system-ui, -apple-system, Segoe UI, sans-serif"
+    fontFamily: "Avenir Next, Segoe UI, system-ui, -apple-system, sans-serif"
   mono:
     fontFamily: "ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace"
 rounded:
-  DEFAULT: "1rem"
-  control: "1.25rem"
+  DEFAULT: "0.5rem"
+  control: "0.375rem"
   compact: "0.5rem"
 spacing:
   control-gap: "0.5rem"
   content-gap: "0.75rem"
   panel-padding: "1rem"
-  toolbar-height: "4rem"
-  context-bar-height: "3.5rem"
+  toolbar-height: "3.5rem"
+  context-bar-height: "3.375rem"
 components:
   app-bar: {}
   engineering-canvas: {}
@@ -51,10 +51,11 @@ components:
 
 ### Creative North Star
 
-The interface follows the Frame Studio workbench language: quiet white and cool-gray surfaces,
-cobalt workflow/action accents, precise dividers, and a light gridded model space where geometry,
-constraints, loads, deformation, and recovered responses stay visibly connected. Nonlinear-specific
-controls and evidence remain explicit rather than being hidden behind the simpler visual language.
+The September 2026 redesign uses a technical drawing-desk language: a deep petroleum header,
+quiet white inspectors, warm near-white graph paper, and teal actions. The model is the visual
+center. Compact rectangular controls, precise dividers, tabular numbers, and a stable coordinate
+space replace pill-heavy chrome. Preserve literal engineering information and the existing
+model, draft, and accepted-state boundaries.
 
 ### Product context and register
 
@@ -80,23 +81,22 @@ controls and evidence remain explicit rather than being hidden behind the simple
 
 ## Colors
 
-`primary` owns safe primary actions, focus, selection, and the normal model overlay. `secondary`
+`primary` owns safe primary actions, focus, selection, and selection overlays. `secondary`
 and `success` identify reaction and accepted-state evidence. `warning` marks recoverable limits or
 invalidated results; `danger` is reserved for failures and destructive entity removal. The
 `canvas` is a cool near-white plotting surface. Application chrome uses Material 3 surface roles
 (`background`, `surface`, `surface-container-low`, `surface-container`, `surface-container-high`)
 and `divider` so hierarchy is mostly tonal.
 
-The light canvas is the largest quiet surface; structural geometry uses navy/cobalt, loads use red,
+The near-white canvas is the largest quiet surface; structural geometry uses navy/teal, loads use red,
 and reactions use teal. Result plots may use primary blue, danger red, success green, teal, and amber, but every color has
-a label, number, icon, line style, or table alternative. The current release has one light chrome
-theme; high-contrast operation must retain platform focus and semantic text rather than relying on
+a label, number, icon, line style, or table alternative. The current release has one light workspace theme with a dark identity header; high-contrast operation must retain platform focus and semantic text rather than relying on
 canvas color alone.
 
 ## Typography
 
-The canonical sans stack is defined by `typography.sans`: Roboto with native system fallbacks for
-compact English product copy. Headings and actions use weight 500 for hierarchy; body guidance
+The canonical sans stack is defined by `typography.sans`: Avenir Next with Segoe UI and native system fallbacks for
+compact English product copy. Headings use weight 600 and actions use weight 500 for hierarchy; body guidance
 stays regular and compact. Solver
 IDs, model IDs, DOF names, formulas, and exact JSON-oriented identifiers may use
 `typography.mono`. Numeric tables use tabular alignment where the component supports it. English
@@ -105,24 +105,22 @@ contract.
 
 ## Layout
 
-The desktop shell separates Frame, Continuum, Plate, and Shell into persistent workspaces and separates
-Model from Results as top-level modes. Model mode places the workflow rail at the far left, gives the
-combined model tree and Properties/Analysis forms the dominant work surface, and reserves the right
-region for graphical model editing. Results mode replaces those mutation surfaces with a read-only
-result canvas and a dedicated evidence workspace; results are never embedded in a bottom model dock.
-The shell sits under a two-row top app bar (identity/actions, then mode and workspace context) and a
-collapsible six-step workflow rail. A persistent transaction strip below the context bar owns staged
-edit status, Cancel, and Apply changes.
-The model builder starts directly with Setup and Topology entities; it does not repeat workflow
-readiness or search controls above the list. Double-clicking an entity collapses Properties to a
-named 48 px restore rail, while the visible collapse/expand buttons provide keyboard and touch access.
-`toolbar-height`, `context-bar-height`, `panel-padding`, `content-gap`, and `control-gap` mirror
-the MUI 8 dp grid. The canvas and result workspace may own bounded scrolling; the Properties workspace and
-navigator keep visible scrollbars. Geometry is reserved during analysis so progress, success, and
-error states do not move the primary action.
+The desktop shell separates Frame, Continuum, Plate, and Shell into persistent workspaces and
+Model from Results as top-level modes. Model mode uses a 240 px model navigator, a flexible central
+canvas, and a 312 px right inspector. Collapsing Properties leaves a 40 px restore rail. Selecting
+an entity or a workflow step restores its inspector. Double-clicking a tree entity retains the
+established collapse shortcut; explicit buttons remain available for keyboard users.
 
-The current engineering workspace has a 1120 px desktop support floor. Narrow-width verification
-must preserve horizontal access to all four regions; a future mobile workflow requires a separate
+A 56 px identity/action bar, a 54 px workspace bar, and a compact horizontal workflow strip
+reserve more vertical room for the model. A 3 px progress track stays allocated while idle and
+busy. The Apply/Cancel strip spans the full workbench bottom. Each navigator/form/results panel
+owns its vertical scroller. Results mode keeps a read-only canvas and independently scrollable
+evidence side by side. The document owns horizontal scrolling below the desktop support floor;
+no controls are silently clipped. The SVG uses its measured viewport dimensions and true SVG
+screen transforms, so diagram and pointer coordinates share the same mapping.
+
+The engineering workspace retains a 1120 px desktop support floor. Narrow-width verification
+must preserve horizontal access to all regions; a future mobile workflow requires a separate
 navigation contract rather than silently hiding model or result controls.
 
 Identity is progressive rather than a route gate. Guest mode opens the complete modeling and analysis
@@ -135,13 +133,13 @@ the current model stays visible and is not discarded when a session changes.
 Tonal surface containers establish most hierarchy. The app bar, canvas overlay, and result-dock
 chrome may use modest Material elevation (levels 1–2) because they contain persistent
 actions/status or overlap the plotting bed. Properties sections, tables, alerts, and static content
-stay flat. The light canvas layers compact opaque controls over the plot, but does not use blur or
+stay flat. The near-white canvas layers compact opaque controls over the plot, but does not use blur or
 translucent glass effects.
 
 ## Shapes
 
-Controls use the `control` radius (M3 buttons ~20 dp), major work panes use `DEFAULT` (16 dp),
-and filled fields / dense table frames use `compact`. Status chips stay 8 dp rounded because they
+Controls use the `control` radius (6 px), major work panes use `DEFAULT` (8 px),
+and filled fields / dense table frames use `compact`. Status chips stay 5–8 px rounded because they
 encode transient state, not navigation.
 Entity geometry uses precise strokes and nodes rather than rounded card metaphors. Dividers remain
 one-pixel neutral lines.
@@ -167,7 +165,7 @@ icons retain the button's dimensions.
 
 The workspace bar changes the active working document and must show all four supported families by
 name while preserving each family's independent model, draft, selection, analysis, and result state.
-The Model/Results toggle owns the top-level mode boundary. The workflow rail opens the canonical edit target for Model, Materials, Supports,
+The Model/Results toggle owns the top-level mode boundary. The workflow strip opens the canonical edit target for Model, Materials, Supports,
 Loads, Mesh, and Solve; completion markers come from live model/analysis state. The left builder
 starts directly with Setup and Topology and keeps every entity reachable. Entity navigation,
 inspector tabs, canvas result modes, and result tabs each own one level of state. Tables retain headers
@@ -191,6 +189,29 @@ Distributed loads render as repeated directional arrows over their member, surfa
 while exact components, units, coordinate system, and fixed-reference limitation remain in the
 selected load inspector.
 
+### Canvas navigation and domain rendering
+
+Zoom controls and the wheel zoom about the chosen anchor; Fit model/F restores framing. Pan view,
+Alt + drag, and middle-button drag move the camera. Focused canvas arrow keys provide a non-drag
+pan alternative. Ctrl + wheel remains browser-owned. Escape cancels an active drag or pan mode.
+Frame and sketch drags preserve the original camera and commit one draft change on release after
+a 4 px movement threshold; pointer cancellation restores the original model. Grid spacing follows
+physical coordinates and is shown with model length units. Dense mesh labels show selected,
+loaded, and constrained nodes; all mesh nodes remain selectable. Result mode omits editable sketch
+overlays, displays reactions at all constrained mesh nodes, and retains explicit final-state
+recovery warnings. Nodal load rendering includes every load and nonzero component; rotational
+components use moment arcs. Navy geometry, coral loads, slate supports, and dashed reference
+geometry retain engineering roles distinct from the teal UI actions.
+
+### Runtime token mapping
+
+| Token group | Runtime owner | Consumers |
+| --- | --- | --- |
+| Colors, typography, radii | `frontend/src/theme.ts` | MUI controls, chrome, inspectors, dialogs, charts |
+| Canvas surface, grid, selection, reactions | `studioTheme.palette` | `ModelCanvas.tsx` via `useTheme` |
+| Geometry, load and support glyphs | Domain drawing colors in `ModelCanvas.tsx` | SVG only; unchanged engineering role |
+| Scrollbars and reduced motion | `MuiCssBaseline` in `theme.ts` | All owned scrolling surfaces |
+
 ### Forms and overlays
 
 MUI filled TextField/Select remains the canonical field and authored select owner. Fields keep
@@ -213,6 +234,13 @@ Guest can model, mesh, solve, import, and export, while server-enforced saving a
 an authenticated HttpOnly session. History is private per account, bounded to 24 snapshots, and uses a
 single pessimistic delete confirmation that names the snapshot and states that deletion is permanent.
 
+The Step 2 Math Core is an App Bar utility, not a fifth model workspace or a Results tab. Its bounded
+dialog uses the established MUI fields and dialog geometry, pairs each core/operation selector with a
+server-owned executable JSON example, and keeps the residual convention and trial/commit boundary
+visible beside the request. Response envelopes remain literal, scrollable, and monospaced. The tool is
+disabled while a nonlinear analysis is running and never mutates the active model, revision, draft, or
+result evidence.
+
 Entity display names are stored as UI metadata in the model `extensions` object. The navigator,
 Properties header, canvas, selectors, exports, and saved snapshots consume the same label resolver.
 Renaming never mutates solver IDs or connectivity references; clearing a custom name restores the
@@ -226,8 +254,7 @@ support text; they do not replace it.
 
 ### Motion
 
-Motion communicates state only: 160-200 ms for disclosure, selection, and result-dock height
-changes. Analysis progress is continuous only while work is active. Reduced-motion mode removes
+Motion communicates state only: 160-200 ms for disclosure, selection, and disclosure changes. Analysis progress is continuous only while work is active. Reduced-motion mode removes
 geometry transitions and retains immediate state changes and readable progress text.
 
 ### Content and data visualization
@@ -240,7 +267,7 @@ very large or small magnitudes. Plot colors always have legends, axis labels, an
 ## Do's and Don'ts
 
 - **Do:** keep model family, formulation, DOF set, active result, and solver status visibly aligned.
-- **Do:** reuse the established MUI theme and four-region CAE workbench across every family.
+- **Do:** reuse the established MUI theme and navigator/canvas/inspector workbench across every family.
 - **Don't:** expose a model-family option that only changes copy while submitting a Frame payload.
 - **Don't:** imply full 3D shell rendering, stability proof, or unsupported constitutive behavior
   from the current projected visualization.

@@ -5,7 +5,7 @@ from __future__ import annotations
 import re
 from datetime import datetime
 from enum import StrEnum
-from typing import Annotated, Any, Self
+from typing import Annotated, Any, Literal, Self
 from uuid import UUID
 
 from pydantic import BaseModel, ConfigDict, Field, JsonValue, field_validator, model_validator
@@ -183,6 +183,73 @@ class SurfaceMeshResponse(ApiModel):
     boundaries: tuple[MeshBoundary, ...]
 
 
+class MathCoreOperationSpec(ApiModel):
+    name: str
+    summary: str
+    required_parameters: tuple[str, ...] = ()
+    optional_parameters: tuple[str, ...] = ()
+    example_parameters: dict[str, JsonValue] = Field(default_factory=dict)
+
+
+class MathCoreMetadata(ApiModel):
+    core_id: str
+    title: str
+    version: str
+    source_path: str
+    scope: str
+    residual_convention: str
+    state_protocol: str
+    verification_ids: tuple[str, ...]
+    verification_meaning: str
+    limitations: tuple[str, ...]
+    operations: tuple[MathCoreOperationSpec, ...]
+
+
+class MathCoreLimits(ApiModel):
+    max_parameter_values: Annotated[int, Field(ge=1)]
+    max_parameter_depth: Annotated[int, Field(ge=1)]
+
+
+class MathCoreCatalog(ApiModel):
+    schema_version: Literal["1.0.0"] = "1.0.0"
+    adapter_version: str
+    limits: MathCoreLimits
+    cores: tuple[MathCoreMetadata, ...]
+
+
+class MathCoreRequest(ApiModel):
+    schema_version: Literal["1.0.0"] = "1.0.0"
+    request_id: Annotated[str, Field(min_length=1, max_length=160)] | None = None
+    core: Annotated[str, Field(min_length=1, max_length=80)]
+    operation: Annotated[str, Field(min_length=1, max_length=80)]
+    parameters: dict[str, JsonValue] = Field(default_factory=dict)
+
+
+class MathCoreExecutionError(ApiModel):
+    code: str
+    message: str
+    details: dict[str, JsonValue] = Field(default_factory=dict)
+
+
+class MathCoreResponse(ApiModel):
+    schema_version: Literal["1.0.0"] = "1.0.0"
+    request_id: str | None = None
+    core: str
+    operation: str
+    status: Literal["ok", "error"]
+    data: JsonValue | None = None
+    diagnostics: dict[str, JsonValue] = Field(default_factory=dict)
+    error: MathCoreExecutionError | None = None
+
+    @model_validator(mode="after")
+    def check_execution_payload(self) -> Self:
+        if self.status == "ok" and self.error is not None:
+            raise ValueError("successful math-core responses cannot carry an error")
+        if self.status == "error" and self.error is None:
+            raise ValueError("failed math-core responses require an error")
+        return self
+
+
 class AnalysisRestart(ApiModel):
     restart_schema_version: str = "1.0.0"
     committed_state: dict[str, JsonValue]
@@ -270,6 +337,13 @@ __all__ = [
     "ExecutionMode",
     "HealthResponse",
     "LoginRequest",
+    "MathCoreCatalog",
+    "MathCoreExecutionError",
+    "MathCoreLimits",
+    "MathCoreMetadata",
+    "MathCoreOperationSpec",
+    "MathCoreRequest",
+    "MathCoreResponse",
     "MeshBoundary",
     "MeshBoundarySegment",
     "ModelValidationResponse",

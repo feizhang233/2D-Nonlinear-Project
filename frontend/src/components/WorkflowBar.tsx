@@ -53,136 +53,31 @@ export function WorkflowBar({
   const nextStep = STEP_COPY.find((step) => !complete[step.key])?.key ?? null
 
   return (
-    <Box
-      aria-label="Modeling workflow progress"
-      sx={{
-        bgcolor: 'background.paper',
-        borderBottom: '1px solid',
-        borderColor: 'divider',
-        px: 2,
-        py: expanded ? 1.25 : 0.75,
-      }}
-    >
+    <Box aria-label="Modeling workflow progress" sx={{ bgcolor: 'background.paper', borderBottom: '1px solid', borderColor: 'divider', px: 2, py: 0.75 }}>
       <Stack direction="row" sx={{ alignItems: 'center', gap: 2 }}>
-        <Box sx={{ width: 138, flexShrink: 0 }}>
-          <Typography variant="overline" color="text.secondary">Workflow</Typography>
-          <Typography variant="body2" sx={{ fontWeight: 600 }}>{completedCount} of 6 complete</Typography>
+        <Box sx={{ width: 208, flexShrink: 0 }}>
+          <Typography variant="overline" color="text.secondary" sx={{ mr: 1 }}>Workflow</Typography>
+          <Typography component="span" variant="caption" sx={{ fontWeight: 600 }}>{completedCount} of 6 complete</Typography>
         </Box>
-
-        {expanded && (
-          <Stack
-            component="ol"
-            direction="row"
-            sx={{
-              flex: 1,
-              minWidth: 0,
-              alignItems: 'stretch',
-              listStyle: 'none',
-              p: 0,
-              m: 0,
-            }}
-          >
-            {STEP_COPY.map((step, index) => {
-              const isComplete = complete[step.key]
-              const isActive = activeStep === step.key
-              const isNext = nextStep === step.key
-              return (
-                <Box
-                  component="li"
-                  key={step.key}
-                  sx={{
-                    position: 'relative',
-                    flex: 1,
-                    minWidth: 0,
-                    '&:not(:last-of-type)::after': {
-                      content: '""',
-                      position: 'absolute',
-                      top: 15,
-                      left: 'calc(50% + 22px)',
-                      right: 'calc(-50% + 22px)',
-                      height: 2,
-                      bgcolor: isComplete ? 'primary.main' : 'divider',
-                    },
-                  }}
-                >
-                  <Box
-                    component="button"
-                    type="button"
-                    aria-current={isActive ? 'step' : undefined}
-                    onClick={() => onStepChange(step.key)}
-                    sx={{
-                      position: 'relative',
-                      zIndex: 1,
-                      width: '100%',
-                      minHeight: 62,
-                      border: 0,
-                      borderRadius: 2.5,
-                      bgcolor: isActive ? 'action.selected' : 'transparent',
-                      color: 'text.primary',
-                      font: 'inherit',
-                      cursor: 'pointer',
-                      display: 'flex',
-                      flexDirection: 'column',
-                      alignItems: 'center',
-                      gap: 0.25,
-                      px: 0.75,
-                      py: 0.25,
-                      '&:hover': { bgcolor: isActive ? 'action.selected' : 'action.hover' },
-                      '&:focus-visible': {
-                        outline: '3px solid',
-                        outlineColor: 'primary.light',
-                        outlineOffset: 2,
-                      },
-                    }}
-                  >
-                    <Box
-                      sx={{
-                        width: 30,
-                        height: 30,
-                        borderRadius: '50%',
-                        display: 'grid',
-                        placeItems: 'center',
-                        bgcolor: isComplete || isNext ? 'primary.main' : 'background.containerHigh',
-                        color: isComplete || isNext ? 'primary.contrastText' : 'text.secondary',
-                        border: isActive ? '3px solid' : '1px solid',
-                        borderColor: isActive ? 'primary.light' : 'divider',
-                        fontWeight: 700,
-                        fontSize: 12,
-                      }}
-                    >
-                      {isComplete ? <CheckRoundedIcon sx={{ fontSize: 18 }} /> : index + 1}
+        {expanded ? (
+          <Stack component="ol" direction="row" sx={{ flex: 1, minWidth: 0, listStyle: 'none', p: 0, m: 0, gap: 0.5 }}>
+            {STEP_COPY.map((step, index) => (
+              <Box component="li" key={step.key} sx={{ flex: 1, minWidth: 0 }}>
+                <Tooltip title={step.helper}>
+                  <Box component="button" type="button" aria-label={step.label} aria-current={activeStep === step.key ? 'step' : undefined} onClick={() => onStepChange(step.key)} sx={{ width: '100%', height: 34, border: 0, borderRadius: 1, px: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 0.75, font: 'inherit', color: activeStep === step.key ? 'primary.main' : 'text.secondary', bgcolor: activeStep === step.key ? 'action.selected' : 'transparent', cursor: 'pointer', '&:hover': { bgcolor: 'action.hover' }, '&:focus-visible': { outline: '2px solid', outlineColor: 'primary.main' } }}>
+                    <Box component="span" sx={{ width: 20, height: 20, borderRadius: 0.75, display: 'grid', placeItems: 'center', bgcolor: complete[step.key] ? 'background.container' : 'background.containerLow', color: complete[step.key] ? 'primary.main' : 'text.secondary', fontSize: 10, fontWeight: 700 }}>
+                      {complete[step.key] ? <CheckRoundedIcon sx={{ fontSize: 14 }} /> : index + 1}
                     </Box>
-                    <Stack direction="row" spacing={0.5} sx={{ alignItems: 'center', minWidth: 0 }}>
-                      <Typography variant="caption" noWrap sx={{ fontWeight: isActive ? 700 : 600 }}>
-                        {step.label}
-                      </Typography>
-                      {isNext && <Chip label="Next" size="small" color="primary" sx={{ height: 18, '& .MuiChip-label': { px: 0.75, fontSize: 10 } }} />}
-                    </Stack>
-                    <Typography variant="caption" color="text.secondary" noWrap sx={{ maxWidth: '100%', fontSize: 10 }}>
-                      {step.helper}
-                    </Typography>
+                    <Typography component="span" variant="caption" sx={{ fontWeight: activeStep === step.key ? 700 : 500 }}>{step.label}</Typography>
+                    {nextStep === step.key && <Chip label="Next" size="small" variant="outlined" sx={{ height: 18, '& .MuiChip-label': { px: 0.5, fontSize: 9 } }} />}
                   </Box>
-                </Box>
-              )
-            })}
+                </Tooltip>
+              </Box>
+            ))}
           </Stack>
-        )}
-
-        {!expanded && (
-          <Typography variant="body2" color="text.secondary" sx={{ flex: 1 }}>
-            {nextStep ? `Next: ${STEP_COPY.find((step) => step.key === nextStep)?.label}` : 'Workflow complete'}
-          </Typography>
-        )}
-
+        ) : <Typography variant="caption" color="text.secondary" sx={{ flex: 1 }}>{nextStep ? `Next: ${STEP_COPY.find((step) => step.key === nextStep)?.label}` : 'Workflow complete'}</Typography>}
         <Tooltip title={expanded ? 'Hide workflow' : 'Show workflow'}>
-          <IconButton
-            size="small"
-            aria-label={expanded ? 'Hide workflow' : 'Show workflow'}
-            aria-expanded={expanded}
-            onClick={() => onExpandedChange(!expanded)}
-          >
-            {expanded ? <ExpandLessRoundedIcon /> : <ExpandMoreRoundedIcon />}
-          </IconButton>
+          <IconButton size="small" aria-label={expanded ? 'Hide workflow' : 'Show workflow'} aria-expanded={expanded} onClick={() => onExpandedChange(!expanded)}>{expanded ? <ExpandLessRoundedIcon /> : <ExpandMoreRoundedIcon />}</IconButton>
         </Tooltip>
       </Stack>
     </Box>

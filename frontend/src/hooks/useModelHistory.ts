@@ -22,6 +22,7 @@ export function useModelHistory(currentUser: AuthUser | null, options: Options) 
   const [deletingId, setDeletingId] = useState<string | null>(null)
   const savingRef = useRef(false)
   const deletingRef = useRef(false)
+  const mutationVersionRef = useRef(0)
   const ownerRef = useRef<string | null>(currentUser?.id ?? null)
   ownerRef.current = currentUser?.id ?? null
   const ownerId = currentUser?.id ?? null
@@ -42,9 +43,10 @@ export function useModelHistory(currentUser: AuthUser | null, options: Options) 
       return
     }
     setLoading(true)
+    const version = mutationVersionRef.current
     try {
       const saved = await listSavedModels(signal)
-      if (signal?.aborted || ownerRef.current !== requestedOwner) return
+      if (signal?.aborted || ownerRef.current !== requestedOwner || mutationVersionRef.current !== version) return
       setState({ ownerId: requestedOwner, entries: saved })
     } catch (error) {
       if (signal?.aborted || (error instanceof DOMException && error.name === 'AbortError')) return
@@ -74,6 +76,7 @@ export function useModelHistory(currentUser: AuthUser | null, options: Options) 
     try {
       const entry = await saveModelSnapshot(model, model.name.trim() || 'Untitled model')
       if (ownerRef.current !== requestedOwner) return null
+      mutationVersionRef.current += 1
       setState((current) => ({
         ownerId: requestedOwner,
         entries: [entry, ...(current.ownerId === requestedOwner ? current.entries : [])]
@@ -87,7 +90,7 @@ export function useModelHistory(currentUser: AuthUser | null, options: Options) 
       return null
     } finally {
       savingRef.current = false
-      if (ownerRef.current === requestedOwner) setSaving(false)
+      setSaving(false)
     }
   }, [requestFailed, showMessage])
 
@@ -99,6 +102,7 @@ export function useModelHistory(currentUser: AuthUser | null, options: Options) 
     try {
       await deleteSavedModel(entry.id)
       if (ownerRef.current !== requestedOwner) return false
+      mutationVersionRef.current += 1
       setState((current) => current.ownerId === requestedOwner
         ? { ...current, entries: current.entries.filter((item) => item.id !== entry.id) }
         : current)
@@ -109,7 +113,7 @@ export function useModelHistory(currentUser: AuthUser | null, options: Options) 
       return false
     } finally {
       deletingRef.current = false
-      if (ownerRef.current === requestedOwner) setDeletingId(null)
+      setDeletingId(null)
     }
   }, [requestFailed, showMessage])
 

@@ -1,4 +1,8 @@
 import CenterFocusStrongRoundedIcon from '@mui/icons-material/CenterFocusStrongRounded'
+import ZoomInRoundedIcon from '@mui/icons-material/ZoomInRounded'
+import ZoomOutRoundedIcon from '@mui/icons-material/ZoomOutRounded'
+import PanToolRoundedIcon from '@mui/icons-material/PanToolRounded'
+import { alpha, useTheme } from '@mui/material/styles'
 import GridOnRoundedIcon from '@mui/icons-material/GridOnRounded'
 import Box from '@mui/material/Box'
 import Chip from '@mui/material/Chip'
@@ -9,7 +13,8 @@ import ToggleButton from '@mui/material/ToggleButton'
 import ToggleButtonGroup from '@mui/material/ToggleButtonGroup'
 import Tooltip from '@mui/material/Tooltip'
 import Typography from '@mui/material/Typography'
-import { useMemo, useRef, useState, type KeyboardEvent, type MouseEvent, type PointerEvent as ReactPointerEvent } from 'react'
+import { useEffect, useId, useMemo, useRef, useState, type KeyboardEvent, type MouseEvent, type PointerEvent as ReactPointerEvent } from 'react'
+import { clientToSvg, fitCamera, gridInterval, projectPoint, unprojectPoint, zoomCamera, type Camera, type Point } from '../canvasViewport'
 import type { Dof, JsonValue, LoadInput, ModelInput, ResultView, Selection, SolveResult } from '../domain'
 import { elementDisplayLabel, loadDisplayLabel, nodeDisplayLabel } from '../entityLabels'
 import {
@@ -51,11 +56,7 @@ interface ModelCanvasProps {
   onPendingMember: (nodeId: string | null) => void
 }
 
-const WIDTH = 1000
-const HEIGHT = 560
-const PAD = 110
 const TRANSLATIONAL_DOFS: Dof[] = ['UX', 'UY', 'UZ']
-const CANVAS = '#fbfcff'
 
 const activateOnKeyboard = (event: KeyboardEvent<SVGGElement | SVGCircleElement>, action: () => void) => {
   if (event.key === 'Enter' || event.key === ' ') {
@@ -67,11 +68,34 @@ const activateOnKeyboard = (event: KeyboardEvent<SVGGElement | SVGCircleElement>
 
 export function ModelCanvas({
   readOnly = false, showResultControls = false,
-  model, result, selectedStep, view, selection, cadTool, placement, pendingMember,
+  model: inputModel, result, selectedStep, view, selection, cadTool, placement, pendingMember,
   onViewChange, onSelection, onModelChange, onPlace, onPendingMember,
 }: ModelCanvasProps) {
+  const theme = useTheme()
+  const CANVAS = theme.palette.background.canvas
+  const instanceId = useId().replace(/:/g, '')
+  const svgRef = useRef<SVGSVGElement>(null)
+  const [viewport, setViewport] = useState({ width: 1000, height: 560 })
+  const { width: WIDTH, height: HEIGHT } = viewport
+  const [camera, setCamera] = useState<Camera | null>(null)
+  const [panMode, setPanMode] = useState(false)
+  const [dragModel, setDragModel] = useState<ModelInput | null>(null)
+  const model = dragModel ?? inputModel
   const [showGrid, setShowGrid] = useState(true)
-  const dragRef = useRef<{ id: string; kind: 'sketch' | 'frame'; moved: boolean } | null>(null)
+  const dragRef = useRef<{
+    id: string; kind: 'sketch' | 'frame' | 'pan'; moved: boolean;
+    start: Point; camera: Camera; model: ModelInput; preview: ModelInput | null;
+  } | null>(null)
+  useEffect(() => {
+    const svg = svgRef.current
+    if (!svg || typeof ResizeObserver === 'undefined') return
+    const observer = new ResizeObserver(([entry]) => {
+      const { width, height } = entry.contentRect
+      if (width > 0 && height > 0) setViewport({ width, height })
+    })
+    observer.observe(svg)
+    return () => observer.disconnect()
+  }, [])
   const skipClickRef = useRef(false)
   const family = MODEL_FAMILIES[model.model_family]
   const dofs = dofsForModel(model)
@@ -118,26 +142,46 @@ export function ModelCanvas({
   const maxY = Math.max(...allY)
   const spanX = Math.max(maxX - minX, 1e-6)
   const spanY = Math.max(maxY - minY, 1e-6)
-  const scale = Math.min((WIDTH - 2 * PAD) / spanX, (HEIGHT - 2 * PAD) / spanY)
-  const project = (point: { x: number; y: number }) => ({
-    x: WIDTH / 2 + (point.x - (minX + maxX) / 2) * scale,
-    y: HEIGHT / 2 - (point.y - (minY + maxY) / 2) * scale,
-  })
-  const unproject = (screenX: number, screenY: number) => ({
-    x: (minX + maxX) / 2 + (screenX - WIDTH / 2) / scale,
-    y: (minY + maxY) / 2 - (screenY - HEIGHT / 2) / scale,
-  })
-  const svgPoint = (event: { currentTarget: Element; clientX: number; clientY: number }) => {
-    const rect = event.currentTarget.getBoundingClientRect()
-    return {
-      x: ((event.clientX - rect.left) / Math.max(rect.width, 1)) * WIDTH,
-      y: ((event.clientY - rect.top) / Math.max(rect.height, 1)) * HEIGHT,
+  const fitted = fitCamera(allX.map((x, index) => ({ x, y: allY[index] })), viewport)
+  const activeCamera = camera ?? fitted
+  const scale = activeCamera.scale
+  const project = (point: Point) => projectPoint(point, activeCamera, viewport)
+  const unproject = (screenX: number, screenY: number) => unprojectPoint({ x: screenX, y: screenY }, activeCamera, viewport)
+  const svgPoint = (event: { clientX: number; clientY: number }) => {
+    const svg = svgRef.current
+    if (!svg) return { x: 0, y: 0 }
+    const matrix = svg.getScreenCTM?.()
+    if (matrix && typeof DOMPoint !== 'undefined') {
+      const point = new DOMPoint(event.clientX, event.clientY).matrixTransform(matrix.inverse())
+      return { x: point.x, y: point.y }
     }
+    return clientToSvg({ x: event.clientX, y: event.clientY }, svg.getBoundingClientRect(), viewport)
   }
+  const zoom = (factor: number, anchor = { x: WIDTH / 2, y: HEIGHT / 2 }) => {
+    setCamera(zoomCamera(activeCamera, factor, anchor, viewport))
+  }
+  const gridSize = gridInterval(scale)
+  const gridPixels = gridSize * scale
+  const origin = project({ x: 0, y: 0 })
+  useEffect(() => {
+    const svg = svgRef.current
+    if (!svg) return
+    const onWheel = (event: WheelEvent) => {
+      if (event.ctrlKey) return
+      event.preventDefault()
+      setCamera(zoomCamera(activeCamera, Math.exp(-Math.max(-100, Math.min(100, event.deltaY)) * 0.002), svgPoint(event), viewport))
+    }
+    svg.addEventListener('wheel', onWheel, { passive: false })
+    return () => svg.removeEventListener('wheel', onWheel)
+  }, [activeCamera, viewport])
+  useEffect(() => { setPanMode(false) }, [cadTool, placement])
   const nodeScreen = new Map(Array.from(positions, ([id, point]) => [id, project(point)]))
   const referenceScreen = new Map(model.nodes.map((node) => [node.id, project({ x: node.coordinates[0] ?? 0, y: node.coordinates[1] ?? 0 })]))
   const constrainedNodes = new Set(model.constraints.map((constraint) => constraint.node_id))
-  const loadedNodes = new Map(model.loads.filter((load) => load.node_id).map((load) => [load.node_id as string, load]))
+  const loadedNodes = new Map<string, LoadInput[]>()
+  model.loads.filter((load) => load.kind === 'nodal' && load.node_id).forEach((load) => {
+    loadedNodes.set(load.node_id!, [...(loadedNodes.get(load.node_id!) ?? []), load])
+  })
   const reactionValues = Array.from(reactions.values()).flatMap((value) => dofs.map((dof) => Math.abs(Number(value[dof] ?? 0))))
   const maxReaction = Math.max(1e-12, ...reactionValues)
   const resultByElement = new Map(resultElements.map((record) => [String(record.element_id), record]))
@@ -166,16 +210,6 @@ export function ModelCanvas({
     const uy = Number(load.components.UY ?? 0)
     const uz = Number(load.components.UZ ?? 0)
     return { dx: ux + 0.7 * uz, dy: -uy - 0.7 * uz }
-  }
-
-  const loadGlyph = (load: LoadInput) => {
-    const loadDof = dofs.find((dof) => Math.abs(load.components[dof] ?? 0) > 0)
-    const loadValue = loadDof ? load.components[loadDof] ?? 0 : 0
-    const sign = Math.sign(loadValue || 1)
-    const loadVector = loadDof === 'UX' ? { dx: 54 * sign, dy: 0 }
-      : loadDof === 'UY' ? { dx: 0, dy: -54 * sign }
-        : { dx: 38 * sign, dy: -38 * sign }
-    return { loadDof, loadVector }
   }
 
   const distributedGlyphs: Array<{
@@ -258,24 +292,60 @@ export function ModelCanvas({
 
   const selectElement = (event: MouseEvent<SVGGElement>, id: string) => {
     event.stopPropagation()
-    if (editingCad) return
+    if (editingCad || panMode) return
     onSelection({ kind: 'elements', id })
   }
 
-  const handleCanvasPointerMove = (event: ReactPointerEvent<SVGSVGElement>) => {
-    if (readOnly || !dragRef.current) return
-    dragRef.current.moved = true
-    const world = worldFromEvent(event)
-    if (dragRef.current.kind === 'sketch') {
-      onModelChange(moveSketchVertex(model, dragRef.current.id, [world.x, world.y]))
-    } else {
-      onModelChange(moveFrameNode(model, dragRef.current.id, [world.x, world.y]))
-    }
+  const beginDrag = (event: ReactPointerEvent<SVGElement>, kind: 'sketch' | 'frame' | 'pan', id = '') => {
+    if (event.button !== 0 && event.button !== 1) return
+    event.preventDefault()
+    event.stopPropagation()
+    svgRef.current?.setPointerCapture?.(event.pointerId)
+    setCamera(activeCamera)
+    dragRef.current = { id, kind, moved: false, start: svgPoint(event), camera: activeCamera, model, preview: null }
   }
 
-  const handleCanvasPointerUp = () => {
-    if (dragRef.current?.moved) skipClickRef.current = true
+  const handleCanvasPointerMove = (event: ReactPointerEvent<SVGSVGElement>) => {
+    const drag = dragRef.current
+    if (!drag) return
+    const point = svgPoint(event)
+    if (!drag.moved && Math.hypot(point.x - drag.start.x, point.y - drag.start.y) < 4) return
+    drag.moved = true
+    if (drag.kind === 'pan') {
+      setCamera({ ...drag.camera, x: drag.camera.x - (point.x - drag.start.x) / drag.camera.scale, y: drag.camera.y + (point.y - drag.start.y) / drag.camera.scale })
+      return
+    }
+    if (readOnly) return
+    const delta = { x: (point.x - drag.start.x) / drag.camera.scale, y: -(point.y - drag.start.y) / drag.camera.scale }
+    const original = drag.kind === 'sketch'
+      ? getSketch(drag.model).vertices.find((vertex) => vertex.id === drag.id)?.coordinates
+      : drag.model.nodes.find((node) => node.id === drag.id)?.coordinates
+    if (!original) return
+    const coordinates = [original[0] + delta.x, original[1] + delta.y]
+    drag.preview = drag.kind === 'sketch'
+      ? moveSketchVertex(drag.model, drag.id, coordinates)
+      : moveFrameNode(drag.model, drag.id, coordinates)
+    setDragModel(drag.preview)
+  }
+
+  const handleCanvasPointerUp = (event: ReactPointerEvent<SVGSVGElement>) => {
+    const drag = dragRef.current
     dragRef.current = null
+    if (svgRef.current?.hasPointerCapture?.(event.pointerId)) svgRef.current.releasePointerCapture(event.pointerId)
+    if (drag?.moved) {
+      skipClickRef.current = true
+      if (drag.preview && !readOnly) onModelChange(drag.preview, { kind: drag.kind === 'sketch' ? 'geometry' : 'nodes', id: drag.id })
+    }
+    setDragModel(null)
+  }
+
+  const cancelDrag = () => {
+    if (dragRef.current) {
+      setCamera(dragRef.current.camera)
+      skipClickRef.current = true
+    }
+    dragRef.current = null
+    setDragModel(null)
   }
 
   const handleCanvasClick = (event: MouseEvent<SVGSVGElement>) => {
@@ -283,7 +353,8 @@ export function ModelCanvas({
       skipClickRef.current = false
       return
     }
-    if (readOnly) return
+    if (readOnly || panMode) return
+    setCamera(activeCamera)
     const world = worldFromEvent(event)
     if (cadTool === 'add-vertex' && isSurfaceFamily(model)) {
       const next = addOuterVertexAt(model, [world.x, world.y])
@@ -311,31 +382,37 @@ export function ModelCanvas({
     if (nodeId) onPlace(nodeId)
   }
 
-  const canvasCursor = readOnly ? 'default' : placement ? 'copy'
+  const canvasCursor = panMode ? 'grab' : readOnly ? 'default' : placement ? 'copy'
     : cadTool === 'add-vertex' || cadTool === 'add-hole' || cadTool === 'add-node' ? 'crosshair'
       : cadTool === 'add-member' ? 'cell'
         : 'default'
 
   const renderSupportAndLoad = (point: { x: number; y: number }, nodeId: string) => {
-    const load = loadedNodes.get(nodeId)
-    const glyph = load ? loadGlyph(load) : null
+    const loads = loadedNodes.get(nodeId) ?? []
+    const components = loads.flatMap((load) => dofs.filter((dof) => Math.abs(load.components[dof] ?? 0) > 0).map((dof) => ({ load, dof, sign: Math.sign(load.components[dof]!) })))
     return (
       <>
         {constrainedNodes.has(nodeId) && (
           <path d={`M ${point.x - 13} ${point.y + 21} L ${point.x + 13} ${point.y + 21} L ${point.x} ${point.y + 4} Z`} fill="#8c96a8" stroke="#596477" strokeWidth="1.5" />
         )}
-        {load && glyph?.loadDof && view !== 'reactions' && (
-          <g>
-            <line x1={point.x} y1={point.y} x2={point.x + glyph.loadVector.dx} y2={point.y + glyph.loadVector.dy} stroke="#d64e66" strokeWidth="2.5" markerEnd="url(#load-arrow)" />
-            <text x={point.x + glyph.loadVector.dx + 7} y={point.y + glyph.loadVector.dy - 6} fill="#a42d43" fontSize="10">{loadDisplayLabel(model, load.id)} · {glyph.loadDof}</text>
+        {view !== 'reactions' && components.map(({ load, dof, sign }, index) => {
+          const length = 48 + index * 16
+          const dx = dof === 'UX' ? length * sign : dof === 'UY' ? 0 : length * 0.7 * sign
+          const dy = dof === 'UY' ? -length * sign : dof === 'UX' ? 0 : -length * 0.7 * sign
+          const rotational = dof.startsWith('R')
+          return <g key={`${load.id}-${dof}`} pointerEvents="none">
+            {rotational
+              ? <path d={`M ${point.x - 20} ${point.y - 10} A 24 24 0 1 ${sign > 0 ? 0 : 1} ${point.x + 20} ${point.y - 10}`} fill="none" stroke="#d64e66" strokeWidth="2.5" markerEnd={`url(#${instanceId}-load-arrow)`} />
+              : <line x1={point.x} y1={point.y} x2={point.x + dx} y2={point.y + dy} stroke="#d64e66" strokeWidth="2.5" markerEnd={`url(#${instanceId}-load-arrow)`} />}
+            <text x={point.x + (rotational ? 26 : dx + 7)} y={point.y + (rotational ? -26 - index * 12 : dy - 6)} fill="#a42d43" fontSize="10">{loadDisplayLabel(model, load.id)} · {dof}</text>
           </g>
-        )}
+        })}
       </>
     )
   }
 
   return (
-    <Box sx={{ position: 'relative', minWidth: 0, minHeight: 0, height: '100%', overflow: 'hidden', bgcolor: 'background.canvas' }}>
+    <Box sx={{ position: 'relative', minWidth: 0, minHeight: 0, height: '100%', overflow: 'hidden', bgcolor: 'background.canvas', '& [role=button]:focus-visible': { outline: '2px solid', outlineColor: 'primary.main', outlineOffset: 4 }, '& [role=button]:hover': { filter: 'brightness(0.8)' } }}>
       <Stack
         direction="row"
         spacing={1}
@@ -350,7 +427,7 @@ export function ModelCanvas({
           '& > *': { pointerEvents: 'auto' },
         }}
       >
-        <Paper elevation={2} sx={{ display: 'flex', alignItems: 'center', gap: 1, px: 1, py: 0.75, borderRadius: 5, flexWrap: 'wrap', maxWidth: '100%' }}>
+        <Paper elevation={2} sx={{ display: 'flex', alignItems: 'center', gap: 1, px: 1, py: 0.75, borderRadius: 1, flexWrap: 'wrap', maxWidth: '100%', border: '1px solid', borderColor: 'divider' }}>
           {showResultControls && (
             <ToggleButtonGroup exclusive size="small" value={view} onChange={(_, value: ResultView | null) => value && onViewChange(value)}>
               <ToggleButton value="model">Model</ToggleButton>
@@ -373,10 +450,11 @@ export function ModelCanvas({
           />
         </Paper>
         <Box sx={{ flex: 1 }} />
-        <Paper elevation={2} sx={{ display: 'flex', alignItems: 'center', px: 0.5, py: 0.5, borderRadius: 5, flexShrink: 0 }}>
+        <Paper elevation={1} sx={{ position: 'absolute', right: 0, top: showResultControls ? 120 : 62, display: 'flex', flexDirection: 'column', alignItems: 'center', p: 0.5, borderRadius: 1, border: '1px solid', borderColor: 'divider' }}>
           <Tooltip title={showGrid ? 'Hide background grid' : 'Show background grid'}>
             <IconButton
               aria-label="Show background grid"
+              aria-pressed={showGrid}
               size="small"
               onClick={() => setShowGrid((value) => !value)}
               color={showGrid ? 'primary' : 'default'}
@@ -384,13 +462,10 @@ export function ModelCanvas({
               <GridOnRoundedIcon fontSize="small" />
             </IconButton>
           </Tooltip>
-          <Tooltip title="View fitted automatically">
-            <span>
-              <IconButton aria-label="View fitted automatically" disabled size="small">
-                <CenterFocusStrongRoundedIcon fontSize="small" />
-              </IconButton>
-            </span>
-          </Tooltip>
+          <Tooltip title="Zoom in (+)"><IconButton aria-label="Zoom in" size="small" onClick={() => zoom(1.25)}><ZoomInRoundedIcon fontSize="small" /></IconButton></Tooltip>
+          <Tooltip title="Zoom out (−)"><IconButton aria-label="Zoom out" size="small" onClick={() => zoom(0.8)}><ZoomOutRoundedIcon fontSize="small" /></IconButton></Tooltip>
+          <Tooltip title="Fit model (F)"><IconButton aria-label="Fit model" size="small" onClick={() => setCamera(null)}><CenterFocusStrongRoundedIcon fontSize="small" /></IconButton></Tooltip>
+          <Tooltip title="Pan view · drag or use arrow keys"><IconButton aria-label="Pan view" aria-pressed={panMode} size="small" color={panMode ? 'primary' : 'default'} onClick={() => setPanMode((value) => !value)}><PanToolRoundedIcon fontSize="small" /></IconButton></Tooltip>
         </Paper>
       </Stack>
       {!readOnly && placement && (
@@ -411,24 +486,37 @@ export function ModelCanvas({
         </Paper>
       )}
       <svg
+        ref={svgRef}
+        tabIndex={0}
         viewBox={`0 0 ${WIDTH} ${HEIGHT}`}
-        role="img"
+        role="group"
         aria-label={`${family.label} 2D engineering projection`}
-        style={{ width: '100%', height: '100%', minHeight: 360, display: 'block', cursor: canvasCursor }}
+        style={{ width: '100%', height: '100%', display: 'block', cursor: canvasCursor, touchAction: 'none' }}
         onClick={handleCanvasClick}
+        onPointerDown={(event) => { if (panMode || event.button === 1 || event.altKey) beginDrag(event, 'pan') }}
+        onKeyDown={(event) => {
+          if (event.key === 'Escape') { cancelDrag(); setPanMode(false); return }
+          if ((event.target !== event.currentTarget && event.key.startsWith('Arrow')) || event.ctrlKey || event.metaKey || event.altKey || event.nativeEvent.isComposing) return
+          if (event.key === 'f' || event.key === 'F') setCamera(null)
+          else if (event.key === '+' || event.key === '=') zoom(1.25)
+          else if (event.key === '-') zoom(0.8)
+          else if (event.key.startsWith('Arrow')) setCamera({ ...activeCamera, x: activeCamera.x + (event.key === 'ArrowRight' ? -40 : event.key === 'ArrowLeft' ? 40 : 0) / scale, y: activeCamera.y + (event.key === 'ArrowDown' ? 40 : event.key === 'ArrowUp' ? -40 : 0) / scale })
+          else return
+          event.preventDefault()
+        }}
         onPointerMove={handleCanvasPointerMove}
         onPointerUp={handleCanvasPointerUp}
-        onPointerLeave={() => { dragRef.current = null }}
+        onPointerCancel={cancelDrag}
+        onLostPointerCapture={() => { if (dragRef.current) cancelDrag() }}
       >
         <defs>
-          <pattern id="minor-grid" width="25" height="25" patternUnits="userSpaceOnUse"><path d="M 25 0 L 0 0 0 25" fill="none" stroke="#e9edf5" strokeWidth="0.7" /></pattern>
-          <pattern id="major-grid" width="100" height="100" patternUnits="userSpaceOnUse"><rect width="100" height="100" fill="url(#minor-grid)" /><path d="M 100 0 L 0 0 0 100" fill="none" stroke="#dce3ef" strokeWidth="1" /></pattern>
-          <marker id="load-arrow" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 z" fill="#d64e66" /></marker>
-          <marker id="reaction-arrow" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 z" fill="#008b8b" /></marker>
+          <pattern id={`${instanceId}-minor-grid`} x={origin.x} y={origin.y} width={gridPixels / 5} height={gridPixels / 5} patternUnits="userSpaceOnUse"><circle cx="0.8" cy="0.8" r="0.65" fill={theme.palette.divider} /></pattern>
+          <pattern id={`${instanceId}-major-grid`} x={origin.x} y={origin.y} width={gridPixels} height={gridPixels} patternUnits="userSpaceOnUse"><path d={`M ${gridPixels} 0 L 0 0 0 ${gridPixels}`} fill="none" stroke={theme.palette.divider} strokeWidth="0.65" /></pattern>
+          <marker id={`${instanceId}-load-arrow`} markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 z" fill="#d64e66" /></marker>
+          <marker id={`${instanceId}-reaction-arrow`} markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 z" fill={theme.palette.secondary.main} /></marker>
         </defs>
         <rect width={WIDTH} height={HEIGHT} fill={CANVAS} />
-        {showGrid && <rect width={WIDTH} height={HEIGHT} fill="url(#major-grid)" />}
-        <line x1={PAD / 2} x2={WIDTH - PAD / 2} y1={HEIGHT - 58} y2={HEIGHT - 58} stroke="#cbd3e0" strokeWidth="1" />
+        {showGrid && <g pointerEvents="none"><rect width={WIDTH} height={HEIGHT} fill={`url(#${instanceId}-minor-grid)`} /><rect width={WIDTH} height={HEIGHT} fill={`url(#${instanceId}-major-grid)`} /><line x1={0} x2={WIDTH} y1={origin.y} y2={origin.y} stroke={theme.palette.divider} /><line x1={origin.x} x2={origin.x} y1={0} y2={HEIGHT} stroke={theme.palette.divider} /></g>}
 
         {shouldDeform && model.elements.map((element) => {
           const points = element.node_ids.map((id) => referenceScreen.get(id)).filter(Boolean) as Array<{ x: number; y: number }>
@@ -453,18 +541,18 @@ export function ModelCanvas({
             <g
               key={element.id}
               role="button"
-              tabIndex={editingCad ? -1 : 0}
+              tabIndex={editingCad || panMode ? -1 : 0}
               aria-label={`Select ${elementLabel}`}
               onKeyDown={(event) => activateOnKeyboard(event, action)}
               onClick={(event) => selectElement(event, element.id)}
-              style={{ cursor: editingCad ? canvasCursor : 'pointer', outline: 'none', pointerEvents: editingCad ? 'none' : 'auto' }}
+              style={{ cursor: editingCad ? canvasCursor : 'pointer', pointerEvents: editingCad || panMode ? 'none' : 'auto' }}
             >
               {isSurface ? (
-                <polygon points={points.map((point) => `${point.x},${point.y}`).join(' ')} fill={selected ? 'rgba(69,99,181,.18)' : `rgba(69,99,181,${view === 'internal' ? 0.12 + forceLevel * 0.22 : 0.08})`} stroke={selected ? '#4563b5' : color} strokeWidth={selected ? 5 : denseSurfaceMesh || hideMeshNodes ? 1.4 : 3.2} strokeLinejoin="round" />
+                <polygon points={points.map((point) => `${point.x},${point.y}`).join(' ')} fill={alpha(view === 'internal' ? color : theme.palette.primary.main, selected ? 0.18 : view === 'internal' ? 0.12 + forceLevel * 0.22 : 0.06)} stroke={selected ? theme.palette.primary.main : color} strokeWidth={selected ? 5 : denseSurfaceMesh || hideMeshNodes ? 1.4 : 3.2} strokeLinejoin="round" />
               ) : (
                 <>
                   <line x1={points[0].x} y1={points[0].y} x2={points[1].x} y2={points[1].y} stroke="transparent" strokeWidth="18" />
-                  <line x1={points[0].x} y1={points[0].y} x2={points[1].x} y2={points[1].y} stroke={selected ? '#4563b5' : color} strokeWidth={selected ? 5 : 3.2} strokeLinecap="round" />
+                  <line x1={points[0].x} y1={points[0].y} x2={points[1].x} y2={points[1].y} stroke={selected ? theme.palette.primary.main : color} strokeWidth={selected ? 5 : 3.2} strokeLinecap="round" />
                 </>
               )}
               {showLabel && <text x={center.x} y={center.y - 10} textAnchor="middle" fill="#394154" fontSize="12" fontWeight="600">{elementLabel}</text>}
@@ -482,7 +570,7 @@ export function ModelCanvas({
               y2={glyph.y}
               stroke="#d64e66"
               strokeWidth="2.2"
-              markerEnd="url(#load-arrow)"
+              markerEnd={`url(#${instanceId}-load-arrow)`}
             />
             {glyph.label && <text x={glyph.x + 7} y={glyph.y - 7} fill="#a42d43" fontSize="10">{glyph.label} · distributed</text>}
           </g>
@@ -514,29 +602,30 @@ export function ModelCanvas({
               <circle
                 cx={point.x}
                 cy={point.y}
-                r={selected || pendingMember === node.id ? 8 : 6}
-                fill={selected ? '#ffffff' : '#eaf0ff'}
-                stroke="#4563b5"
-                strokeWidth={3}
+                r={selected || pendingMember === node.id ? 6 : denseSurfaceMesh ? 2.5 : 4.5}
+                fill={selected ? '#ffffff' : theme.palette.background.container}
+                stroke={theme.palette.primary.main}
+                strokeWidth={denseSurfaceMesh ? 1 : 2}
                 role="button"
                 tabIndex={0}
                 aria-label={`Select ${nodeLabel}`}
                 onKeyDown={(event) => activateOnKeyboard(event, selectNode)}
                 onPointerDown={(event) => {
                   event.stopPropagation()
+                  if (panMode || event.button === 1 || event.altKey) { beginDrag(event, 'pan'); return }
                   if (!readOnly && !isSurfaceFamily(model) && cadTool === 'select' && !placement) {
-                    dragRef.current = { id: node.id, kind: 'frame', moved: false }
+                    beginDrag(event, 'frame', node.id)
                   }
                 }}
-                onClick={(event) => { event.stopPropagation(); selectNode() }}
-                style={{ cursor: readOnly ? 'pointer' : placement ? 'copy' : 'pointer', outline: 'none' }}
+                onClick={(event) => { event.stopPropagation(); if (skipClickRef.current) { skipClickRef.current = false; return }; if (!panMode) selectNode() }}
+                style={{ cursor: readOnly ? 'pointer' : placement ? 'copy' : 'pointer' }}
               />
-              <text x={point.x + 10} y={point.y - 8} fill="#394154" fontSize="11" fontWeight="600">{nodeLabel}</text>
+              {(selected || (!denseSurfaceMesh && !hideMeshNodes) || constrainedNodes.has(node.id) || loadedNodes.has(node.id)) && <text pointerEvents="none" x={point.x + 10} y={point.y - 8} fill="#394154" fontSize="11" fontWeight="600">{nodeLabel}</text>}
             </g>
           )
         })}
 
-        {isSurfaceFamily(model) && sketch.loops.map((loop) => {
+        {!readOnly && isSurfaceFamily(model) && sketch.loops.map((loop) => {
           const points = loop.vertexIds.map((id) => {
             const vertex = sketch.vertices.find((item) => item.id === id)
             return vertex ? project({ x: vertex.coordinates[0], y: vertex.coordinates[1] }) : null
@@ -546,7 +635,7 @@ export function ModelCanvas({
             <polygon
               key={loop.id}
               points={points.map((point) => `${point.x},${point.y}`).join(' ')}
-              fill={loop.kind === 'hole' ? '#fbfcff' : hideMeshNodes ? 'rgba(69,99,181,.06)' : 'none'}
+              fill={loop.kind === 'hole' ? CANVAS : hideMeshNodes ? alpha(theme.palette.primary.main, 0.04) : 'none'}
               stroke={loop.kind === 'hole' ? '#b76a00' : '#1f3b73'}
               strokeWidth={loop.kind === 'hole' ? 2 : 2.8}
               strokeDasharray={loop.kind === 'hole' ? '7 5' : undefined}
@@ -555,13 +644,13 @@ export function ModelCanvas({
           )
         })}
 
-        {isSurfaceFamily(model) && sketch.vertices.map((vertex, index) => {
+        {!readOnly && isSurfaceFamily(model) && sketch.vertices.map((vertex, index) => {
           const point = project({ x: vertex.coordinates[0], y: vertex.coordinates[1] })
           const selected = selection.kind === 'geometry' && selection.id === vertex.id
           const node = nodeForSketchVertex(model, vertex)
           return (
             <g key={vertex.id}>
-              {node && renderSupportAndLoad(point, node.id)}
+
               <circle
                 cx={point.x}
                 cy={point.y}
@@ -572,14 +661,18 @@ export function ModelCanvas({
                 role="button"
                 tabIndex={0}
                 aria-label={`Geometry vertex ${index + 1}`}
-                style={{ cursor: placement ? 'copy' : 'grab', outline: 'none' }}
+                onKeyDown={(event) => activateOnKeyboard(event, () => placement ? placeNode(node?.id) : onSelection({ kind: 'geometry', id: vertex.id }))}
+                style={{ cursor: placement ? 'copy' : 'grab' }}
                 onPointerDown={(event) => {
                   event.stopPropagation()
-                  if (readOnly || placement) return
-                  dragRef.current = { id: vertex.id, kind: 'sketch', moved: false }
+                  if (panMode || event.button === 1 || event.altKey) { beginDrag(event, 'pan'); return }
+                  if (readOnly || placement || cadTool !== 'select') return
+                  beginDrag(event, 'sketch', vertex.id)
                 }}
                 onClick={(event) => {
                   event.stopPropagation()
+                  if (skipClickRef.current) { skipClickRef.current = false; return }
+                  if (panMode) return
                   if (readOnly) {
                     onSelection({ kind: 'geometry', id: vertex.id })
                     return
@@ -591,23 +684,14 @@ export function ModelCanvas({
                   onSelection({ kind: 'geometry', id: vertex.id })
                 }}
               />
-              <text x={point.x + 10} y={point.y - 9} fill="#1f3b73" fontSize="11" fontWeight="700">V{index + 1}</text>
+              <text x={point.x - 12} y={point.y - 13} textAnchor="end" fill="#1f3b73" fontSize="11" fontWeight="700">V{index + 1}</text>
             </g>
           )
         })}
 
         {view === 'reactions' && model.nodes.map((node) => {
           if (!constrainedNodes.has(node.id)) return null
-          if (hideMeshNodes) {
-            const onGeometry = sketch.vertices.some((vertex) => nodeForSketchVertex(model, vertex)?.id === node.id)
-            if (!onGeometry) return null
-          }
-          const point = hideMeshNodes
-            ? (() => {
-              const vertex = sketch.vertices.find((item) => nodeForSketchVertex(model, item)?.id === node.id)
-              return vertex ? project({ x: vertex.coordinates[0], y: vertex.coordinates[1] }) : nodeScreen.get(node.id)
-            })()
-            : nodeScreen.get(node.id)
+          const point = nodeScreen.get(node.id)
           const reaction = reactions.get(node.id)
           if (!point || !reaction) return null
           const arrows = TRANSLATIONAL_DOFS.filter((dof) => dofs.includes(dof)).map((dof) => {
@@ -617,7 +701,7 @@ export function ModelCanvas({
             return { dof, value, dx: 40 * value / maxReaction, dy: -40 * value / maxReaction }
           }).filter((item) => Math.abs(item.value) > maxReaction * 1e-9)
           const moments = dofs.filter((dof) => dof.startsWith('R') && Math.abs(Number(reaction[dof] ?? 0)) > maxReaction * 1e-9)
-          return <g key={`reaction-${node.id}`}>{arrows.map((arrow) => <g key={arrow.dof}><line x1={point.x} y1={point.y} x2={point.x + arrow.dx} y2={point.y + arrow.dy} stroke="#008b8b" strokeWidth="2.5" markerEnd="url(#reaction-arrow)" /><text x={point.x + arrow.dx + 6} y={point.y + arrow.dy - 5} fill="#006d6d" fontSize="10">{arrow.dof} {formatNumber(arrow.value)}</text></g>)}{moments.length > 0 && <text x={point.x + 12} y={point.y + 35} fill="#006d6d" fontSize="10">{moments.map((dof) => `${dof} ${formatNumber(reaction[dof])}`).join(' · ')}</text>}</g>
+          return <g key={`reaction-${node.id}`}>{arrows.map((arrow) => <g key={arrow.dof}><line x1={point.x} y1={point.y} x2={point.x + arrow.dx} y2={point.y + arrow.dy} stroke={theme.palette.secondary.main} strokeWidth="2.5" markerEnd={`url(#${instanceId}-reaction-arrow)`} /><text x={point.x + arrow.dx + 6} y={point.y + arrow.dy - 5} fill={theme.palette.secondary.dark} fontSize="10">{arrow.dof} {formatNumber(arrow.value)}</text></g>)}{moments.length > 0 && <text x={point.x + 12} y={point.y + 35} fill={theme.palette.secondary.dark} fontSize="10">{moments.map((dof) => `${dof} ${formatNumber(reaction[dof])}`).join(' · ')}</text>}</g>
         })}
       </svg>
       <Paper
@@ -628,7 +712,10 @@ export function ModelCanvas({
           bottom: 12,
           px: 1.5,
           py: 0.75,
-          borderRadius: 5,
+          borderRadius: 1,
+          right: 12,
+          flexWrap: 'wrap',
+          pointerEvents: 'none',
           display: 'flex',
           gap: 1.5,
           alignItems: 'center',
@@ -638,7 +725,8 @@ export function ModelCanvas({
         <Typography variant="caption" color="text.secondary">Y ↑</Typography>
         {hasOutOfPlane && <Typography variant="caption" color="text.secondary">UZ ↗ oblique projection</Typography>}
         <Typography variant="caption" color="text.secondary">{model.units.length} · {model.units.force} · {model.units.stress}</Typography>
-        <Typography variant="caption" color="text.secondary">{family.projectionNote}</Typography>
+        <Typography variant="caption" color="text.secondary">Grid {formatNumber(gridSize)} {model.units.length}</Typography>
+        <Typography variant="caption" color="text.secondary" sx={{ ml: 'auto' }}>Scroll to zoom · Alt + drag to pan · F to fit</Typography>
       </Paper>
     </Box>
   )

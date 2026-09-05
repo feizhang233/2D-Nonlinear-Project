@@ -1,0 +1,321 @@
+{
+  "schema_version": "1.0",
+  "package_id": "shell-instability-research-math-core-guide",
+  "package_title": "Shell Instability Research 数学核心引导",
+  "created_date": "2026-08-29",
+  "language": ["zh-CN", "zh-TW-source-pdf", "en-technical-terms"],
+  "scope": {
+    "project_map_id": "P07",
+    "project_map_name": "Shell Instability Research",
+    "duration": "8-12 weeks, default 10-week route",
+    "included": [
+      "limit-point and bifurcation detection and classification",
+      "linearized buckling and tangent critical subspaces",
+      "spherical arc-length continuation",
+      "single-mode and multi-mode Koiter reduction",
+      "mode interaction and clustered-mode tracking",
+      "imperfection sensitivity and local one-half/two-thirds scaling",
+      "single-mode and multi-mode branch switching workflow",
+      "cylindrical-shell and spherical-shell analytical benchmarks",
+      "verification V00 through V10",
+      "executable Python math core and generated V00-V10 evidence",
+      "8-week compressed, 10-week default and 12-week extended study plans"
+    ],
+    "excluded": [
+      "production nonlinear shell element implementation",
+      "complete finite-rotation formulation",
+      "complete material plasticity damage contact or fracture implementation",
+      "design-code knock-down factors",
+      "experimental calibration and probabilistic reliability",
+      "universal mesh step tolerance or modal-cluster thresholds",
+      "automatic physical branch selection for arbitrary nonconservative systems"
+    ]
+  },
+  "canonical_sources": [
+    {
+      "document_id": "A01",
+      "path": "01_核心算法/核心算法与实现顺序.md",
+      "rule": "Use for package-level algorithms, symbols, multi-mode extension and implementation order."
+    },
+    {
+      "document_id": "R00",
+      "path": "04_完整参考/Shell_Instability_Research_完整數學邏輯推導與例題_繁中.pdf",
+      "rule": "Use for the complete 30-page derivation, six worked examples and original research checklist."
+    },
+    {
+      "document_id": "B07",
+      "path": "05_参考资料/Koiter_Elastic_Stability.pdf",
+      "rule": "Use to resolve single/multiple critical modes, asymptotic coefficients and imperfection theory at the cited pages."
+    }
+  ],
+  "default_reading_sequence": ["G01", "G02", "G03", "A01", "L01", "V01", "C03", "P01", "M01"],
+  "documents": [
+    {
+      "id": "G00",
+      "path": "README.md",
+      "category": "navigation",
+      "priority": 1,
+      "summary": "Package goal, directory map, shortest reading path and completion boundary.",
+      "keywords": ["scope", "navigation", "8-12 weeks", "shell instability"]
+    },
+    {
+      "id": "G01",
+      "path": "AGENTS.md",
+      "category": "agent-instructions",
+      "priority": 1,
+      "summary": "Mandatory rules for residual signs, critical-point classification, modal clusters, imperfections, branch evidence and verification gates.",
+      "keywords": ["AGENTS", "limit point", "bifurcation", "critical subspace", "verification gate"]
+    },
+    {
+      "id": "G02",
+      "path": "AI_USAGE.md",
+      "category": "ai-instructions",
+      "priority": 1,
+      "summary": "Task routing, canonical symbols, five distinct instability conclusions, modal-interaction rules and prohibited inference.",
+      "keywords": ["AI usage", "left null vector", "mode cluster", "prohibited inference"]
+    },
+    {
+      "id": "G03",
+      "path": "CONTENT_INDEX.md",
+      "category": "human-readable-index",
+      "priority": 1,
+      "summary": "File, algorithm, verification, source-page and keyword routing.",
+      "keywords": ["content index", "routing", "verification pair", "PDF page"]
+    },
+    {
+      "id": "A01",
+      "path": "01_核心算法/核心算法与实现顺序.md",
+      "category": "core-algorithm",
+      "priority": 1,
+      "summary": "Residual and stability, critical-point detection/classification, eigenbuckling, arc length, single/multi-mode Koiter reduction, modal tracking, imperfections and branch switching.",
+      "keywords": ["tangent stiffness", "limit point", "bifurcation", "arc length", "Koiter", "mode interaction", "branch switching"]
+    },
+    {
+      "id": "L01",
+      "path": "02_算法局限/算法局限与适用边界.md",
+      "category": "limitations",
+      "priority": 1,
+      "summary": "Mathematical, continuation, asymptotic, modal, imperfection, shell discretization, material, boundary and engineering limitations.",
+      "keywords": ["limitation", "nonconservative", "modal cluster", "locking", "GMNIA"]
+    },
+    {
+      "id": "Q01",
+      "path": "03_验证题目与答案/验证题目.md",
+      "category": "verification-questions",
+      "priority": 1,
+      "summary": "Independent V00-V10 problems from tangent verification through end-to-end shell-instability review.",
+      "keywords": ["verification question", "mode interaction", "arc length", "imperfection", "cylinder", "sphere"]
+    },
+    {
+      "id": "S01",
+      "path": "03_验证题目与答案/配套答案.md",
+      "category": "verification-solutions",
+      "priority": 1,
+      "summary": "Paired analytical, numerical and evidence answers for V00-V10.",
+      "keywords": ["answer", "reference value", "Hessian", "two-thirds law", "branch seed"]
+    },
+    {
+      "id": "V01",
+      "path": "03_验证题目与答案/验证矩阵.md",
+      "category": "verification-plan",
+      "priority": 1,
+      "summary": "Ordered validation matrix, acceptance criteria, merge gates and automation metadata.",
+      "keywords": ["test matrix", "acceptance gate", "directional derivative", "GNIA", "GMNIA"]
+    },
+    {
+      "id": "P01",
+      "path": "07_学习路线/8-12周研究路线.md",
+      "category": "study-plan",
+      "priority": 1,
+      "summary": "Default 10-week research route with 8-week compression and 12-week extensions.",
+      "keywords": ["8 weeks", "10 weeks", "12 weeks", "study plan", "research deliverable"]
+    },
+    {
+      "id": "R00",
+      "path": "04_完整参考/Shell_Instability_Research_完整數學邏輯推導與例題_繁中.pdf",
+      "category": "canonical-study-pdf",
+      "priority": 1,
+      "pages": 30,
+      "summary": "Complete derivation from potential energy through Koiter, imperfections, shallow shells, arc length, branch switching and six worked examples.",
+      "page_routes": [
+        {"topic": "symbols and mathematical toolbox", "pdf_pages": "1-7"},
+        {"topic": "stability limit point and bifurcation", "pdf_pages": "8-11"},
+        {"topic": "Koiter reduction and imperfection sensitivity", "pdf_pages": "12-16"},
+        {"topic": "shallow shell cylinder and sphere", "pdf_pages": "17-22"},
+        {"topic": "finite elements arc length and branch switching", "pdf_pages": "23-25"},
+        {"topic": "six worked examples", "pdf_pages": "26-28"},
+        {"topic": "research matrix sources and concept chain", "pdf_pages": "29-30"}
+      ],
+      "keywords": ["Koiter", "imperfection sensitivity", "shallow shell", "arc length", "branch switching"]
+    },
+    {
+      "id": "R01",
+      "path": "04_完整参考/Plate_Shell_Buckling_完整數學推導與例題_繁中.pdf",
+      "category": "prerequisite-pdf",
+      "priority": 2,
+      "pages": 19,
+      "summary": "Linear plate/shell buckling, energy method, analytical modes, finite-element generalized eigenproblem and six examples.",
+      "keywords": ["linear buckling", "geometric stiffness", "plate", "cylinder", "sphere"]
+    },
+    {
+      "id": "B00",
+      "path": "05_参考资料/README.md",
+      "category": "reference-navigation",
+      "priority": 2,
+      "summary": "Reading routes and internal-use boundary for the four bundled source PDFs.",
+      "keywords": ["reference", "reading route", "source page"]
+    },
+    {
+      "id": "B07",
+      "path": "05_参考资料/Koiter_Elastic_Stability.pdf",
+      "category": "source-pdf",
+      "priority": 2,
+      "pages": 240,
+      "summary": "Primary source for stability limits, single/multiple critical modes, postbuckling and imperfection sensitivity.",
+      "page_routes": [
+        {"topic": "stability and multiple critical modes", "pdf_pages": "11-36"},
+        {"topic": "postbuckling reduction and branch stability", "pdf_pages": "37-50"},
+        {"topic": "imperfection sensitivity", "pdf_pages": "51-56"},
+        {"topic": "shallow shell spherical shell cylindrical shell and localized imperfections", "pdf_pages": "176-236"}
+      ],
+      "keywords": ["Koiter", "multiple buckling modes", "asymptotic", "imperfection"]
+    },
+    {
+      "id": "B04",
+      "path": "05_参考资料/deBorst_Nonlinear_FEA_2e.pdf",
+      "category": "source-pdf",
+      "priority": 2,
+      "pages": 527,
+      "summary": "Primary numerical source for linear buckling, arc length, stability, uniqueness and branch switching.",
+      "page_routes": [
+        {"topic": "linear buckling", "pdf_pages": "119-121"},
+        {"topic": "arc length and Riks", "pdf_pages": "134-146"},
+        {"topic": "stability bifurcation and branch switching", "pdf_pages": "147-152"}
+      ],
+      "keywords": ["linear buckling", "Riks", "arc length", "branch switching"]
+    },
+    {
+      "id": "B06",
+      "path": "05_参考资料/Timoshenko_Gere_Theory_of_Elastic_Stability.pdf",
+      "category": "source-pdf",
+      "priority": 3,
+      "pages": 437,
+      "summary": "Classical analytical and experimental context for plate and shell buckling.",
+      "page_routes": [
+        {"topic": "thin plates", "pdf_pages": "268-333"},
+        {"topic": "cylindrical and spherical shells", "pdf_pages": "347-406"}
+      ],
+      "keywords": ["classical stability", "plate buckling", "cylindrical shell", "spherical shell"]
+    },
+    {
+      "id": "B03",
+      "path": "05_参考资料/Chapelle_Bathe_FEA_of_Shells.pdf",
+      "category": "source-pdf",
+      "priority": 3,
+      "pages": 337,
+      "summary": "Advanced shell-model asymptotics, pure-bending subspaces and nonlinear shell-analysis context.",
+      "page_routes": [
+        {"topic": "shell thickness asymptotics and pure bending", "pdf_pages": "127-181"},
+        {"topic": "nonlinear shell analysis", "pdf_pages": "302-312"}
+      ],
+      "keywords": ["shell asymptotics", "pure bending", "locking", "nonlinear shell"]
+    },
+    {
+      "id": "M01",
+      "path": "06_来源映射/参考资料与范围映射.md",
+      "category": "provenance",
+      "priority": 2,
+      "summary": "Workspace origins, formula routes, new synthesis, exclusions and traceability rules.",
+      "keywords": ["provenance", "source mapping", "scope", "traceability"]
+    },
+    {
+      "id": "M02",
+      "path": "06_来源映射/P07_核心章节映射.jsonl",
+      "category": "machine-readable-source-map",
+      "priority": 2,
+      "summary": "Nineteen key P07 source routes with exact files, sections, PDF pages and topics.",
+      "keywords": ["JSONL", "P07", "chapter map", "PDF page"]
+    },
+    {
+      "id": "C00",
+      "path": "08_可复现脚本/README.md",
+      "category": "script-navigation",
+      "priority": 2,
+      "summary": "Script provenance, output-path warning and boundary between existing PDFs and new Markdown additions.",
+      "keywords": ["reproducibility", "script", "output path", "warning"]
+    },
+    {
+      "id": "C01",
+      "path": "08_可复现脚本/generate_shell_instability_research_pdf.py",
+      "category": "source-script",
+      "priority": 3,
+      "summary": "Copied generator for the 30-page shell-instability PDF.",
+      "keywords": ["ReportLab", "PDF generator", "shell instability"]
+    },
+    {
+      "id": "C02",
+      "path": "08_可复现脚本/generate_plate_shell_buckling_pdf.py",
+      "category": "source-script",
+      "priority": 3,
+      "summary": "Copied generator for the 19-page prerequisite buckling PDF.",
+      "keywords": ["ReportLab", "PDF generator", "plate shell buckling"]
+    },
+    {
+      "id": "C03",
+      "path": "09_Python数学核心/README.md",
+      "category": "executable-math-core-navigation",
+      "priority": 1,
+      "summary": "Python module routing, input-process-output contracts, execution commands and implementation boundaries.",
+      "keywords": ["Python", "math core", "validation", "NumPy", "scope"]
+    },
+    {
+      "id": "C04",
+      "path": "09_Python数学核心/run_validation_problems.py",
+      "category": "validation-runner",
+      "priority": 1,
+      "summary": "Executable V00-V10 calculations with numerical assertions and Markdown/JSON evidence generation.",
+      "keywords": ["Python", "V00-V10", "worked problems", "verification runner"]
+    },
+    {
+      "id": "C05",
+      "path": "09_Python数学核心/output/V00-V10_演算结果.md",
+      "category": "generated-validation-evidence",
+      "priority": 1,
+      "summary": "Human-readable worked calculations, residuals, errors, classifications and acceptance status for V00-V10.",
+      "keywords": ["PASS", "calculation", "residual", "error", "evidence"]
+    },
+    {
+      "id": "H01",
+      "path": "FILE_MANIFEST.sha256",
+      "category": "integrity-manifest",
+      "priority": 2,
+      "summary": "SHA-256 hashes for copied PDFs and generator scripts.",
+      "keywords": ["SHA-256", "integrity", "manifest", "copied artifact"]
+    }
+  ],
+  "verification_pairs": [
+    {"test_id": "V00", "question_document": "Q01", "solution_document": "S01", "topic": "consistent tangent directional derivative"},
+    {"test_id": "V01", "question_document": "Q01", "solution_document": "S01", "topic": "limit-point versus bifurcation classification"},
+    {"test_id": "V02", "question_document": "Q01", "solution_document": "S01", "topic": "two-DOF generalized eigenbuckling"},
+    {"test_id": "V03", "question_document": "Q01", "solution_document": "S01", "topic": "single-mode Koiter supercritical and subcritical branches"},
+    {"test_id": "V04", "question_document": "Q01", "solution_document": "S01", "topic": "two-mode interaction and mixed-branch stability"},
+    {"test_id": "V05", "question_document": "Q01", "solution_document": "S01", "topic": "Koiter two-thirds imperfection law"},
+    {"test_id": "V06", "question_document": "Q01", "solution_document": "S01", "topic": "spherical arc-length predictor corrector past a limit point"},
+    {"test_id": "V07", "question_document": "Q01", "solution_document": "S01", "topic": "branch-switching seed and full-order evidence"},
+    {"test_id": "V08", "question_document": "Q01", "solution_document": "S01", "topic": "axially compressed cylindrical-shell benchmark"},
+    {"test_id": "V09", "question_document": "Q01", "solution_document": "S01", "topic": "spherical-shell external-pressure benchmark"},
+    {"test_id": "V10", "question_document": "Q01", "solution_document": "S01", "topic": "end-to-end GNIA GMNIA research audit"}
+  ],
+  "routing": [
+    {"intent": "classify limit point or bifurcation", "read": ["G02", "A01", "Q01", "S01", "B04"], "tests": ["V01"]},
+    {"intent": "run linear shell buckling", "read": ["R01", "A01", "L01", "B04"], "tests": ["V00", "V02", "V08", "V09"]},
+    {"intent": "implement arc length", "read": ["A01", "L01", "R00", "B04"], "tests": ["V00", "V06"]},
+    {"intent": "analyze single-mode postbuckling", "read": ["A01", "R00", "B07"], "tests": ["V03", "V05"]},
+    {"intent": "analyze mode interaction", "read": ["A01", "L01", "B07", "Q01", "S01"], "tests": ["V04"]},
+    {"intent": "study imperfection sensitivity", "read": ["A01", "L01", "R00", "B07"], "tests": ["V05", "V10"]},
+    {"intent": "switch equilibrium branch", "read": ["A01", "L01", "B04"], "tests": ["V07", "V10"]},
+    {"intent": "execute the Python math core and worked validations", "read": ["C03", "A01", "L01", "V01"], "run": ["C04"], "evidence": ["C05"], "tests": ["V00", "V01", "V02", "V03", "V04", "V05", "V06", "V07", "V08", "V09", "V10"]},
+    {"intent": "plan 8 to 12 week research", "read": ["P01", "V01", "M01", "G03"]},
+    {"intent": "make engineering strength claim", "read": ["L01", "V01", "M01"], "tests": ["V10"], "warning": "This package does not supply design-code factors, experimental calibration or probabilistic reliability."}
+  ]
+}

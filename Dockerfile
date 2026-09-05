@@ -18,6 +18,12 @@ COPY pyproject.toml README.md MANIFEST.in ./
 COPY src ./src
 COPY frontend/dist ./frontend/dist
 COPY dependencies /tmp/dependencies
+COPY ["Step 2 Math Core/step2_math_core", "./Step 2 Math Core/step2_math_core"]
+COPY ["Step 2 Math Core/Plate-Shell-Buckling/Plate-Shell-Buckling/python_math_core/plate_shell_buckling_core", "./Step 2 Math Core/Plate-Shell-Buckling/Plate-Shell-Buckling/python_math_core/plate_shell_buckling_core"]
+COPY ["Step 2 Math Core/Shell-Instability-Research_Math-Core-Guide/Shell-Instability-Research_Math-Core-Guide/09_Python数学核心/src/shell_instability_math", "./Step 2 Math Core/Shell-Instability-Research_Math-Core-Guide/Shell-Instability-Research_Math-Core-Guide/09_Python数学核心/src/shell_instability_math"]
+COPY ["Step 2 Math Core/Shell-Instability-Research_Math-Core-Guide/Shell-Instability-Research_Math-Core-Guide/09_Python数学核心/run_validation_problems.py", "./Step 2 Math Core/Shell-Instability-Research_Math-Core-Guide/Shell-Instability-Research_Math-Core-Guide/09_Python数学核心/run_validation_problems.py"]
+COPY ["Step 2 Math Core/Constitutive Nonlinearity/Constitutive-Nonlinearity_Weeks10-14_Core-Guide/04_可复现算例/reference_material_point.py", "./Step 2 Math Core/Constitutive Nonlinearity/Constitutive-Nonlinearity_Weeks10-14_Core-Guide/04_可复现算例/reference_material_point.py"]
+COPY ["Step 2 Math Core/General Nonlinear Shell/4_General-Nonlinear-Shell_16-24周/08_Python数学核心/general_nonlinear_shell_math", "./Step 2 Math Core/General Nonlinear Shell/4_General-Nonlinear-Shell_16-24周/08_Python数学核心/general_nonlinear_shell_math"]
 
 RUN pip install --no-cache-dir \
         /tmp/dependencies/continuum \

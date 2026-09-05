@@ -1,0 +1,315 @@
+{
+  "schema_version": "1.0",
+  "package_id": "constitutive-nonlinearity-weeks-10-14-core-guide",
+  "package_title": "Constitutive Nonlinearity 第 10-14 周数学核心资料包",
+  "created_date": "2026-08-29",
+  "language": ["zh-CN", "en-technical-terms"],
+  "scope": {
+    "layer": "finite-element material point / Gauss point",
+    "canonical_model": "small-strain rate-independent associative J2 plasticity with linear isotropic hardening; one-dimensional linear combined hardening for cyclic verification",
+    "included": [
+      "small-strain additive elastoplastic state framework",
+      "trial committed rollback state protocol",
+      "one-dimensional backward-Euler return mapping",
+      "three-dimensional J2 radial return",
+      "consistent algorithmic tangent",
+      "plane-stress local constraint and Schur condensation",
+      "one-dimensional cyclic combined hardening",
+      "Voce nonlinear hardening local Newton example",
+      "verification V00 through V11 with paired answers",
+      "independent executable reference values"
+    ],
+    "excluded": [
+      "production finite-strain multiplicative plasticity",
+      "pressure-sensitive and non-associated plasticity",
+      "multi-surface corner active-set algorithms",
+      "three-dimensional Chaboche cyclic plasticity",
+      "viscoplasticity creep and rate effects",
+      "damage fracture and contact",
+      "softening regularization",
+      "temperature pore-pressure anisotropy and multiphysics",
+      "complete finite element solver or element library"
+    ]
+  },
+  "canonical_contract": {
+    "document_id": "A00",
+    "path": "01_核心算法/00_五周总览与材料接口.md",
+    "material_call": "update(total_strain_np1, committed_state, material, options) -> stress_np1, C_alg_np1, trial_state_np1, diagnostics",
+    "state_rule": "Every trial is recomputed from the same committed state; commit only after global convergence."
+  },
+  "canonical_invariants": [
+    "f_trial <= tolerance implies no plastic state update",
+    "Delta_gamma >= 0 on a plastic branch",
+    "alpha_np1 = alpha_n + Delta_gamma and alpha is nondecreasing",
+    "linear isotropic J2 uses denominator 3G + H_iso",
+    "J2 plastic strain increment is deviatoric",
+    "algorithmic tangent differentiates the implemented discrete stress update",
+    "plane stress solves sigma_zz = 0 and does not truncate a 3D stress afterward",
+    "rejected trial states never replace committed state"
+  ],
+  "default_reading_sequence": ["G02", "G01", "G04", "A00", "A10", "A11", "A12", "A13", "A14", "L01", "V01"],
+  "weeks": [
+    {
+      "week": 10,
+      "title": "状态变量与本构框架",
+      "document_ids": ["A00", "A10"],
+      "required_tests": ["V00", "V07"],
+      "source_routes": ["C01", "C02", "C03"]
+    },
+    {
+      "week": 11,
+      "title": "一维隐式塑性积分",
+      "document_ids": ["A11"],
+      "required_tests": ["V01", "V02", "V10"],
+      "source_routes": ["C04", "C05"]
+    },
+    {
+      "week": 12,
+      "title": "J2 径向返回",
+      "document_ids": ["A12"],
+      "required_tests": ["V03", "V04", "V05"],
+      "source_routes": ["C06"]
+    },
+    {
+      "week": 13,
+      "title": "一致切线与平面应力",
+      "document_ids": ["A13"],
+      "required_tests": ["V06", "V09", "V11"],
+      "source_routes": ["C07"]
+    },
+    {
+      "week": 14,
+      "title": "循环加载与组合硬化",
+      "document_ids": ["A14"],
+      "required_tests": ["V02", "V07", "V08"],
+      "source_routes": ["C03"]
+    }
+  ],
+  "documents": [
+    {
+      "id": "G00",
+      "path": "README.md",
+      "category": "navigation",
+      "priority": 1,
+      "summary": "Scope, five-week map, exclusions, shortest reading path and directory tree.",
+      "keywords": ["scope", "weeks 10-14", "constitutive nonlinearity"]
+    },
+    {
+      "id": "G01",
+      "path": "AI_USAGE.md",
+      "category": "ai-instructions",
+      "priority": 1,
+      "summary": "Task routing, canonical symbols, state contract, tensor/Voigt boundary and prohibited inference.",
+      "keywords": ["AI usage", "state contract", "Voigt", "consistent tangent"]
+    },
+    {
+      "id": "G02",
+      "path": "AGENTS.md",
+      "category": "agent-instructions",
+      "priority": 1,
+      "summary": "Folder-scoped rules for state safety, J2 convention, tangent claims and regression gates.",
+      "keywords": ["AGENTS", "commit rollback", "verification gate"]
+    },
+    {
+      "id": "G03",
+      "path": "CONTENT_INDEX.md",
+      "category": "human-readable-index",
+      "priority": 1,
+      "summary": "Human routing by file, week, problem, validation pair, source page and keyword.",
+      "keywords": ["content index", "routing", "source pages"]
+    },
+    {
+      "id": "G04",
+      "path": "AI_CONTENT_INDEX.json",
+      "category": "machine-readable-index",
+      "priority": 1,
+      "summary": "Machine-readable scope, invariants, document routes, week map and verification pairs.",
+      "keywords": ["JSON index", "machine routing", "verification pair"]
+    },
+    {
+      "id": "A00",
+      "path": "01_核心算法/00_五周总览与材料接口.md",
+      "category": "canonical-interface",
+      "priority": 1,
+      "summary": "Five-week dependency, material-point call, layer ownership, state transaction and implementation sequence.",
+      "keywords": ["material update", "trial state", "committed state", "diagnostics"]
+    },
+    {
+      "id": "A10",
+      "path": "01_核心算法/W10_状态变量与本构框架.md",
+      "category": "core-algorithm",
+      "priority": 1,
+      "week": 10,
+      "summary": "Small-strain elastoplastic split, yield/flow/hardening, KKT, internal variables, dissipation and state semantics.",
+      "keywords": ["additive split", "KKT", "state variable", "dissipation"]
+    },
+    {
+      "id": "A11",
+      "path": "01_核心算法/W11_一维隐式塑性积分.md",
+      "category": "core-algorithm",
+      "priority": 1,
+      "week": 11,
+      "summary": "One-dimensional backward-Euler predictor-corrector, closed-form combined hardening tangent and guarded nonlinear-hardening Newton.",
+      "keywords": ["backward Euler", "plastic corrector", "Delta gamma", "Voce"]
+    },
+    {
+      "id": "A12",
+      "path": "01_核心算法/W12_J2径向返回算法.md",
+      "category": "core-algorithm",
+      "priority": 1,
+      "week": 12,
+      "summary": "Tensor J2 trial state, radial return, 3G plus H denominator, state update, invariants and safeguards.",
+      "keywords": ["J2", "von Mises", "radial return", "3G plus H"]
+    },
+    {
+      "id": "A13",
+      "path": "01_核心算法/W13_一致切线与平面应力.md",
+      "category": "core-algorithm",
+      "priority": 1,
+      "week": 13,
+      "summary": "Discrete consistent tangent, finite-difference check, plane-strain/stress distinction, local sigma-zz solve and Schur condensation.",
+      "keywords": ["algorithmic tangent", "directional derivative", "plane stress", "Schur"]
+    },
+    {
+      "id": "A14",
+      "path": "01_核心算法/W14_循环加载与组合硬化.md",
+      "category": "core-algorithm",
+      "priority": 1,
+      "week": 14,
+      "summary": "One-dimensional combined hardening, reverse yield, Bauschinger mechanism, cyclic history fields and upgrade gates.",
+      "keywords": ["cyclic loading", "kinematic hardening", "backstress", "Bauschinger"]
+    },
+    {
+      "id": "L01",
+      "path": "02_算法局限/算法局限与升级边界.md",
+      "category": "limitations",
+      "priority": 1,
+      "summary": "Boundaries for strain range, pressure sensitivity, nonsmooth points, accuracy, plane stress, cyclic models, softening, locking, Voigt and state safety.",
+      "keywords": ["limitation", "finite strain", "softening", "volumetric locking", "Chaboche"]
+    },
+    {
+      "id": "Q01",
+      "path": "03_验证题目与答案/验证题目.md",
+      "category": "verification-questions",
+      "priority": 1,
+      "summary": "Independent V00-V11 problems covering elastic/plastic updates, J2, tangent, state, cyclic loading, plane stress and coupling.",
+      "keywords": ["verification question", "V00", "V11"]
+    },
+    {
+      "id": "S01",
+      "path": "03_验证题目与答案/配套答案.md",
+      "category": "verification-solutions",
+      "priority": 1,
+      "summary": "Paired derivations, numerical reference values and interpretation for V00-V11.",
+      "keywords": ["paired answer", "reference value", "yield residual"]
+    },
+    {
+      "id": "S02",
+      "path": "03_验证题目与答案/Python演算校验报告.md",
+      "category": "verification-report",
+      "priority": 1,
+      "summary": "Auditable Python execution report for V00-V11, including cyclic history and multi-step tangent errors.",
+      "keywords": ["Python report", "V00-V11", "PASS", "directional derivative"]
+    },
+    {
+      "id": "V01",
+      "path": "03_验证题目与答案/验证矩阵.md",
+      "category": "verification-plan",
+      "priority": 1,
+      "summary": "Layered test order, tolerances, change-to-regression map, metadata and merge gates.",
+      "keywords": ["test matrix", "tolerance", "regression", "merge gate"]
+    },
+    {
+      "id": "X00",
+      "path": "04_可复现算例/README.md",
+      "category": "executable-navigation",
+      "priority": 1,
+      "summary": "How to run and maintain the independent NumPy material-point reference.",
+      "keywords": ["reproduce", "NumPy", "reference check"]
+    },
+    {
+      "id": "X01",
+      "path": "04_可复现算例/reference_material_point.py",
+      "category": "executable-reference",
+      "priority": 1,
+      "summary": "Executable tensor J2, 1D combined hardening, plane stress, Voce and V00-V11 numerical checks.",
+      "keywords": ["reference implementation", "J2 update", "plane stress", "cyclic history"]
+    },
+    {
+      "id": "X02",
+      "path": "04_可复现算例/validate_package.py",
+      "category": "package-validator",
+      "priority": 1,
+      "summary": "Validates document routes, V00-V11 question-answer parity, C01-C12 source mappings, Markdown delimiters and all Python reference calculations.",
+      "keywords": ["package validation", "source routes", "question answer parity", "Python checks"]
+    },
+    {
+      "id": "R00",
+      "path": "05_参考资料/README.md",
+      "category": "reference-navigation",
+      "priority": 2,
+      "summary": "PDF page routes and usage boundaries for the two bundled source books.",
+      "keywords": ["reference route", "de Borst", "Bonet"]
+    },
+    {
+      "id": "R01",
+      "path": "05_参考资料/deBorst_et_al_2012_Nonlinear_FEA_2e.pdf",
+      "category": "source-pdf",
+      "priority": 3,
+      "summary": "Primary source for small-strain plasticity, hardening, integration, consistent tangent, multi-surface limits and locking.",
+      "page_routes": [
+        {"topic": "plasticity framework and hardening", "pdf_pages": "235-254"},
+        {"topic": "stress integration and radial return", "pdf_pages": "255-265"},
+        {"topic": "consistent tangent", "pdf_pages": "265-268"},
+        {"topic": "multi-surface and locking boundaries", "pdf_pages": "268-293"}
+      ],
+      "keywords": ["plasticity", "return mapping", "consistent tangent"]
+    },
+    {
+      "id": "R02",
+      "path": "05_参考资料/Bonet_et_al_2012_Worked_Examples_Nonlinear_Continuum.pdf",
+      "category": "source-pdf",
+      "priority": 3,
+      "summary": "Supplementary source for finite-strain multiplicative plasticity and dissipation examples, outside the canonical implementation.",
+      "page_routes": [
+        {"topic": "large elastoplastic deformation and multiplicative split", "pdf_pages": "105-109"},
+        {"topic": "finite-strain plastic dissipation", "pdf_pages": "109-110"}
+      ],
+      "keywords": ["finite strain", "F equals Fe Fp", "plastic dissipation"]
+    },
+    {
+      "id": "M01",
+      "path": "06_来源映射/公式与页码映射.md",
+      "category": "source-mapping",
+      "priority": 2,
+      "summary": "Human-readable mapping from canonical topics and limitations to complete source PDF pages.",
+      "keywords": ["source mapping", "formula provenance", "PDF page"]
+    },
+    {
+      "id": "M02",
+      "path": "06_来源映射/source_map.jsonl",
+      "category": "machine-source-mapping",
+      "priority": 2,
+      "summary": "Machine-readable C01-C12 source routes with canonical or excluded scope labels.",
+      "keywords": ["JSONL", "C01", "C12", "scope label"]
+    }
+  ],
+  "verification_pairs": [
+    {"test_id": "V00", "question_path": "03_验证题目与答案/验证题目.md", "answer_path": "03_验证题目与答案/配套答案.md", "topic": "elastic branch and virgin state"},
+    {"test_id": "V01", "question_path": "03_验证题目与答案/验证题目.md", "answer_path": "03_验证题目与答案/配套答案.md", "topic": "one-dimensional closed-form return"},
+    {"test_id": "V02", "question_path": "03_验证题目与答案/验证题目.md", "answer_path": "03_验证题目与答案/配套答案.md", "topic": "elastic unloading and state preservation"},
+    {"test_id": "V03", "question_path": "03_验证题目与答案/验证题目.md", "answer_path": "03_验证题目与答案/配套答案.md", "topic": "J2 hydrostatic invariance"},
+    {"test_id": "V04", "question_path": "03_验证题目与答案/验证题目.md", "answer_path": "03_验证题目与答案/配套答案.md", "topic": "three-dimensional J2 radial return"},
+    {"test_id": "V05", "question_path": "03_验证题目与答案/验证题目.md", "answer_path": "03_验证题目与答案/配套答案.md", "topic": "plastic incompressibility KKT and dissipation"},
+    {"test_id": "V06", "question_path": "03_验证题目与答案/验证题目.md", "answer_path": "03_验证题目与答案/配套答案.md", "topic": "consistent tangent directional derivative"},
+    {"test_id": "V07", "question_path": "03_验证题目与答案/验证题目.md", "answer_path": "03_验证题目与答案/配套答案.md", "topic": "trial rollback commit state transaction"},
+    {"test_id": "V08", "question_path": "03_验证题目与答案/验证题目.md", "answer_path": "03_验证题目与答案/配套答案.md", "topic": "cyclic combined hardening"},
+    {"test_id": "V09", "question_path": "03_验证题目与答案/验证题目.md", "answer_path": "03_验证题目与答案/配套答案.md", "topic": "plane-stress local constraint"},
+    {"test_id": "V10", "question_path": "03_验证题目与答案/验证题目.md", "answer_path": "03_验证题目与答案/配套答案.md", "topic": "Voce hardening local Newton"},
+    {"test_id": "V11", "question_path": "03_验证题目与答案/验证题目.md", "answer_path": "03_验证题目与答案/配套答案.md", "topic": "material and global Newton coupling"}
+  ],
+  "upstream_context": {
+    "optional_sibling_package": "../2D-Nonlinear-Project_Math-Core-Guide",
+    "relationship": "This package owns the material-point constitutive update; the sibling package owns global nonlinear equilibrium, control and solver transactions."
+  }
+}

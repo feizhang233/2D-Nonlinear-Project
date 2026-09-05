@@ -83,7 +83,7 @@ export type StudioAction =
   | { type: 'analysisProgressed'; family: ModelFamily; record: AnalysisRecord; revision: number }
   | { type: 'analysisSucceeded'; family: ModelFamily; record: AnalysisRecord; revision: number }
   | { type: 'analysisFailed'; family: ModelFamily; message: string; record?: AnalysisRecord | null; revision: number }
-  | { type: 'analysisCancelled'; family: ModelFamily }
+  | { type: 'analysisCancelled'; family: ModelFamily; record?: AnalysisRecord }
 
 const updateWorkspace = (
   state: StudioState,
@@ -192,10 +192,10 @@ export function studioReducer(state: StudioState, action: StudioAction): StudioS
         resultTab: 'monitor',
       }), 'results')
     case 'analysisProgressed':
-      if (action.revision !== workspace.modelRevision) return state
+      if (action.revision !== workspace.modelRevision || workspace.analysisState !== 'running') return state
       return updateWorkspace(state, family, (current) => ({ ...current, analysisState: 'running', record: action.record, error: null }))
     case 'analysisSucceeded':
-      if (action.revision !== workspace.modelRevision) return state
+      if (action.revision !== workspace.modelRevision || workspace.analysisState !== 'running') return state
       return updateWorkspace(state, family, (current) => ({
         ...current,
         analysisState: 'succeeded',
@@ -204,9 +204,9 @@ export function studioReducer(state: StudioState, action: StudioAction): StudioS
         selectedStep: Math.max(0, (action.record.result?.steps.length ?? 1) - 1),
         resultView: 'deformation',
         resultInvalidated: false,
-      }), 'results')
+      }), state.activeFamily === family ? 'results' : state.mode)
     case 'analysisFailed':
-      if (action.revision !== workspace.modelRevision) return state
+      if (action.revision !== workspace.modelRevision || workspace.analysisState !== 'running') return state
       return updateWorkspace(state, family, (current) => ({
         ...current,
         analysisState: 'failed',
@@ -215,8 +215,8 @@ export function studioReducer(state: StudioState, action: StudioAction): StudioS
         resultTab: 'failure',
         resultView: 'model',
         resultInvalidated: false,
-      }), 'results')
+      }), state.activeFamily === family ? 'results' : state.mode)
     case 'analysisCancelled':
-      return updateWorkspace(state, family, (current) => ({ ...current, analysisState: 'idle', record: null, error: null }))
+      return updateWorkspace(state, family, (current) => ({ ...current, analysisState: 'idle', record: action.record ?? null, resultView: 'model', error: null }), state.activeFamily === family && !action.record ? 'model' : state.mode)
   }
 }

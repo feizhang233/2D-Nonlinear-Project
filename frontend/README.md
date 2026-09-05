@@ -37,3 +37,30 @@ and exposes cooperative cancellation. It clears current results and restart stat
 model changes. Versioned restart bundles can be exported from terminal results and imported for a
 continued calculation. Arc-length convergence is labelled only as augmented-equilibrium
 convergence; the UI does not present it as a stability or branch-uniqueness result.
+
+The top-level `Math Core` tool opens a separate reference-operation dialog backed by
+`/api/v1/math-cores`. It exposes server-owned core/operation metadata, executable JSON
+examples, residual/state conventions, limits, and the stable response envelope. Running a
+reference operation never changes the active workspace, staged model, or Results evidence.
+
+
+## Workbench interaction
+
+The editor uses a left model navigator, a central drawing canvas, and a right
+Properties/Analysis inspector. The bottom Apply/Cancel bar commits staged changes.
+All four model families keep independent documents and results.
+
+- Wheel or +/− controls: zoom about the pointer or viewport center.
+- Fit model / F: fit the model to the current viewport.
+- Pan view, Alt + drag, or middle drag: move the view; canvas arrow keys also pan.
+- Escape: cancel a drag or leave pan/edit placement mode.
+- Node/sketch drag: preview while moving; stage one change on release.
+- Ctrl/Command + Enter: run/cancel only outside fields, menus, and dialogs.
+
+Generated surface mesh entities are inspectable but remain read-only. Import
+validates the model with the backend before replacing the current document.
+Requests distinguish schema/limit failures, invalid responses, timeouts, and
+cancellation; uncertain server completion is never automatically retried.
+
+See [the September 2026 audit](../FRONTEND_AUDIT_2026-09-05.md) for findings,
+fixes, verification, and remaining platform boundaries.
