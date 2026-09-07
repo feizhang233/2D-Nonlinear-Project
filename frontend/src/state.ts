@@ -1,3 +1,4 @@
+import type { WorkspaceArchive } from './projectFiles'
 import type {
   AnalysisRecord,
   AnalysisRestart,
@@ -74,6 +75,7 @@ export type StudioAction =
   | { type: 'draftApplied' }
   | { type: 'draftCancelled' }
   | { type: 'documentReplaced'; model: ModelInput; selection?: Selection; restart?: AnalysisRestart | null; runOptions?: RunOptions }
+  | { type: 'archiveRestored'; archive: WorkspaceArchive }
   | { type: 'selectionChanged'; selection: Selection }
   | { type: 'inspectorTabChanged'; tab: WorkspaceState['inspectorTab'] }
   | { type: 'resultTabChanged'; tab: ResultTab }
@@ -171,6 +173,17 @@ export function studioReducer(state: StudioState, action: StudioAction): StudioS
         mode: 'model',
         workspaces: { ...state.workspaces, [targetFamily]: nextTarget },
       }
+    }
+    case 'archiveRestored': {
+      const archive = action.archive
+      const record = archive.record
+      return updateWorkspace(state, family, (current) => ({
+        ...current, runOptions: archive.run_options, record,
+        analysisState: record?.status === 'succeeded' ? 'succeeded' : record?.status === 'failed' ? 'failed' : 'idle',
+        error: record?.error?.message ?? null, resultInvalidated: false,
+        selectedStep: Math.max(0, Math.min(archive.selected_step, (record?.result?.steps.length ?? 1) - 1)),
+        resultView: archive.result_view, resultTab: archive.result_tab,
+      }), record ? 'results' : 'model')
     }
     case 'selectionChanged':
       return updateWorkspace(state, family, (current) => ({ ...current, selection: action.selection, inspectorTab: 'properties' }))

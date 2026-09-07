@@ -51,7 +51,7 @@ Open in the browser:
 | Swagger UI | http://127.0.0.1:8000/docs |
 | Health | http://127.0.0.1:8000/health |
 
-> An account is not required for modeling, meshing, analysis, JSON import, or JSON export. Registration and login add a private, server-side model history. Guest models are not saved.
+> An account is not required for modeling, meshing, analysis, JSON import, or JSON export. Registration and login add a private, server-side model history. Guests can download model/result project files; account history requires sign-in.
 
 > **What you see first:** Nonlinear Studio opens with a shallow-arch Frame verification model. Frame, Continuum, Plate, and Shell are separate workspaces. Edit through the model tree, forms, or graphical canvas, then Apply or Cancel the staged changes before running the analysis. Completed solves open in the separate Results mode.
 
@@ -62,13 +62,14 @@ Open in the browser:
 | Area | What you get |
 | --- | --- |
 | Four model families | One workflow for nonlinear Frame, Continuum, Plate, and flat-Shell models |
+| Sections and member editing | Reusable custom/rectangle/circle/I/tube sections, assignments, keyboard deletion, and member splitting |
 | Visual modeling | Model tree and forms as the primary editor, graphical canvas editing, transactional Apply/Cancel, editable Frame topology, and visible read-only surface meshes |
 | Nonlinear solution | Full or modified Newton, load/displacement control, line search, adaptive stepping, cutback, and spherical arc length |
 | State safety | Trial, commit, rollback, restart, rejected-step history, and model provenance |
 | Meshing | Gmsh-backed all-Q4 remeshing for Continuum, Plate, and flat-Shell boundaries |
 | Distributed loads | Consistent member, edge, and surface load conversion for supported formulations |
 | Results | Deformation, reactions, element response, convergence history, failures, and load-displacement paths |
-| Identity and models | HttpOnly sessions, user-isolated SQLite history, and a no-save guest mode |
+| Projects and identity | Portable model/result project files for guests; HttpOnly sessions and private SQLite project snapshots |
 | API and scripting | Versioned validation, meshing, synchronous/asynchronous analysis, cancellation, and an importable Python core |
 | Step 2 Math Core | Bounded browser/API access to buckling, instability, constitutive, and general-shell reference operations |
 
@@ -186,6 +187,7 @@ The default synchronous API limit is 1 MiB per request and 10,000 degrees of fre
 | `GET` | `/health` | Service, version, execution modes, and limits |
 | `POST` | `/api/v1/models/validate` | Validate a versioned model and report execution eligibility |
 | `POST` | `/api/v1/meshes` | Generate a named-boundary Q4 surface mesh with Gmsh |
+| `POST` | `/api/v1/projects/validate` | Validate a portable model/result project before restoration (20 MiB archive limit) |
 | `GET` | `/api/v1/math-cores` | List Step 2 cores, operations, contracts, examples, and HTTP limits |
 | `GET` | `/api/v1/math-cores/{core_id}` | Read one Step 2 core contract |
 | `POST` | `/api/v1/math-cores/execute` | Execute one bounded reference operation through the stable envelope |

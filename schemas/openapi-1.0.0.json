@@ -1687,6 +1687,29 @@
         "title": "PostResult",
         "type": "object"
       },
+      "ProjectDocument": {
+        "additionalProperties": false,
+        "properties": {
+          "model": {
+            "$ref": "#/components/schemas/ModelInput"
+          },
+          "studio_project_version": {
+            "const": "1.0.0",
+            "title": "Studio Project Version",
+            "type": "string"
+          },
+          "workspace": {
+            "$ref": "#/components/schemas/WorkspaceArchive"
+          }
+        },
+        "required": [
+          "studio_project_version",
+          "model",
+          "workspace"
+        ],
+        "title": "ProjectDocument",
+        "type": "object"
+      },
       "RegisterRequest": {
         "additionalProperties": false,
         "properties": {
@@ -1789,6 +1812,25 @@
         "title": "ResultLocation",
         "type": "string"
       },
+      "RunOptions": {
+        "additionalProperties": false,
+        "properties": {
+          "numberOfSteps": {
+            "default": 10,
+            "maximum": 10000.0,
+            "minimum": 1.0,
+            "title": "Numberofsteps",
+            "type": "integer"
+          },
+          "targetLoadFactor": {
+            "default": 1.0,
+            "title": "Targetloadfactor",
+            "type": "number"
+          }
+        },
+        "title": "RunOptions",
+        "type": "object"
+      },
       "SavedModel": {
         "additionalProperties": false,
         "properties": {
@@ -1810,6 +1852,16 @@
             "format": "date-time",
             "title": "Saved At",
             "type": "string"
+          },
+          "workspace": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/WorkspaceArchive"
+              },
+              {
+                "type": "null"
+              }
+            ]
           }
         },
         "required": [
@@ -1833,6 +1885,16 @@
             "minLength": 1,
             "title": "Name",
             "type": "string"
+          },
+          "workspace": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/WorkspaceArchive"
+              },
+              {
+                "type": "null"
+              }
+            ]
           }
         },
         "required": [
@@ -2329,6 +2391,60 @@
           "type"
         ],
         "title": "ValidationError",
+        "type": "object"
+      },
+      "WorkspaceArchive": {
+        "additionalProperties": false,
+        "properties": {
+          "record": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/AnalysisRecord"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "result_tab": {
+            "default": "monitor",
+            "enum": [
+              "monitor",
+              "curves",
+              "tables",
+              "failure"
+            ],
+            "title": "Result Tab",
+            "type": "string"
+          },
+          "result_view": {
+            "default": "model",
+            "enum": [
+              "model",
+              "deformation",
+              "reactions",
+              "internal",
+              "moment",
+              "shear",
+              "axial"
+            ],
+            "title": "Result View",
+            "type": "string"
+          },
+          "run_options": {
+            "$ref": "#/components/schemas/RunOptions"
+          },
+          "selected_step": {
+            "default": 0,
+            "minimum": 0.0,
+            "title": "Selected Step",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "run_options"
+        ],
+        "title": "WorkspaceArchive",
         "type": "object"
       }
     }
@@ -3224,6 +3340,68 @@
           }
         },
         "summary": "Delete Saved Model",
+        "tags": [
+          "model history"
+        ]
+      }
+    },
+    "/api/v1/projects/validate": {
+      "post": {
+        "description": "Validate a portable model/result snapshot before restoring the workbench.",
+        "operationId": "validate_project_api_v1_projects_validate_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ProjectDocument"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProjectDocument"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "413": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorResponse"
+                }
+              }
+            },
+            "description": "Request Entity Too Large"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorResponse"
+                }
+              }
+            },
+            "description": "Unprocessable Entity"
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorResponse"
+                }
+              }
+            },
+            "description": "Internal Server Error"
+          }
+        },
+        "summary": "Validate Project",
         "tags": [
           "model history"
         ]

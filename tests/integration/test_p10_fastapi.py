@@ -50,6 +50,7 @@ def test_health_and_openapi_publish_only_the_planned_p10_paths():
         "/api/v1/auth/logout",
         "/api/v1/models",
         "/api/v1/models/validate",
+        "/api/v1/projects/validate",
         "/api/v1/models/{entry_id}",
         "/api/v1/math-cores",
         "/api/v1/math-cores/{core_id}",

@@ -1,294 +1,386 @@
+import ChevronRightRoundedIcon from '@mui/icons-material/ChevronRightRounded'
+import SettingsOutlinedIcon from '@mui/icons-material/SettingsOutlined'
 import AddRoundedIcon from '@mui/icons-material/AddRounded'
-import ArchitectureRoundedIcon from '@mui/icons-material/ArchitectureRounded'
-import ArrowDownwardRoundedIcon from '@mui/icons-material/ArrowDownwardRounded'
-import BlurOnRoundedIcon from '@mui/icons-material/BlurOnRounded'
-import CategoryRoundedIcon from '@mui/icons-material/CategoryRounded'
-import CheckCircleRoundedIcon from '@mui/icons-material/CheckCircleRounded'
+import CloseRoundedIcon from '@mui/icons-material/CloseRounded'
 import DeleteOutlineRoundedIcon from '@mui/icons-material/DeleteOutlineRounded'
-import ExpandMoreRoundedIcon from '@mui/icons-material/ExpandMoreRounded'
-import FolderOpenRoundedIcon from '@mui/icons-material/FolderOpenRounded'
-import GridOnRoundedIcon from '@mui/icons-material/GridOnRounded'
-import LockRoundedIcon from '@mui/icons-material/LockRounded'
-import Box from '@mui/material/Box'
-import Chip from '@mui/material/Chip'
-import Collapse from '@mui/material/Collapse'
-import Divider from '@mui/material/Divider'
-import IconButton from '@mui/material/IconButton'
-import List from '@mui/material/List'
-import ListItemButton from '@mui/material/ListItemButton'
-import ListItemIcon from '@mui/material/ListItemIcon'
-import ListItemText from '@mui/material/ListItemText'
-import Tooltip from '@mui/material/Tooltip'
-import Typography from '@mui/material/Typography'
-import { useEffect, useMemo, useState, type MouseEvent } from 'react'
-import type { EntityKind, ModelInput, Selection } from '../domain'
-import { entityDisplayLabel, loadDisplayLabel, modelDisplayLabel, supportDisplayLabel } from '../entityLabels'
-import { editablePlacementNodes, firstFreePlacementNodeId, isSurfaceFamily } from '../geometrySketch'
-import { meshStatusForModel } from '../meshing'
+import SearchRoundedIcon from '@mui/icons-material/SearchRounded'
+import {
+  Box,
+  Button,
+  IconButton,
+  InputAdornment,
+  Stack,
+  TextField,
+  Tooltip,
+  Typography,
+} from '@mui/material'
+import { useEffect, useRef, useState, type ReactNode } from 'react'
+import type {
+  EntityKind,
+  ModelInput,
+  Selection,
+  SelectionKind,
+} from '../domain'
+import { entityDisplayLabel } from '../entityLabels'
+import {
+  editablePlacementNodes,
+  firstFreePlacementNodeId,
+  isSurfaceFamily,
+} from '../geometrySketch'
 import { dofsForModel, MODEL_FAMILIES } from '../modelFamilies'
-import { addNodalLoadAtNode, addSupportAtNode, groupedSupports, nextPrefixedId } from '../supports'
+import { addSection, sectionLibrary } from '../sections'
+import { addSupportAtNode, nextPrefixedId } from '../supports'
 
-interface ModelNavigatorProps {
+const GROUPS: Array<{ kind: SelectionKind; label: string }> = [
+  { kind: 'geometry', label: 'Geometry' },
+  { kind: 'nodes', label: 'Nodes' },
+  { kind: 'elements', label: 'Elements' },
+  { kind: 'materials', label: 'Materials' },
+  { kind: 'sections', label: 'Sections' },
+  { kind: 'constraints', label: 'Supports' },
+  { kind: 'loads', label: 'Loads' },
+  { kind: 'mesh', label: 'Mesh' },
+]
+
+interface Props {
   model: ModelInput
   selection: Selection
   onSelection: (selection: Selection) => void
   onModelChange: (model: ModelInput, selection?: Selection) => void
-  onEntityDoubleClick?: () => void
+  onDelete: () => void
+  onInspectModel: () => void
+  onAddLoad: () => void
+  onDraw: (tool: 'add-node' | 'add-member') => void
+  children?: ReactNode
 }
 
-interface EntityDefinition {
-  kind: Exclude<EntityKind, 'model'>
-  label: string
-  description: string
-  section: 'setup' | 'topology'
-  icon: typeof BlurOnRoundedIcon
-}
-
-const definitions: EntityDefinition[] = [
-  { kind: 'materials', label: 'Materials', description: 'Constitutive models', section: 'setup', icon: CategoryRoundedIcon },
-  { kind: 'constraints', label: 'Supports', description: 'Boundary conditions', section: 'setup', icon: LockRoundedIcon },
-  { kind: 'loads', label: 'Loads', description: 'Nodal and distributed', section: 'setup', icon: ArrowDownwardRoundedIcon },
-  { kind: 'nodes', label: 'Nodes', description: 'Coordinates and DOFs', section: 'topology', icon: BlurOnRoundedIcon },
-  { kind: 'elements', label: 'Elements', description: 'Connectivity and formulation', section: 'topology', icon: ArchitectureRoundedIcon },
-]
-
-const idsFor = (model: ModelInput, kind: Exclude<EntityKind, 'model'>): string[] => model[kind].map((item) => item.id)
-
-export function ModelNavigator({ model, selection, onSelection, onModelChange, onEntityDoubleClick }: ModelNavigatorProps) {
-  const family = MODEL_FAMILIES[model.model_family]
-  const familyDofs = dofsForModel(model)
-  const [openGroups, setOpenGroups] = useState<Record<string, boolean>>({})
-  const supports = useMemo(() => groupedSupports(model, familyDofs), [model, familyDofs])
-  const meshStatus = meshStatusForModel(model)
-  const surfaceTopologyReadOnly = isSurfaceFamily(model)
-  const meshDescription = model.model_family === 'frame'
-    ? `Line topology · ${meshStatus.nodeCount} nodes · ${meshStatus.elementCount} elements`
-    : `${meshStatus.sourceLabel} · ${meshStatus.nodeCount} nodes · ${meshStatus.elementCount} Q4`
-
+export function ModelNavigator({
+  model,
+  selection,
+  onSelection,
+  onModelChange,
+  onDelete,
+  onDraw,
+  onAddLoad,
+  onInspectModel,
+  children,
+}: Props) {
+  const [query, setQuery] = useState('')
+  const [visible, setVisible] = useState(60)
+  const searchRef = useRef<HTMLInputElement>(null)
   useEffect(() => {
-    const selected = document.querySelector('[data-selected-entity="true"]')
-    if (selected && 'scrollIntoView' in selected && typeof selected.scrollIntoView === 'function') {
-      selected.scrollIntoView({ block: 'nearest' })
-    }
-  }, [selection])
+    setQuery('')
+    setVisible(60)
+  }, [selection.kind, model.model_id])
+  const count = (kind: SelectionKind): number | undefined => {
+    if (kind === 'sections') return sectionLibrary(model).definitions.length
+    if (kind === 'constraints')
+      return new Set(model.constraints.map((item) => item.node_id)).size
+    if (kind === 'geometry' || kind === 'mesh' || kind === 'model')
+      return undefined
+    return model[kind].length
+  }
+  const kind = selection.kind
+  const group = GROUPS.find((item) => item.kind === kind)
+  const items =
+    kind === 'sections'
+      ? sectionLibrary(model).definitions.map((s) => ({
+          id: s.id,
+          label: s.name,
+        }))
+      : kind === 'model' || kind === 'geometry' || kind === 'mesh'
+        ? []
+        : (kind === 'constraints'
+            ? [...new Set(model.constraints.map((item) => item.node_id))]
+            : model[kind].map((item) => item.id)
+          ).map((id) => ({
+            id,
+            label: entityDisplayLabel(
+              model,
+              kind as Exclude<EntityKind, 'model'>,
+              id,
+            ),
+          }))
+  const filtered = items.filter((item) =>
+    `${item.label} ${item.id}`.toLowerCase().includes(query.toLowerCase()),
+  )
+  const selectedIndex = filtered.findIndex((item) => item.id === selection.id)
+  const displayed = filtered.slice(0, Math.max(visible, selectedIndex + 1))
+  const readonly =
+    isSurfaceFamily(model) && (kind === 'nodes' || kind === 'elements')
+  const noAdd =
+    readonly ||
+    !group ||
+    kind === 'geometry' ||
+    kind === 'mesh' ||
+    (kind === 'elements' && !model.materials.length) ||
+    (kind === 'constraints' && !firstFreePlacementNodeId(model)) ||
+    (kind === 'loads' && !editablePlacementNodes(model).length)
 
-  const add = (kind: EntityKind) => {
+  const add = () => {
+    const family = MODEL_FAMILIES[model.model_family]
     const next = structuredClone(model)
-    if (kind === 'nodes') {
-      const id = nextPrefixedId('N', next.nodes.map((item) => item.id))
-      next.nodes.push({ id, coordinates: model.model_family === 'shell' ? [0, 0, 0] : [0, 0] })
-      onModelChange(next, { kind, id })
-    } else if (kind === 'elements') {
-      const id = nextPrefixedId('E', next.elements.map((item) => item.id))
-      next.elements.push({
-        id,
-        formulation: family.formulation,
-        node_ids: next.nodes.slice(0, family.elementNodeCount).map((item) => item.id),
-        material_id: next.materials[0]?.id ?? '',
-        properties: structuredClone(family.defaultElementProperties),
-      })
-      onModelChange(next, { kind, id })
-    } else if (kind === 'materials') {
-      const id = nextPrefixedId('M', next.materials.map((item) => item.id))
-      next.materials.push({ id, model: family.defaultMaterial.model, parameters: structuredClone(family.defaultMaterial.parameters) })
-      onModelChange(next, { kind, id })
-    } else if (kind === 'constraints') {
-      const nodeId = firstFreePlacementNodeId(next)
-      if (!nodeId) return
-      onModelChange(addSupportAtNode(next, nodeId, familyDofs), { kind, id: nodeId })
-    } else if (kind === 'loads') {
-      const nodeId = editablePlacementNodes(next)[0]?.id ?? next.nodes[0]?.id ?? ''
-      const added = addNodalLoadAtNode(next, nodeId, family.primaryLoadDof, family.primaryLoadDof === 'UX' ? 1 : -1)
+    if (kind === 'sections') {
+      const added = addSection(model)
       onModelChange(added.model, { kind, id: added.id })
     }
-    setOpenGroups((current) => ({ ...current, [kind]: true }))
-  }
-
-  const removeLoad = (id: string) => {
-    const next = structuredClone(model)
-    next.loads = next.loads.filter((item) => item.id !== id)
-    onModelChange(next, { kind: 'loads' })
-  }
-
-  const removeSupport = (nodeId: string) => {
-    const next = structuredClone(model)
-    next.constraints = next.constraints.filter((item) => item.node_id !== nodeId)
-    onModelChange(next, { kind: 'constraints' })
-  }
-
-  const groups = useMemo(() => definitions.map((definition) => {
-    const ids = idsFor(model, definition.kind)
-    return {
-      ...definition,
-      ids,
-      visibleIds: ids,
-      readOnly: surfaceTopologyReadOnly && (definition.kind === 'nodes' || definition.kind === 'elements'),
-      supportGroups: definition.kind === 'constraints' ? supports.groups : [],
+    if (kind === 'nodes') onDraw('add-node')
+    if (kind === 'elements') onDraw('add-member')
+    if (kind === 'materials') {
+      const id = nextPrefixedId(
+        'M',
+        next.materials.map((item) => item.id),
+      )
+      next.materials.push({
+        id,
+        model: family.defaultMaterial.model,
+        parameters: structuredClone(family.defaultMaterial.parameters),
+      })
+      onModelChange(next, { kind, id })
     }
-  }), [model, supports.groups, surfaceTopologyReadOnly])
-
-  const handleEntityDoubleClick = (event: MouseEvent<HTMLElement>) => {
-    if ((event.target as HTMLElement).closest('[data-navigator-action="true"]')) return
-    onEntityDoubleClick?.()
+    if (kind === 'constraints') {
+      const id = firstFreePlacementNodeId(model)
+      if (id)
+        onModelChange(addSupportAtNode(model, id, dofsForModel(model)), {
+          kind,
+          id,
+        })
+    }
+    if (kind === 'loads') onAddLoad()
   }
-
-  const renderGroup = ({ kind, label, description, icon: Icon, ids, visibleIds, readOnly, supportGroups }: typeof groups[number]) => {
-    const active = selection.kind === kind
-    const open = kind in openGroups ? Boolean(openGroups[kind]) : active
-    const count = kind === 'constraints' ? supports.nodeCount : ids.length
-    const placementCount = editablePlacementNodes(model).length
-    const addDisabled = (kind === 'nodes' && surfaceTopologyReadOnly)
-      || (kind === 'elements' && (surfaceTopologyReadOnly || model.nodes.length < family.elementNodeCount))
-      || (kind === 'constraints' && (placementCount === 0 || !firstFreePlacementNodeId(model)))
-      || (kind === 'loads' && placementCount === 0)
-
-    return (
-      <Box key={kind} sx={{ mt: 0.5 }}>
-        <ListItemButton
-          selected={active && !selection.id}
-          onDoubleClick={handleEntityDoubleClick}
-          onClick={() => {
-            onSelection({ kind })
-            setOpenGroups((current) => ({ ...current, [kind]: true }))
-          }}
-          sx={{ minHeight: 52, '&.Mui-selected::before': { content: '""', position: 'absolute', left: 0, top: 8, bottom: 8, width: 3, bgcolor: 'primary.main', borderRadius: '0 3px 3px 0' } }}
-        >
-          <ListItemIcon><Icon fontSize="small" /></ListItemIcon>
-          <ListItemText
-            primary={label}
-            secondary={readOnly ? 'Visible read-only mesh entities' : description}
-            slotProps={{ primary: { sx: { fontWeight: 600 } }, secondary: { variant: 'caption', noWrap: true } }}
-          />
-          <Chip label={count} size="small" variant="outlined" sx={{ height: 22, mr: 0.25 }} />
-          <Tooltip title={kind === 'constraints' && addDisabled && model.nodes.length ? 'Every node already has a support' : `Add ${label.toLowerCase()}`}>
-            <span>
-              <IconButton
-                data-navigator-action="true"
-                size="small"
-                aria-label={`Add ${label.toLowerCase()}`}
-                disabled={addDisabled}
-                onClick={(event) => { event.stopPropagation(); add(kind) }}
-              >
-                <AddRoundedIcon fontSize="small" />
-              </IconButton>
-            </span>
-          </Tooltip>
+  return (
+    <Stack sx={{ height: '100%', minHeight: 0 }}>
+      <Stack
+        direction="row"
+        sx={{
+          height: 52,
+          px: 2,
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          flexShrink: 0,
+        }}
+      >
+        <Typography variant="subtitle2" sx={{ fontWeight: 600 }}>
+          Model
+        </Typography>
+        <Tooltip title="Model name and units">
           <IconButton
-            data-navigator-action="true"
             size="small"
-            aria-label={open ? `Collapse ${label.toLowerCase()}` : `Expand ${label.toLowerCase()}`}
-            onClick={(event) => {
-              event.stopPropagation()
-              setOpenGroups((current) => ({ ...current, [kind]: !open }))
-            }}
+            aria-label="Model information"
+            onClick={onInspectModel}
           >
-            <ExpandMoreRoundedIcon sx={{ fontSize: 20, transform: open ? 'rotate(180deg)' : undefined, transition: 'transform .18s' }} />
+            <SettingsOutlinedIcon sx={{ fontSize: 17 }} />
           </IconButton>
-        </ListItemButton>
-        <Collapse in={open} timeout={180} unmountOnExit>
-          {kind === 'constraints' ? (
-            supportGroups.length === 0 ? (
-              <Typography variant="caption" color="text.secondary" sx={{ display: 'block', pl: 6, py: 0.75 }}>No supports yet</Typography>
-            ) : supportGroups.map((group) => (
-              <Box key={group.class} sx={{ pt: 0.25 }}>
-                <Typography variant="caption" color="text.secondary" sx={{ display: 'block', pl: 6, py: 0.5, fontWeight: 600 }}>
-                  {group.label}
-                </Typography>
-                {group.items.map((item) => (
-                  <ListItemButton
-                    key={item.nodeId}
-                    selected={selection.kind === 'constraints' && selection.id === item.nodeId}
-                    data-selected-entity={selection.kind === 'constraints' && selection.id === item.nodeId ? 'true' : undefined}
-                    onClick={() => onSelection({ kind: 'constraints', id: item.nodeId })}
-                    onDoubleClick={handleEntityDoubleClick}
-                    sx={{ pl: 6, minHeight: 36, pr: 0.5 }}
-                  >
-                    <ListItemText
-                      primary={supportDisplayLabel(model, item.nodeId)}
-                      secondary={item.dofs.join(' · ')}
+        </Tooltip>
+      </Stack>
+      <Box sx={{ flex: 1, minHeight: 0, overflow: 'auto', px: 1, pb: 2 }}>
+        {GROUPS.map((item) => (
+          <Box key={item.kind}>
+            <Button
+              fullWidth
+              aria-label={
+                item.kind === 'mesh'
+                  ? 'Open mesh settings'
+                  : `Browse ${item.label.toLowerCase()}`
+              }
+              aria-expanded={kind === item.kind}
+              aria-pressed={kind === item.kind}
+              onClick={() =>
+                onSelection({ kind: kind === item.kind ? 'model' : item.kind })
+              }
+              sx={{
+                justifyContent: 'flex-start',
+                height: 38,
+                px: 1,
+                gap: 1,
+                color: kind === item.kind ? 'primary.main' : 'text.primary',
+                bgcolor: kind === item.kind ? 'action.selected' : 'transparent',
+                fontSize: 13,
+              }}
+            >
+              <ChevronRightRoundedIcon
+                sx={{
+                  fontSize: 16,
+                  color: 'text.secondary',
+                  transform: kind === item.kind ? 'rotate(90deg)' : 'none',
+                }}
+              />
+              {item.label}
+              <Typography
+                component="span"
+                variant="caption"
+                color="text.secondary"
+                sx={{ ml: 'auto', fontVariantNumeric: 'tabular-nums' }}
+              >
+                {count(item.kind)}
+              </Typography>
+            </Button>
+            {kind === item.kind &&
+              (kind === 'geometry' ? (
+                <Box sx={{ mt: 1 }}>{children}</Box>
+              ) : (
+                <Box sx={{ pt: 0.5, pb: 1, pl: 1.75 }}>
+                  {!['mesh', 'geometry'].includes(kind) && (
+                    <Button
+                      size="small"
+                      startIcon={<AddRoundedIcon />}
+                      disabled={noAdd}
+                      onClick={add}
+                      aria-label={`Add ${item.label.toLowerCase()}`}
+                      sx={{ justifyContent: 'flex-start', mb: 0.5 }}
+                    >
+                      New{' '}
+                      {kind === 'constraints'
+                        ? 'support'
+                        : kind === 'elements'
+                          ? 'member'
+                          : item.label.toLowerCase().slice(0, -1)}
+                    </Button>
+                  )}
+                  {(items.length > 8 || query) && (
+                    <TextField
+                      inputRef={searchRef}
+                      label={`Find ${item.label.toLowerCase()}`}
+                      value={query}
+                      onChange={(event) => {
+                        setQuery(event.target.value)
+                        setVisible(60)
+                      }}
+                      sx={{ mb: 1, mr: 1 }}
                       slotProps={{
-                        primary: { variant: 'body2', sx: { fontFamily: 'ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace' } },
-                        secondary: { variant: 'caption' },
+                        input: {
+                          startAdornment: (
+                            <InputAdornment position="start">
+                              <SearchRoundedIcon fontSize="small" />
+                            </InputAdornment>
+                          ),
+                          endAdornment: query && (
+                            <InputAdornment position="end">
+                              <IconButton
+                                size="small"
+                                aria-label="Clear entity search"
+                                onClick={() => {
+                                  setQuery('')
+                                  searchRef.current?.focus()
+                                }}
+                              >
+                                <CloseRoundedIcon fontSize="small" />
+                              </IconButton>
+                            </InputAdornment>
+                          ),
+                        },
                       }}
                     />
-                    <Tooltip title={`Delete ${supportDisplayLabel(model, item.nodeId)}`}>
-                      <IconButton data-navigator-action="true" size="small" aria-label={`Delete ${supportDisplayLabel(model, item.nodeId)}`} onClick={(event) => { event.stopPropagation(); removeSupport(item.nodeId) }}>
-                        <DeleteOutlineRoundedIcon fontSize="small" />
-                      </IconButton>
-                    </Tooltip>
-                  </ListItemButton>
-                ))}
-              </Box>
-            ))
-          ) : visibleIds.length === 0 ? (
-            <Typography variant="caption" color="text.secondary" sx={{ display: 'block', pl: 6, py: 0.75 }}>
-              No {label.toLowerCase()} yet
-            </Typography>
-          ) : visibleIds.map((id) => (
-            <ListItemButton
-              key={id}
-              selected={selection.kind === kind && selection.id === id}
-              data-selected-entity={selection.kind === kind && selection.id === id ? 'true' : undefined}
-              onClick={() => onSelection({ kind, id })}
-              onDoubleClick={handleEntityDoubleClick}
-              sx={{ pl: 6, minHeight: 34, pr: 0.5 }}
-            >
-              <ListItemText primary={entityDisplayLabel(model, kind, id)} slotProps={{ primary: { variant: 'body2' } }} />
-              {readOnly && <LockRoundedIcon aria-label="Read-only mesh entity" sx={{ fontSize: 15, color: 'text.disabled', mr: 0.75 }} />}
-              {kind === 'loads' && (
-                <Tooltip title={`Delete ${loadDisplayLabel(model, id)}`}>
-                  <IconButton data-navigator-action="true" size="small" aria-label={`Delete ${loadDisplayLabel(model, id)}`} onClick={(event) => { event.stopPropagation(); removeLoad(id) }}>
-                    <DeleteOutlineRoundedIcon fontSize="small" />
-                  </IconButton>
-                </Tooltip>
-              )}
-            </ListItemButton>
-          ))}
-        </Collapse>
+                  )}
+                  {displayed.map((entry) => (
+                    <Button
+                      key={entry.id}
+                      aria-label={`Select ${entry.label}`}
+                      aria-pressed={selection.id === entry.id}
+                      onClick={() => onSelection({ kind, id: entry.id })}
+                      sx={{
+                        width: '100%',
+                        justifyContent: 'flex-start',
+                        textAlign: 'left',
+                        px: 1.5,
+                        minHeight: 32,
+                        color:
+                          selection.id === entry.id
+                            ? 'primary.main'
+                            : 'text.secondary',
+                        bgcolor:
+                          selection.id === entry.id
+                            ? 'action.selected'
+                            : 'transparent',
+                        borderLeft: '2px solid',
+                        borderLeftColor:
+                          selection.id === entry.id
+                            ? 'primary.main'
+                            : 'divider',
+                        borderRadius: 0,
+                        overflowWrap: 'anywhere',
+                      }}
+                    >
+                      <Typography
+                        variant="body2"
+                        sx={{
+                          fontWeight: selection.id === entry.id ? 600 : 400,
+                        }}
+                      >
+                        {entry.label}
+                      </Typography>
+                    </Button>
+                  ))}
+                  {!displayed.length && !['model', 'mesh'].includes(kind) && (
+                    <Typography
+                      variant="caption"
+                      color="text.secondary"
+                      sx={{ display: 'block', px: 1, py: 1 }}
+                    >
+                      {query
+                        ? 'No matching items. Clear the search to see all items.'
+                        : `No ${item.label.toLowerCase()} yet.`}
+                    </Typography>
+                  )}
+                  {kind === 'mesh' && (
+                    <Typography
+                      variant="caption"
+                      color="text.secondary"
+                      sx={{ display: 'block', px: 1, py: 1 }}
+                    >
+                      Mesh settings are open in Properties.
+                    </Typography>
+                  )}
+                  {filtered.length > displayed.length && (
+                    <Button
+                      size="small"
+                      fullWidth
+                      onClick={() => setVisible((n) => n + 60)}
+                    >
+                      Show 60 more · {filtered.length} total
+                    </Button>
+                  )}
+                </Box>
+              ))}
+          </Box>
+        ))}
       </Box>
-    )
-  }
-
-  return (
-    <Box sx={{ height: '100%', overflow: 'auto', display: 'flex', flexDirection: 'column', scrollbarGutter: 'stable' }}>
-      <List dense disablePadding sx={{ px: 0.75, py: 1.5 }}>
-        <Typography variant="overline" color="text.secondary" sx={{ display: 'block', px: 1.25, pb: 0.5 }}>Setup</Typography>
-        <ListItemButton
-          selected={selection.kind === 'model'}
-          data-selected-entity={selection.kind === 'model' ? 'true' : undefined}
-          onClick={() => onSelection({ kind: 'model' })}
-          onDoubleClick={handleEntityDoubleClick}
-          sx={{ minHeight: 52, '&.Mui-selected::before': { content: '""', position: 'absolute', left: 0, top: 8, bottom: 8, width: 3, bgcolor: 'primary.main', borderRadius: '0 3px 3px 0' } }}
+      {selection.id && !['geometry', 'mesh', 'model'].includes(kind) && (
+        <Box
+          sx={{
+            borderTop: '1px solid',
+            borderColor: 'divider',
+            px: 2,
+            py: 0.5,
+          }}
         >
-          <ListItemIcon><FolderOpenRoundedIcon fontSize="small" /></ListItemIcon>
-          <ListItemText
-            primary="Model information"
-            secondary={modelDisplayLabel()}
-            slotProps={{ primary: { sx: { fontWeight: 600 } }, secondary: { variant: 'caption', noWrap: true } }}
-          />
-        </ListItemButton>
-        {groups.filter((group) => group.section === 'setup').map(renderGroup)}
-
-        <Divider sx={{ my: 1.25 }} />
-        <Typography variant="overline" color="text.secondary" sx={{ display: 'block', px: 1.25, pb: 0.5 }}>Topology</Typography>
-        <ListItemButton
-          selected={selection.kind === 'mesh'}
-          data-selected-entity={selection.kind === 'mesh' ? 'true' : undefined}
-          aria-label="Open mesh settings"
-          onClick={() => onSelection({ kind: 'mesh' })}
-          onDoubleClick={handleEntityDoubleClick}
-          sx={{ minHeight: 54, '&.Mui-selected::before': { content: '""', position: 'absolute', left: 0, top: 8, bottom: 8, width: 3, bgcolor: 'primary.main', borderRadius: '0 3px 3px 0' } }}
-        >
-          <ListItemIcon><GridOnRoundedIcon fontSize="small" /></ListItemIcon>
-          <ListItemText
-            primary="Mesh"
-            secondary={meshDescription}
-            slotProps={{ primary: { sx: { fontWeight: 600 } }, secondary: { variant: 'caption', noWrap: true } }}
-          />
-          {meshStatus.generatedByGmsh && <CheckCircleRoundedIcon color="success" sx={{ fontSize: 18, mr: 1 }} />}
-        </ListItemButton>
-        {groups.filter((group) => group.section === 'topology').map(renderGroup)}
-      </List>
-    </Box>
+          <Button
+            size="small"
+            startIcon={<DeleteOutlineRoundedIcon />}
+            color="error"
+            disabled={readonly}
+            onClick={onDelete}
+          >
+            Delete selected
+          </Button>
+          {readonly && (
+            <Typography
+              variant="caption"
+              color="text.secondary"
+              sx={{ display: 'block' }}
+            >
+              Generated topology · read-only
+            </Typography>
+          )}
+        </Box>
+      )}
+      <Typography
+        variant="caption"
+        color="text.secondary"
+        sx={{ px: 2, py: 1.25, borderTop: '1px solid', borderColor: 'divider' }}
+      >
+        {model.nodes.length} nodes · {model.elements.length} elements
+      </Typography>
+    </Stack>
   )
 }

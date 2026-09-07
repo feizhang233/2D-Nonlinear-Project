@@ -238,9 +238,9 @@ export interface AnalysisRecord {
 }
 
 export type EntityKind = 'model' | 'nodes' | 'elements' | 'materials' | 'constraints' | 'loads'
-export type SelectionKind = EntityKind | 'mesh' | 'geometry'
+export type SelectionKind = EntityKind | 'mesh' | 'geometry' | 'sections'
 export interface Selection { kind: SelectionKind; id?: string }
-export type ResultView = 'model' | 'deformation' | 'reactions' | 'internal'
+export type ResultView = 'model' | 'deformation' | 'reactions' | 'internal' | 'moment' | 'shear' | 'axial'
 export type ResultTab = 'monitor' | 'curves' | 'tables' | 'failure'
 
 export interface RunOptions {
@@ -261,6 +261,7 @@ export interface SessionResponse {
 }
 
 export interface SavedModel {
+  workspace?: import('./projectFiles').WorkspaceArchive | null
   id: string
   name: string
   model_family: ModelFamily

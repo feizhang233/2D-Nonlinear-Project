@@ -26,6 +26,15 @@ class RequestSizeLimitMiddleware:
             await self.app(scope, receive, send)
             return
 
+        # Result archives can exceed model submission limits; solver inputs keep their bound.
+        request_limit = (
+            max(self.max_request_bytes, 20 * 1024 * 1024)
+            if (
+                scope.get("method") == "POST"
+                and scope.get("path") in {"/api/v1/projects/validate", "/api/v1/models"}
+            )
+            else self.max_request_bytes
+        )
         headers = {key.lower(): value for key, value in scope.get("headers", [])}
         content_length = headers.get(b"content-length")
         if content_length is not None:
@@ -33,8 +42,8 @@ class RequestSizeLimitMiddleware:
                 declared_size = int(content_length)
             except ValueError:
                 declared_size = 0
-            if declared_size > self.max_request_bytes:
-                await self._reject(scope, receive, send, declared_size)
+            if declared_size > request_limit:
+                await self._reject(scope, receive, send, declared_size, request_limit)
                 return
 
         received_size = 0
@@ -45,7 +54,7 @@ class RequestSizeLimitMiddleware:
             message = await receive()
             if message["type"] == "http.request":
                 received_size += len(message.get("body", b""))
-                if received_size > self.max_request_bytes:
+                if received_size > request_limit:
                     raise _RequestTooLarge
             return message
 
@@ -60,7 +69,7 @@ class RequestSizeLimitMiddleware:
         except _RequestTooLarge:
             if response_started:
                 raise
-            await self._reject(scope, receive, send, received_size)
+            await self._reject(scope, receive, send, received_size, request_limit)
 
     async def _reject(
         self,
@@ -68,18 +77,17 @@ class RequestSizeLimitMiddleware:
         receive: Receive,
         send: Send,
         actual_size: int,
+        request_limit: int,
     ) -> None:
         payload = ApiErrorResponse(
             error=ApiErrorDetail(
                 category=ApiErrorCategory.INPUT,
                 code="REQUEST_TOO_LARGE",
-                message=(
-                    f"request body exceeds the {self.max_request_bytes}-byte synchronous API limit"
-                ),
+                message=(f"request body exceeds the {request_limit}-byte API limit"),
                 location="$.body",
                 details={
                     "actual_or_declared_bytes": actual_size,
-                    "max_request_bytes": self.max_request_bytes,
+                    "max_request_bytes": request_limit,
                 },
             )
         )

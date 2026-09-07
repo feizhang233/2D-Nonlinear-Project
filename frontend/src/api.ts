@@ -1,3 +1,4 @@
+import type { ProjectDocument, WorkspaceArchive } from './projectFiles'
 import type {
   AnalysisRecord,
   AnalysisRestart,
@@ -86,9 +87,9 @@ export function listSavedModels(signal?: AbortSignal) {
   return requestJson<SavedModel[]>('/api/v1/models', { method: 'GET', signal })
 }
 
-export function saveModelSnapshot(model: ModelInput, name: string, signal?: AbortSignal) {
+export function saveModelSnapshot(model: ModelInput, name: string, signal?: AbortSignal, workspace?: WorkspaceArchive) {
   return requestJson<SavedModel>('/api/v1/models', {
-    method: 'POST', body: JSON.stringify({ name, model }), signal,
+    method: 'POST', body: JSON.stringify({ name, model, ...(workspace ? { workspace } : {}) }), signal,
   })
 }
 
@@ -143,4 +144,8 @@ export function executeMathCore(payload: MathCoreRequest, signal?: AbortSignal) 
   return requestJson<MathCoreResponse>('/api/v1/math-cores/execute', {
     method: 'POST', body: JSON.stringify(payload), signal,
   })
+}
+
+export function validateProject(project: ProjectDocument, signal?: AbortSignal) {
+  return requestJson<ProjectDocument>('/api/v1/projects/validate', { method: 'POST', body: JSON.stringify(project), signal })
 }

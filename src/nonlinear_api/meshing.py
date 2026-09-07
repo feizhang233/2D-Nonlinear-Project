@@ -12,6 +12,7 @@ from threading import RLock
 import gmsh
 import numpy as np
 
+from nonlinear_api.cad_geometry import validate_geometry
 from nonlinear_api.schemas import (
     MeshBoundary,
     MeshBoundarySegment,
@@ -224,6 +225,13 @@ def _edge_distance(point: np.ndarray, start: np.ndarray, end: np.ndarray) -> tup
 def _generate_surface_mesh_serialized(request: SurfaceMeshRequest) -> SurfaceMeshResponse:
     """Generate one first-order all-Q4 mesh on the dedicated Gmsh thread."""
 
+    if request.model.model_family not in _SURFACE_FAMILIES:
+        raise SurfaceMeshError("Gmsh surface meshing requires Continuum, Plate, or Shell")
+    geometry = (request.model.extensions or {}).get("geometry")
+    try:
+        circles = validate_geometry(geometry) if geometry is not None else {}
+    except (ValueError, TypeError, KeyError, AttributeError) as exc:
+        raise SurfaceMeshError(f"Invalid CAD geometry: {exc}") from exc
     sketch_loops = _sketch_loops(request.model)
     boundary_loops = sketch_loops if sketch_loops is not None else [_surface_boundary(request)]
     boundary = boundary_loops[0]
@@ -242,6 +250,7 @@ def _generate_surface_mesh_serialized(request: SurfaceMeshRequest) -> SurfaceMes
         curve_loop_tags: list[int] = []
         outer_line_tags: list[int] = []
         outer_point_tags: list[int] = []
+        all_curve_tags: list[int] = []
         for loop_index, loop in enumerate(boundary_loops):
             point_tags = [
                 gmsh.model.geo.addPoint(
@@ -249,10 +258,23 @@ def _generate_surface_mesh_serialized(request: SurfaceMeshRequest) -> SurfaceMes
                 )
                 for _, point in loop
             ]
-            line_tags = [
-                gmsh.model.geo.addLine(point_tags[index], point_tags[(index + 1) % len(point_tags)])
-                for index in range(len(point_tags))
-            ]
+            circle = circles.get(frozenset(name for name, _ in loop))
+            if circle:
+                center_tag = gmsh.model.geo.addPoint(*circle["center"], z_value, request.mesh_size)
+                line_tags = [
+                    gmsh.model.geo.addCircleArc(
+                        point_tags[index], center_tag, point_tags[(index + 1) % len(point_tags)]
+                    )
+                    for index in range(len(point_tags))
+                ]
+            else:
+                line_tags = [
+                    gmsh.model.geo.addLine(
+                        point_tags[index], point_tags[(index + 1) % len(point_tags)]
+                    )
+                    for index in range(len(point_tags))
+                ]
+            all_curve_tags.extend(line_tags)
             curve_loop_tags.append(gmsh.model.geo.addCurveLoop(line_tags))
             if loop_index == 0:
                 outer_line_tags = line_tags
@@ -260,7 +282,15 @@ def _generate_surface_mesh_serialized(request: SurfaceMeshRequest) -> SurfaceMes
         surface_tag = gmsh.model.geo.addPlaneSurface(curve_loop_tags)
         gmsh.model.geo.synchronize()
 
-        if len(boundary_loops) == 1 and len(boundary) == 4:
+        convex_quad = len(boundary) == 4 and all(
+            (boundary[(i + 1) % 4][1][0] - boundary[i][1][0])
+            * (boundary[(i + 2) % 4][1][1] - boundary[(i + 1) % 4][1][1])
+            - (boundary[(i + 1) % 4][1][1] - boundary[i][1][1])
+            * (boundary[(i + 2) % 4][1][0] - boundary[(i + 1) % 4][1][0])
+            > 1e-12
+            for i in range(4)
+        )
+        if len(boundary_loops) == 1 and convex_quad:
             lengths = [
                 hypot(
                     float(boundary[(index + 1) % 4][1][0] - boundary[index][1][0]),
@@ -277,7 +307,7 @@ def _generate_surface_mesh_serialized(request: SurfaceMeshRequest) -> SurfaceMes
             gmsh.model.mesh.setTransfiniteSurface(surface_tag, cornerTags=outer_point_tags)
         gmsh.model.mesh.setRecombine(2, surface_tag)
         gmsh.model.mesh.generate(2)
-        if len(boundary_loops) > 1:
+        if len(boundary_loops) > 1 or not convex_quad:
             gmsh.model.mesh.recombine()
             element_types, _, _ = gmsh.model.mesh.getElements(2, surface_tag)
             needs_subdivision = False
@@ -344,6 +374,20 @@ def _generate_surface_mesh_serialized(request: SurfaceMeshRequest) -> SurfaceMes
         if not quads:
             raise SurfaceMeshError("Gmsh produced no Q4 elements")
 
+        # Construction points (e.g. arc centers) are not finite-element nodes.
+        connected_ids = {node_id_by_tag[tag] for _, connectivity in quads for tag in connectivity}
+        nodes = tuple(node for node in nodes if node.id in connected_ids)
+        curve_parameters = []
+        for curve in all_curve_tags:
+            tags, coords, _ = gmsh.model.mesh.getNodes(1, curve, includeBoundary=True)
+            params = gmsh.model.getParametrization(1, curve, coords)
+            curve_parameters.append(
+                {
+                    node_id_by_tag[int(tag)]: float(value)
+                    for tag, value in zip(tags, params, strict=True)
+                }
+            )
+
         elements = tuple(
             ElementInput(
                 id=f"E{index + 1}",
@@ -378,19 +422,18 @@ def _generate_surface_mesh_serialized(request: SurfaceMeshRequest) -> SurfaceMes
         if count != 1:
             continue
         element_id, local_edge, pair = element_by_edge[key]
-        midpoint = (node_coordinates[pair[0]] + node_coordinates[pair[1]]) / 2.0
-        distances = [_edge_distance(midpoint, start, end) for start, end in mesh_edges]
-        boundary_index = min(range(len(distances)), key=lambda index: distances[index][0])
-        _, start_parameter = _edge_distance(
-            node_coordinates[pair[0]],
-            mesh_edges[boundary_index][0],
-            mesh_edges[boundary_index][1],
+        boundary_index = next(
+            (
+                i
+                for i, params in enumerate(curve_parameters)
+                if pair[0] in params and pair[1] in params
+            ),
+            None,
         )
-        _, end_parameter = _edge_distance(
-            node_coordinates[pair[1]],
-            mesh_edges[boundary_index][0],
-            mesh_edges[boundary_index][1],
-        )
+        if boundary_index is None:
+            raise SurfaceMeshError("A Q4 boundary segment could not be bound to its CAD curve")
+        start_parameter = curve_parameters[boundary_index][pair[0]]
+        end_parameter = curve_parameters[boundary_index][pair[1]]
         ordered_pair = pair if start_parameter <= end_parameter else (pair[1], pair[0])
         boundary_segments[boundary_index].append(
             (
@@ -426,7 +469,7 @@ def _generate_surface_mesh_serialized(request: SurfaceMeshRequest) -> SurfaceMes
         boundaries.append(
             MeshBoundary(
                 id=f"B{index + 1}",
-                label=f"边界 {index + 1}",
+                label=f"Boundary {index + 1}",
                 node_ids=ordered_node_ids,
                 segments=segments,
                 length=length,

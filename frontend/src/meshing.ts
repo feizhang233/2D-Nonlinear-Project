@@ -1,3 +1,4 @@
+import { assignSection, sectionLibrary } from './sections'
 import type {
   JsonValue, LoadInput, MeshBoundary, ModelInput, NodeInput, SurfaceMeshResponse,
 } from './domain'
@@ -255,5 +256,8 @@ export function applySurfaceMesh(model: ModelInput, response: SurfaceMeshRespons
       },
     },
   }
-  return withMeshedSignature(writeSketch(next, sketch))
+  const defaultSection = sectionLibrary(model).default_id
+  const assigned = model.extensions?.section_library && defaultSection
+    ? assignSection(next, defaultSection, next.elements.map((element) => element.id)) : next
+  return withMeshedSignature(writeSketch(assigned, sketch))
 }

@@ -1,3 +1,4 @@
+import { FrameSectionTable } from './FrameSectionTable'
 import CheckCircleRoundedIcon from '@mui/icons-material/CheckCircleRounded'
 import ErrorRoundedIcon from '@mui/icons-material/ErrorRounded'
 import ExpandLessRoundedIcon from '@mui/icons-material/ExpandLessRounded'
@@ -27,7 +28,7 @@ import Tooltip from '@mui/material/Tooltip'
 import Typography from '@mui/material/Typography'
 import { useTheme } from '@mui/material/styles'
 import { useEffect, useState } from 'react'
-import type { AnalysisRecord, ModelInput, ResultTab } from '../domain'
+import type { AnalysisRecord, ModelInput, ResultTab, Selection } from '../domain'
 import { elementDisplayLabel } from '../entityLabels'
 import { MiniChart } from './MiniChart'
 import { EmptyState, StatTile } from './chrome'
@@ -39,6 +40,8 @@ import {
 
 interface ResultsDockProps {
   standalone?: boolean
+  selection: Selection
+  onSelection: (selection: Selection) => void
   model: ModelInput
   record: AnalysisRecord | null
   state: 'idle' | 'validating' | 'running' | 'succeeded' | 'failed'
@@ -57,7 +60,7 @@ const tabLabels: Array<{ value: ResultTab; label: string; compactLabel: string }
   { value: 'failure', label: 'Failure evidence', compactLabel: 'Failures' },
 ]
 
-export function ResultsDock({ standalone = false, model, record, state, error, invalidated, tab, selectedStep, onTabChange, onStepChange }: ResultsDockProps) {
+export function ResultsDock({ selection, onSelection, standalone = false, model, record, state, error, invalidated, tab, selectedStep, onTabChange, onStepChange }: ResultsDockProps) {
   const theme = useTheme()
   const [expanded, setExpanded] = useState(false)
   const result = record?.result ?? null
@@ -78,7 +81,7 @@ export function ResultsDock({ standalone = false, model, record, state, error, i
   const open = standalone || expanded
 
   return (
-    <Box sx={{ height: standalone ? '100%' : open ? 300 : 48, minHeight: 0, flexShrink: 0, borderTop: standalone ? 0 : '1px solid', borderColor: 'divider', overflow: 'hidden', transition: 'height .18s ease', bgcolor: 'background.paper' }}>
+    <Box sx={{ height: standalone ? '100%' : open ? 300 : 48, minHeight: 0, flexShrink: 0, borderTop: standalone ? 0 : '1px solid', borderColor: 'divider', overflow: 'hidden', transition: 'height .18s ease', bgcolor: 'background.paper', '& .MuiTableCell-root': { whiteSpace: 'nowrap' } }}>
       <Stack direction="row" sx={{ alignItems: 'center', height: 48, borderBottom: open ? '1px solid' : 0, borderColor: 'divider', px: 1, bgcolor: 'background.containerLow' }}>
         <Tabs
           value={tab}
@@ -122,7 +125,7 @@ export function ResultsDock({ standalone = false, model, record, state, error, i
                 <EmptyState
                   icon={<HistoryToggleOffRoundedIcon />}
                   title="Ready to solve"
-                  body="Review the model on the left and analysis controls on the right, then choose Run analysis or press Ctrl / ⌘ + Enter."
+                  body="Review the model and Analysis settings, then choose Run analysis or press Ctrl / ⌘ + Enter."
                 />
               )}
               {state === 'running' && (
@@ -135,7 +138,7 @@ export function ResultsDock({ standalone = false, model, record, state, error, i
                     <StatTile label="Accepted" value={String(record?.progress.accepted_steps ?? 0)} color="success" />
                   </Stack>
                   <Typography variant="caption" color="text.secondary" sx={{ display: 'block', mt: 1 }}>
-                    API polling updates the job state. Cancellation preserves committed state and discards uncommitted trials.
+                    Progress updates automatically. Cancel retains accepted steps.
                   </Typography>
                 </Box>
               )}
@@ -143,9 +146,7 @@ export function ResultsDock({ standalone = false, model, record, state, error, i
               {result && (
                 <>
                   <Stack direction="row" spacing={1} sx={{ alignItems: 'center', flexWrap: 'wrap' }} useFlexGap>
-                    <Chip size="small" color={result.status === 'succeeded' ? 'success' : 'error'} label={result.status === 'succeeded' ? 'Solve succeeded' : 'Solve failed'} />
-                    <Chip size="small" variant="outlined" label={family.label} />
-                    <Typography variant="body2">Solver {result.solver_version}</Typography>
+                    <Typography variant="body2" color={result.status === 'succeeded' ? 'success.main' : 'error.main'}>{result.status === 'succeeded' ? 'Solve succeeded' : 'Solve failed'}</Typography>
                     <Box sx={{ flex: 1 }} />
                     <TextField select label="Current step" value={Math.min(selectedStep, Math.max(0, result.steps.length - 1))} onChange={(event) => onStepChange(Number(event.target.value))} sx={{ minWidth: 168 }}>
                       {result.steps.map((item, index) => <MenuItem key={`${item.step_index}-${index}`} value={index}>Step {item.step_index} · {item.status === 'accepted' ? 'accepted' : 'rejected'}</MenuItem>)}
@@ -212,6 +213,7 @@ export function ResultsDock({ standalone = false, model, record, state, error, i
           {tab === 'tables' && (
             result ? (
               <Stack direction={standalone ? 'column' : 'row'} spacing={2}>
+                {model.model_family === 'frame' && <FrameSectionTable model={model} result={result} selection={selection} onSelection={onSelection} />}
                 <TableContainer sx={{ flex: 1, maxHeight: standalone ? 360 : 216, borderRadius: 2, border: '1px solid', borderColor: 'divider' }}>
                   <Table size="small" stickyHeader>
                     <TableHead>

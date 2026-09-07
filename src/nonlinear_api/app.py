@@ -47,6 +47,7 @@ from nonlinear_api.schemas import (
     MathCoreRequest,
     MathCoreResponse,
     ModelValidationResponse,
+    ProjectDocument,
     RegisterRequest,
     SavedModel,
     SavedModelCreate,
@@ -323,7 +324,18 @@ def create_app(
             user["id"],
             payload.name,
             payload.model.model_dump(mode="json"),
+            payload.workspace.model_dump(mode="json") if payload.workspace else None,
         )
+
+    @app.post(
+        "/api/v1/projects/validate",
+        response_model=ProjectDocument,
+        responses=error_responses,
+        tags=["model history"],
+    )
+    def validate_project(payload: ProjectDocument) -> ProjectDocument:
+        """Validate a portable model/result snapshot before restoring the workbench."""
+        return payload
 
     @app.delete(
         "/api/v1/models/{entry_id}",

@@ -26,6 +26,7 @@ describe('workbench async boundaries', () => {
   it('does not trigger Run from a text field, IME composition, or an account dialog', async () => {
     const fetch = mockRequests(async () => { throw new Error('Unexpected solve') })
     render(<App />)
+    fireEvent.click(screen.getByRole('button', { name: 'Model information' }))
     fireEvent.keyDown(screen.getByRole('textbox', { name: 'Display name' }), { key: 'Enter', ctrlKey: true })
     fireEvent.keyDown(window, { key: 'Enter', ctrlKey: true, isComposing: true })
     fireEvent.click(await screen.findByRole('button', { name: 'Guest account' }))
@@ -93,6 +94,7 @@ describe('workbench async boundaries', () => {
     Object.defineProperty(file, 'text', { value: async () => JSON.stringify({ ...cloneSampleModel(), name: 'Invalid replacement' }) })
     fireEvent.change(document.querySelector('input[type=file]')!, { target: { files: [file] } })
     expect(await screen.findByText('$.nodes[0].coordinates: Invalid coordinates')).toBeTruthy()
+    fireEvent.click(screen.getByRole('button', { name: 'Model information' }))
     expect((screen.getByRole('textbox', { name: 'Display name' }) as HTMLInputElement).value).toBe('Shallow arch limit-point demo')
   })
 })

@@ -1,3 +1,4 @@
+import type { WorkspaceArchive } from '../projectFiles'
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { deleteSavedModel, listSavedModels, saveModelSnapshot, StudioApiError } from '../api'
 import type { AuthUser, ModelInput, SavedModel } from '../domain'
@@ -17,6 +18,7 @@ interface HistoryState {
 export function useModelHistory(currentUser: AuthUser | null, options: Options) {
   const { showMessage, onSessionExpired } = options
   const [state, setState] = useState<HistoryState>({ ownerId: null, entries: [] })
+  const [error, setError] = useState<string | null>(null)
   const [loading, setLoading] = useState(false)
   const [saving, setSaving] = useState(false)
   const [deletingId, setDeletingId] = useState<string | null>(null)
@@ -33,7 +35,9 @@ export function useModelHistory(currentUser: AuthUser | null, options: Options) 
       onSessionExpired()
       return
     }
-    showMessage(error instanceof Error ? error.message : fallback, 'error')
+    const message = error instanceof Error ? error.message : fallback
+    setError(message)
+    showMessage(message, 'error')
   }, [onSessionExpired, showMessage])
 
   const refresh = useCallback(async (signal?: AbortSignal) => {
@@ -42,6 +46,7 @@ export function useModelHistory(currentUser: AuthUser | null, options: Options) 
       setState({ ownerId: null, entries: [] })
       return
     }
+    setError(null)
     setLoading(true)
     const version = mutationVersionRef.current
     try {
@@ -60,6 +65,7 @@ export function useModelHistory(currentUser: AuthUser | null, options: Options) 
     if (!ownerId) {
       setState({ ownerId: null, entries: [] })
       setLoading(false)
+      setError(null)
       return
     }
     const controller = new AbortController()
@@ -68,13 +74,14 @@ export function useModelHistory(currentUser: AuthUser | null, options: Options) 
     return () => controller.abort()
   }, [ownerId, refresh])
 
-  const save = useCallback(async (model: ModelInput): Promise<SavedModel | null> => {
+  const save = useCallback(async (model: ModelInput, workspace?: WorkspaceArchive): Promise<SavedModel | null> => {
     const requestedOwner = ownerRef.current
     if (!requestedOwner || savingRef.current) return null
     savingRef.current = true
+    setError(null)
     setSaving(true)
     try {
-      const entry = await saveModelSnapshot(model, model.name.trim() || 'Untitled model')
+      const entry = await saveModelSnapshot(model, model.name.trim() || 'Untitled model', undefined, workspace)
       if (ownerRef.current !== requestedOwner) return null
       mutationVersionRef.current += 1
       setState((current) => ({
@@ -117,5 +124,5 @@ export function useModelHistory(currentUser: AuthUser | null, options: Options) 
     }
   }, [requestFailed, showMessage])
 
-  return { entries, loading, saving, deletingId, refresh, save, remove }
+  return { entries, error, loading, saving, deletingId, refresh, save, remove }
 }

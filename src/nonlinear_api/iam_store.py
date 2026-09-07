@@ -42,10 +42,7 @@ def hash_password(password: str) -> str:
     )
     encoded_salt = base64.urlsafe_b64encode(salt).decode("ascii")
     encoded_digest = base64.urlsafe_b64encode(digest).decode("ascii")
-    return (
-        f"{PASSWORD_SCHEME}${SCRYPT_N}${SCRYPT_R}${SCRYPT_P}"
-        f"${encoded_salt}${encoded_digest}"
-    )
+    return f"{PASSWORD_SCHEME}${SCRYPT_N}${SCRYPT_R}${SCRYPT_P}${encoded_salt}${encoded_digest}"
 
 
 def verify_password(password: str, encoded: str) -> bool:
@@ -130,6 +127,17 @@ class IdentityStore:
                 ON saved_models(user_id, saved_at DESC);
             """
         )
+        columns = {row["name"] for row in connection.execute("PRAGMA table_info(saved_models)")}
+        if "workspace_json" not in columns:
+            try:
+                connection.execute("ALTER TABLE saved_models ADD COLUMN workspace_json TEXT")
+                connection.commit()
+            except sqlite3.OperationalError:
+                # Another connection may have completed the additive migration.
+                if "workspace_json" not in {
+                    row["name"] for row in connection.execute("PRAGMA table_info(saved_models)")
+                }:
+                    raise
         return connection
 
     @staticmethod
@@ -224,7 +232,7 @@ class IdentityStore:
         with self._connect() as connection:
             rows = connection.execute(
                 """
-                SELECT id, name, model_family, saved_at, model_json
+                SELECT id, name, model_family, saved_at, model_json, workspace_json
                 FROM saved_models
                 WHERE user_id = ?
                 ORDER BY saved_at DESC
@@ -239,24 +247,33 @@ class IdentityStore:
                 "model_family": str(row["model_family"]),
                 "saved_at": str(row["saved_at"]),
                 "model": json.loads(str(row["model_json"])),
+                "workspace": json.loads(row["workspace_json"]) if row["workspace_json"] else None,
             }
             for row in rows
         ]
 
-    def save_model(self, user_id: str, name: str, model: dict[str, Any]) -> dict[str, Any]:
+    def save_model(
+        self,
+        user_id: str,
+        name: str,
+        model: dict[str, Any],
+        workspace: dict[str, Any] | None = None,
+    ) -> dict[str, Any]:
         entry = {
             "id": uuid4().hex,
             "name": name.strip(),
             "model_family": str(model["model_family"]),
             "saved_at": _iso_utc(_utc_now()),
             "model": model,
+            "workspace": workspace,
         }
         model_json = json.dumps(model, ensure_ascii=False, allow_nan=False, separators=(",", ":"))
         with self._connect() as connection:
             connection.execute(
                 """
-                INSERT INTO saved_models (id, user_id, name, model_family, saved_at, model_json)
-                VALUES (?, ?, ?, ?, ?, ?)
+                INSERT INTO saved_models
+                    (id, user_id, name, model_family, saved_at, model_json, workspace_json)
+                VALUES (?, ?, ?, ?, ?, ?, ?)
                 """,
                 (
                     entry["id"],
@@ -265,6 +282,7 @@ class IdentityStore:
                     entry["model_family"],
                     entry["saved_at"],
                     model_json,
+                    json.dumps(workspace, allow_nan=False) if workspace is not None else None,
                 ),
             )
             connection.execute(

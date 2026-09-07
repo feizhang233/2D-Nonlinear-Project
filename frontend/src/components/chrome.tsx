@@ -19,13 +19,13 @@ export function SectionHeader({
       {icon && (
         <Box
           sx={{
-            width: 36,
-            height: 36,
+            width: 20,
+            height: 24,
             borderRadius: 2.25,
             flexShrink: 0,
             display: 'grid',
             placeItems: 'center',
-            bgcolor: 'action.selected',
+            bgcolor: 'transparent',
             color: 'primary.main',
           }}
         >
@@ -33,21 +33,50 @@ export function SectionHeader({
         </Box>
       )}
       <Box sx={{ minWidth: 0, flex: 1 }}>
-        <Typography variant="subtitle1">{title}</Typography>
-        {subtitle && (
-          <Typography variant="body2" color="text.secondary">
-            {subtitle}
-          </Typography>
-        )}
+        <Typography variant="subtitle2" sx={{ fontWeight: 600 }}>
+          {title}
+        </Typography>
+        {subtitle &&
+          (subtitle.length > 95 ? (
+            <Box
+              component="details"
+              sx={{
+                mt: 0.5,
+                color: 'text.secondary',
+                fontSize: 12,
+                '& summary': { cursor: 'pointer' },
+              }}
+            >
+              <summary>Details</summary>
+              <Typography variant="caption" sx={{ display: 'block', mt: 0.5 }}>
+                {subtitle}
+              </Typography>
+            </Box>
+          ) : (
+            <Typography variant="caption" color="text.secondary">
+              {subtitle}
+            </Typography>
+          ))}
       </Box>
       {action}
     </Stack>
   )
 }
 
-export function EmptyState({ icon, title, body }: { icon: ReactNode; title: string; body: string }) {
+export function EmptyState({
+  icon,
+  title,
+  body,
+}: {
+  icon: ReactNode
+  title: string
+  body: string
+}) {
   return (
-    <Stack spacing={1} sx={{ alignItems: 'center', justifyContent: 'center', py: 3, px: 2, textAlign: 'center' }}>
+    <Stack
+      spacing={1}
+      sx={{ alignItems: 'center', justifyContent: 'center', py: 3, px: 2, textAlign: 'center' }}
+    >
       <Box
         sx={{
           width: 52,
@@ -84,10 +113,10 @@ export function StatTile({
       sx={{
         px: 1.5,
         py: 1,
-        minWidth: 104,
-        flex: 1,
-        borderRadius: 2.5,
-        bgcolor: 'background.containerLow',
+        minWidth: 0,
+        flex: '1 1 calc(50% - 8px)',
+        borderBottom: '1px solid',
+        borderColor: 'divider',
       }}
     >
       <Typography variant="caption" color="text.secondary">

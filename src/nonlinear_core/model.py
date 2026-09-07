@@ -293,6 +293,13 @@ class ModelInput(ContractModel):
     analysis: AnalysisOptions
     extensions: dict[str, JsonValue] = Field(default_factory=dict)
 
+    @model_validator(mode="after")
+    def check_section_library(self) -> Self:
+        from nonlinear_core.sections import validate_sections
+
+        validate_sections(self)
+        return self
+
     def ordered_dof_refs(self) -> tuple[DofRef, ...]:
         """Return the deterministic node-major, family-DOF-minor global order."""
 

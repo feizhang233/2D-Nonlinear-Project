@@ -1,10 +1,4 @@
-import CheckCircleRoundedIcon from '@mui/icons-material/CheckCircleRounded'
-import CircleOutlinedIcon from '@mui/icons-material/CircleOutlined'
-import Box from '@mui/material/Box'
-import Chip from '@mui/material/Chip'
-import Tab from '@mui/material/Tab'
-import Tabs from '@mui/material/Tabs'
-import Typography from '@mui/material/Typography'
+import { Box, Tab, Tabs, Typography } from '@mui/material'
 import type { ModelFamily } from '../domain'
 import { MODEL_FAMILIES, MODEL_FAMILY_ORDER } from '../modelFamilies'
 
@@ -15,42 +9,46 @@ interface WorkspaceSwitcherProps {
   onChange: (family: ModelFamily) => void
 }
 
-export function WorkspaceSwitcher({ activeFamily, draftFamilies, resultFamilies, onChange }: WorkspaceSwitcherProps) {
+export function WorkspaceSwitcher({
+  activeFamily,
+  draftFamilies,
+  resultFamilies,
+  onChange,
+}: WorkspaceSwitcherProps) {
   return (
-    <Box sx={{ minWidth: 510, borderRight: '1px solid', borderColor: 'divider' }}>
-      <Tabs
-        value={activeFamily}
-        onChange={(_, family: ModelFamily) => onChange(family)}
-        aria-label="Structural model workspaces"
-        sx={{ minHeight: 54, '& .MuiTab-root': { minHeight: 54, minWidth: 124, px: 1.25 } }}
-      >
-        {MODEL_FAMILY_ORDER.map((family) => {
-          const info = MODEL_FAMILIES[family]
-          const hasDraft = draftFamilies.has(family)
-          const hasResults = resultFamilies.has(family)
-          return (
-            <Tab
-              key={family}
-              value={family}
-              aria-label={`${info.label} workspace${hasDraft ? ', unapplied changes' : ''}${hasResults ? ', results available' : ''}`}
-              label={
-                <Box sx={{ width: '100%', textAlign: 'left' }}>
-                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.75 }}>
-                    {hasResults
-                      ? <CheckCircleRoundedIcon color="success" sx={{ fontSize: 16 }} />
-                      : <CircleOutlinedIcon sx={{ fontSize: 15, color: 'text.disabled' }} />}
-                    <Typography component="span" variant="body2" sx={{ fontWeight: 700 }}>{info.label}</Typography>
-                    {hasDraft && <Chip size="small" color="warning" label="Draft" sx={{ height: 20 }} />}
-                  </Box>
-                  <Typography component="span" variant="caption" color="text.secondary" noWrap sx={{ display: 'block', pl: 2.9 }}>
-                    {family === 'frame' ? 'Line elements' : family === 'continuum' ? 'Plane strain' : family === 'plate' ? 'Plate bending' : 'Flat shell'}
-                  </Typography>
-                </Box>
-              }
-            />
-          )
-        })}
-      </Tabs>
-    </Box>
+    <Tabs
+      value={activeFamily}
+      onChange={(_, family: ModelFamily) => onChange(family)}
+      aria-label="Structural model workspaces"
+      sx={{
+        flexShrink: 0,
+        minHeight: 38,
+        '& .MuiTab-root': { minHeight: 38, minWidth: 82, px: 1.5, py: 0, fontSize: 12 },
+        '& .MuiTabs-indicator': { height: 2 },
+      }}
+    >
+      {MODEL_FAMILY_ORDER.map((family) => (
+        <Tab
+          key={family}
+          value={family}
+          aria-label={`${MODEL_FAMILIES[family].label} workspace${draftFamilies.has(family) ? ', unapplied changes' : ''}${resultFamilies.has(family) ? ', results available' : ''}`}
+          label={
+            <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+              {MODEL_FAMILIES[family].label}
+              {draftFamilies.has(family) && (
+                <Typography component="span" color="warning.main" aria-hidden="true">
+                  •
+                </Typography>
+              )}
+              {!draftFamilies.has(family) && resultFamilies.has(family) && (
+                <Typography component="span" color="success.main" aria-hidden="true">
+                  ✓
+                </Typography>
+              )}
+            </Box>
+          }
+        />
+      ))}
+    </Tabs>
   )
 }

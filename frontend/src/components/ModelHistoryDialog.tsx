@@ -27,6 +27,7 @@ interface Props {
   user: AuthUser
   entries: SavedModel[]
   loading: boolean
+  error?: string | null
   saving: boolean
   deletingId: string | null
   onClose: () => void
@@ -40,6 +41,7 @@ export function ModelHistoryDialog({
   user,
   entries,
   loading,
+  error,
   saving,
   deletingId,
   onClose,
@@ -60,6 +62,7 @@ export function ModelHistoryDialog({
       <Dialog open={open} onClose={deleting ? undefined : () => setDeleteCandidate(null)} fullWidth maxWidth="xs">
         <DialogTitle>Delete saved model?</DialogTitle>
         <DialogContent>
+        {error && <Alert severity="error">{error}</Alert>}
           <Alert severity="warning" sx={{ mb: 2 }}>
             “{deleteCandidate.name}” will be permanently removed from your account history. The model currently open in the workbench will not change.
           </Alert>
@@ -130,7 +133,7 @@ export function ModelHistoryDialog({
               >
                 <ListItemText
                   primary={entry.name}
-                  secondary={`${MODEL_FAMILIES[entry.model_family].label} · ${new Date(entry.saved_at).toLocaleString('en-US')}`}
+                  secondary={`${MODEL_FAMILIES[entry.model_family].label} · ${entry.workspace?.record ? 'Model + results' : 'Model only'} · ${new Date(entry.saved_at).toLocaleString('en-US')}`}
                   slotProps={{ primary: { noWrap: true, sx: { fontWeight: 500 } }, secondary: { noWrap: true } }}
                 />
               </ListItem>

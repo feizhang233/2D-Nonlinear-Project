@@ -61,7 +61,7 @@ export function AnalysisPanel({ model, runOptions, onModelChange, onRunOptionsCh
     <Stack spacing={2}>
       <SectionHeader
         icon={<AutoFixHighRoundedIcon fontSize="small" />}
-        title="Nonlinear analysis"
+        title="Loading strategy"
         subtitle={`${family.label} · ${dofs.join(' / ')}`}
       />
       <ToggleButtonGroup exclusive fullWidth size="small" value={options.control_method} onChange={(_, value: ControlMethod | null) => value && setControl(value)}>
@@ -111,7 +111,7 @@ export function AnalysisPanel({ model, runOptions, onModelChange, onRunOptionsCh
         </Stack>
       )}
 
-      <Accordion defaultExpanded>
+      <Accordion>
         <AccordionSummary expandIcon={<ExpandMoreRoundedIcon />}>
           <Stack direction="row" spacing={0.75} sx={{ alignItems: 'center' }}>
             <Typography variant="subtitle2">Newton method and tolerances</Typography>
@@ -143,7 +143,7 @@ export function AnalysisPanel({ model, runOptions, onModelChange, onRunOptionsCh
         </AccordionDetails>
       </Accordion>
 
-      <Accordion defaultExpanded>
+      <Accordion>
         <AccordionSummary expandIcon={<ExpandMoreRoundedIcon />}>
           <Typography variant="subtitle2">Step size, cutback, and line search</Typography>
         </AccordionSummary>
@@ -159,7 +159,7 @@ export function AnalysisPanel({ model, runOptions, onModelChange, onRunOptionsCh
             </Stack>
             <Typography variant="caption" color="text.secondary">Load, displacement, and arc-length control use bounded cutback based on the failure class. Committed state updates only after an accepted step.</Typography>
             <FormControlLabel control={<Switch checked={options.line_search.enabled} disabled={options.control_method === 'arc_length'} onChange={(event) => patchAnalysis({ line_search: { ...options.line_search, enabled: event.target.checked } })} />} label="Enable line search" />
-            {options.control_method === 'arc_length' && <Typography variant="caption" color="text.secondary">The P8 arc-length algorithm does not run together with the P7 line search, so this option is disabled.</Typography>}
+            {options.control_method === 'arc_length' && <Typography variant="caption" color="text.secondary">Line search is unavailable with arc-length control.</Typography>}
           </Stack>
         </AccordionDetails>
       </Accordion>

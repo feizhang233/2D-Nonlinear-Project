@@ -1,3 +1,4 @@
+import Alert from '@mui/material/Alert'
 import WarningAmberRoundedIcon from '@mui/icons-material/WarningAmberRounded'
 import Button from '@mui/material/Button'
 import Dialog from '@mui/material/Dialog'
@@ -9,6 +10,7 @@ import DialogTitle from '@mui/material/DialogTitle'
 interface UnsavedChangesDialogProps {
   open: boolean
   destination: string
+  validationError?: string | null
   onKeepEditing: () => void
   onApplyAndContinue: () => void
   onDiscardAndContinue: () => void
@@ -17,6 +19,7 @@ interface UnsavedChangesDialogProps {
 export function UnsavedChangesDialog({
   open,
   destination,
+  validationError,
   onKeepEditing,
   onApplyAndContinue,
   onDiscardAndContinue,
@@ -30,11 +33,12 @@ export function UnsavedChangesDialog({
         <DialogContentText>
           This workspace contains staged edits. Apply them before opening {destination}, discard them, or keep editing.
         </DialogContentText>
+        {validationError && <Alert severity="error" sx={{ mt: 2 }}>{validationError} Keep editing to correct the section or discard the edits.</Alert>}
       </DialogContent>
       <DialogActions sx={{ px: 3, pb: 2.5, alignItems: 'stretch', flexDirection: 'column-reverse', gap: 1 }}>
         <Button color="inherit" onClick={onKeepEditing}>Keep editing</Button>
         <Button color="error" variant="outlined" onClick={onDiscardAndContinue}>Discard and continue</Button>
-        <Button variant="contained" onClick={onApplyAndContinue}>Apply and continue</Button>
+        <Button variant="contained" disabled={Boolean(validationError)} onClick={onApplyAndContinue}>Apply and continue</Button>
       </DialogActions>
     </Dialog>
   )

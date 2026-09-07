@@ -10,7 +10,7 @@ from uuid import UUID
 
 from pydantic import BaseModel, ConfigDict, Field, JsonValue, field_validator, model_validator
 
-from nonlinear_core import ContractIssue, ModelInput, SolveResult, SolveStatus
+from nonlinear_core import ContractIssue, ModelInput, SolveResult, SolveStatus, model_sha256
 from nonlinear_core.model import ElementInput, ModelFamily, NodeInput
 
 
@@ -111,27 +111,6 @@ class SessionResponse(ApiModel):
         if self.authenticated != (self.user is not None):
             raise ValueError("authenticated must match the user payload")
         return self
-
-
-class SavedModelCreate(ApiModel):
-    name: Annotated[str, Field(min_length=1, max_length=160)]
-    model: ModelInput
-
-    @field_validator("name")
-    @classmethod
-    def validate_name(cls, value: str) -> str:
-        normalized = value.strip()
-        if not normalized:
-            raise ValueError("saved model name cannot be empty")
-        return normalized
-
-
-class SavedModel(ApiModel):
-    id: str
-    name: str
-    model_family: ModelFamily
-    saved_at: datetime
-    model: ModelInput
 
 
 class ModelValidationResponse(ApiModel):
@@ -323,6 +302,82 @@ class AnalysisRecord(ApiModel):
         return self
 
 
+class RunOptions(ApiModel):
+    targetLoadFactor: Annotated[float, Field(allow_inf_nan=False)] = 1.0
+    numberOfSteps: Annotated[int, Field(ge=1, le=10000)] = 10
+
+
+class WorkspaceArchive(ApiModel):
+    run_options: RunOptions
+    record: AnalysisRecord | None = None
+    selected_step: Annotated[int, Field(ge=0)] = 0
+    result_view: Literal[
+        "model", "deformation", "reactions", "internal", "moment", "shear", "axial"
+    ] = "model"
+    result_tab: Literal["monitor", "curves", "tables", "failure"] = "monitor"
+
+
+def validate_archive_model(model: ModelInput, workspace: WorkspaceArchive) -> None:
+    record = workspace.record
+    if record is None:
+        return
+    if record.status not in {
+        AnalysisStatus.SUCCEEDED,
+        AnalysisStatus.FAILED,
+        AnalysisStatus.CANCELLED,
+    }:
+        raise ValueError("Only completed analyses can be saved or restored")
+    fingerprint = model_sha256(model)
+    if record.model_id != model.model_id or record.model_sha256 != fingerprint:
+        raise ValueError("Saved analysis does not belong to this exact model")
+    if record.result is not None and (
+        record.result.model_id != model.model_id or record.result.model_sha256 != fingerprint
+    ):
+        raise ValueError("Saved result does not belong to this exact model")
+    if record.control_method != model.analysis.control_method.value:
+        raise ValueError("Saved analysis control method differs from the model")
+
+
+class ProjectDocument(ApiModel):
+    studio_project_version: Literal["1.0.0"]
+    model: ModelInput
+    workspace: WorkspaceArchive
+
+    @model_validator(mode="after")
+    def check_archive(self) -> Self:
+        validate_archive_model(self.model, self.workspace)
+        return self
+
+
+class SavedModelCreate(ApiModel):
+    name: Annotated[str, Field(min_length=1, max_length=160)]
+    model: ModelInput
+    workspace: WorkspaceArchive | None = None
+
+    @model_validator(mode="after")
+    def check_saved_workspace(self) -> Self:
+        if self.workspace is not None:
+            validate_archive_model(self.model, self.workspace)
+        return self
+
+    @field_validator("name")
+    @classmethod
+    def validate_name(cls, value: str) -> str:
+        normalized = value.strip()
+        if not normalized:
+            raise ValueError("saved model name cannot be empty")
+        return normalized
+
+
+class SavedModel(ApiModel):
+    id: str
+    name: str
+    model_family: ModelFamily
+    saved_at: datetime
+    model: ModelInput
+    workspace: WorkspaceArchive | None = None
+
+
 __all__ = [
     "AnalysisProgress",
     "AnalysisRecord",
@@ -348,6 +403,8 @@ __all__ = [
     "MeshBoundarySegment",
     "ModelValidationResponse",
     "RegisterRequest",
+    "ProjectDocument",
+    "WorkspaceArchive",
     "SavedModel",
     "SavedModelCreate",
     "SessionResponse",

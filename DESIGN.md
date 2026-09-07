@@ -3,22 +3,22 @@ version: alpha
 name: "Nonlinear Studio"
 description: "A compact CAE workbench that keeps nonlinear model state, solver progress, and numerical evidence visibly connected."
 colors:
-  primary: "#0f766e"
-  primary-dark: "#115e59"
-  primary-light: "#4aa69d"
+  primary: "#35635d"
+  primary-dark: "#234a45"
+  primary-light: "#789d96"
   secondary: "#256b8b"
   success: "#138a63"
   warning: "#b76a00"
   danger: "#bd4552"
-  canvas: "#fafcfb"
-  background: "#edf1f1"
+  canvas: "#fcfdfc"
+  background: "#f4f6f5"
   surface: "#ffffff"
-  surface-container-low: "#f2f5f4"
-  surface-container: "#eaf0ee"
-  surface-container-high: "#e0e9e6"
-  text: "#20323a"
-  text-muted: "#5e7077"
-  divider: "#d8e2df"
+  surface-container-low: "#f7f9f8"
+  surface-container: "#f0f4f2"
+  surface-container-high: "#e6eeea"
+  text: "#253037"
+  text-muted: "#68747b"
+  divider: "#e2e7e4"
 typography:
   sans:
     fontFamily: "Avenir Next, Segoe UI, system-ui, -apple-system, sans-serif"
@@ -27,13 +27,13 @@ typography:
 rounded:
   DEFAULT: "0.5rem"
   control: "0.375rem"
-  compact: "0.5rem"
+  compact: "0.3125rem"
 spacing:
   control-gap: "0.5rem"
   content-gap: "0.75rem"
   panel-padding: "1rem"
   toolbar-height: "3.5rem"
-  context-bar-height: "3.375rem"
+  context-bar-height: "2.375rem"
 components:
   app-bar: {}
   engineering-canvas: {}
@@ -51,11 +51,12 @@ components:
 
 ### Creative North Star
 
-The September 2026 redesign uses a technical drawing-desk language: a deep petroleum header,
-quiet white inspectors, warm near-white graph paper, and teal actions. The model is the visual
-center. Compact rectangular controls, precise dividers, tabular numbers, and a stable coordinate
-space replace pill-heavy chrome. Preserve literal engineering information and the existing
-model, draft, and accepted-state boundaries.
+The user's latest direction replaces the crowded instrument-panel treatment with a quiet
+structural drawing workspace. The canvas is the main surface. A single compact action bar and a
+thin family/document row orient the user; the model list expands in place and Properties opens
+when needed. Neutral white surfaces, muted green actions, flat fields and fine dividers reduce
+competing emphasis. The distinctive element is the structural model itself, with restrained
+engineering annotations. No decorative cards or always-visible explanatory banners surround it.
 
 ### Product context and register
 
@@ -66,11 +67,11 @@ model, draft, and accepted-state boundaries.
 - **Locales and language policy:** the owned UI is English-only. User-facing entities start with stable ordinal
   names such as `Model 1`, `Node 1`, `Material 1`, `Support 1`, and `Load 1`, and can be renamed from Properties;
   raw solver IDs remain unchanged inside API, import/export, and diagnostic contracts.
-- **Usage scene:** desktop-first, keyboard-and-pointer, information-dense local engineering work.
+- **Usage scene:** desktop-first, keyboard-and-pointer, focused local engineering work.
 - **Register:** product. Familiar model tree, inspector, viewport, and results-dock patterns win over
   brand expression.
 - **Memorable signature:** four persistent model-family workspaces paired with an explicit Model/Results
-  mode boundary and a staged-edit strip that makes Apply/Cancel ownership continuously visible.
+  mode boundary. The fixed primary action makes Apply/Run ownership visible without a second action band.
 - **Restraint:** forms, tables, toolbars, warnings, and failure evidence remain flat, compact, and
   literal.
 - **Anti-references:** not a marketing dashboard, consumer 3D viewer, glassmorphic control panel,
@@ -90,7 +91,7 @@ and `divider` so hierarchy is mostly tonal.
 
 The near-white canvas is the largest quiet surface; structural geometry uses navy/teal, loads use red,
 and reactions use teal. Result plots may use primary blue, danger red, success green, teal, and amber, but every color has
-a label, number, icon, line style, or table alternative. The current release has one light workspace theme with a dark identity header; high-contrast operation must retain platform focus and semantic text rather than relying on
+a label, number, icon, line style, or table alternative. The current release has one light workspace theme with a light identity header; high-contrast operation must retain platform focus and semantic text rather than relying on
 canvas color alone.
 
 ## Typography
@@ -105,41 +106,47 @@ contract.
 
 ## Layout
 
-The desktop shell separates Frame, Continuum, Plate, and Shell into persistent workspaces and
-Model from Results as top-level modes. Model mode uses a 240 px model navigator, a flexible central
-canvas, and a 312 px right inspector. Collapsing Properties leaves a 40 px restore rail. Selecting
-an entity or a workflow step restores its inspector. Double-clicking a tree entity retains the
-established collapse shortcut; explicit buttons remain available for keyboard users.
+The desktop shell retains four independent families and Model/Results modes. A 56 px header
+contains Project, the mode switch, Save project, Analysis, account, and the fixed 158 px Apply/Run
+button. A 38 px family row names all four families, the current document, and its plain-text status.
+A 2 px progress slot remains allocated. Project owns Open, Export, History, restart export,
+Math Core, Guide, and example reset; its accessible MUI menu preserves the existing guards.
 
-A 56 px identity/action bar, a 54 px workspace bar, and a compact horizontal workflow strip
-reserve more vertical room for the model. A 3 px progress track stays allocated while idle and
-busy. The Apply/Cancel strip spans the full workbench bottom. Each navigator/form/results panel
-owns its vertical scroller. Results mode keeps a read-only canvas and independently scrollable
-evidence side by side. The document owns horizontal scrolling below the desktop support floor;
-no controls are silently clipped. The SVG uses its measured viewport dimensions and true SVG
-screen transforms, so diagram and pointer coordinates share the same mapping.
+Model mode uses a 232 px single-column model list and a flexible canvas. Categories expand
+in place, New precedes their records, and search appears above lists longer than eight records.
+Lists keep 60-record pagination and selected-record reachability. Category counts and the bottom
+model total replace duplicate count banners. Only applicable selected-entity deletion is shown.
 
-The engineering workspace retains a 1120 px desktop support floor. Narrow-width verification
-must preserve horizontal access to all regions; a future mobile workflow requires a separate
-navigation contract rather than silently hiding model or result controls.
+A 48 px toolbar belongs to the canvas and contains Select, Node/Outline, Member/Hole, Support,
+and Load. Sections live in the model list; member splitting lives in Properties. Properties is
+320 px wide when open and occupies no space when closed. Model metadata opens from the list's
+settings action; entity selection opens its form. The form remains mounted while hidden so raw
+unfinished numeric text survives close/reopen. Drawing does not automatically open the inspector
+and resize the canvas between endpoint clicks. The 34 px footer shows edit status and Cancel
+only when there is a draft. Primary action placement is stable in every state.
 
-Identity is progressive rather than a route gate. Guest mode opens the complete modeling and analysis
-workspace immediately. The top app bar groups Save, History, account identity, and Sign out without
-moving the primary Run analysis action. Authentication and model history use bounded MUI dialogs so
-the current model stays visible and is not discarded when a session changes.
+Results uses the full canvas after a successful solve. Results & tables opens a 460 px evidence
+panel with independent scrolling; running and failed solves reveal that panel automatically.
+Hiding it never deletes results, selection or result-tab state. Result quantity remains directly
+accessible on the canvas. The camera toolbar is one flat horizontal group at bottom-right;
+units and grid scale sit unboxed at bottom-left. The grid uses faint major lines without dots.
+
+The desktop support floor remains 1120 px, with document horizontal scrolling below that width.
+Navigator, Properties and result evidence own separate vertical scrollers. Bounded dialogs stay
+within smaller viewports. SVG pointer and diagram coordinates use the measured viewport transform.
+Guest access and authenticated private history retain the established data and permission rules.
 
 ## Elevation & Depth
 
-Tonal surface containers establish most hierarchy. The app bar, canvas overlay, and result-dock
-chrome may use modest Material elevation (levels 1–2) because they contain persistent
-actions/status or overlap the plotting bed. Properties sections, tables, alerts, and static content
+White surfaces, whitespace and one-pixel dividers establish hierarchy. App chrome and canvas
+controls stay flat. Elevation is reserved for open menus, dialogs and transient notifications. Properties sections, tables, alerts, and static content
 stay flat. The near-white canvas layers compact opaque controls over the plot, but does not use blur or
 translucent glass effects.
 
 ## Shapes
 
 Controls use the `control` radius (6 px), major work panes use `DEFAULT` (8 px),
-and filled fields / dense table frames use `compact`. Status chips stay 5–8 px rounded because they
+and outlined fields use `compact` (5 px). Dense table frames use `DEFAULT`. Status chips stay 4 px rounded because they
 encode transient state, not navigation.
 Entity geometry uses precise strokes and nodes rather than rounded card metaphors. Dividers remain
 one-pixel neutral lines.
@@ -156,8 +163,9 @@ success states stay in the panel they affect.
 
 ### Buttons and actions
 
-There is one primary action in the app bar: run analysis, which becomes an explicit cancel action
-while a server job is active. Import, export, example reset, and view controls are secondary.
+One fixed-width primary action in the app bar changes with the transaction state: Apply changes
+for a draft, Run analysis for a committed model, and Cancel while a server job is active.
+Invalid numeric drafts disable Apply; the footer retains only draft status and Cancel. Import, export, example reset, and view controls are secondary.
 Delete is outlined danger and separated inside the selected entity inspector. Busy labels and
 icons retain the button's dimensions.
 
@@ -165,18 +173,20 @@ icons retain the button's dimensions.
 
 The workspace bar changes the active working document and must show all four supported families by
 name while preserving each family's independent model, draft, selection, analysis, and result state.
-The Model/Results toggle owns the top-level mode boundary. The workflow strip opens the canonical edit target for Model, Materials, Supports,
-Loads, Mesh, and Solve; completion markers come from live model/analysis state. The left builder
-starts directly with Setup and Topology and keeps every entity reachable. Entity navigation,
-inspector tabs, canvas result modes, and result tabs each own one level of state. Tables retain headers
+The Model/Results toggle owns the top-level mode boundary. The canvas toolbar groups drawing and placement; Analysis settings opens from the header. The left explorer
+uses Geometry, Materials, Sections, Supports, Loads, Mesh, Nodes and Elements categories. Each
+category owns an explicit New action and an inline list. Larger lists offer search; selected entities expose Delete selected.
+Lists show 60 records at a time with Show more; the selected entity remains reachable. Entity navigation,
+canvas result modes and result tabs each own one level of state. Properties belongs only to the
+selected entity. Analysis settings is a separate bounded dialog opened from the header;
+loading strategy is visible first, with Newton and step controls in collapsed disclosures. Tables retain headers
 and scroll within their result frame. Surface families
 render as closed Q4 faces; Frame renders as line elements. Every result overlay has a table
 alternative.
 
 Mesh is a first-class item in the left entity navigator alongside nodes, elements, materials,
 constraints, and loads. Selecting it opens the dedicated mesh inspector; the model-family context
-bar and canvas toolbar do not duplicate that canonical action. The canvas status chip always
-reports mesh provenance plus live node/element counts. Target size accepts every finite value
+bar and canvas toolbar do not duplicate that canonical action. The canvas caption reports mesh provenance; the model list reports live node/element totals. Target size accepts every finite value
 greater than zero; an example value is never presented or enforced as a lower bound. Limitations,
 explicit generation, busy state, and generated node/element summary stay together in the inspector.
 Dense surface meshes show every node and element in the tree and canvas by default and keep them
@@ -201,7 +211,88 @@ loaded, and constrained nodes; all mesh nodes remain selectable. Result mode omi
 overlays, displays reactions at all constrained mesh nodes, and retains explicit final-state
 recovery warnings. Nodal load rendering includes every load and nonzero component; rotational
 components use moment arcs. Navy geometry, coral loads, slate supports, and dashed reference
-geometry retain engineering roles distinct from the teal UI actions.
+geometry retain engineering roles distinct from the muted green UI actions.
+
+### CAD outline and load placement
+
+Geometry owns a compact Draw outline / Insert vertex / Add hole flow. Outline creation is a
+transient preview: click corners (Shift constrains the next edge), enter exact X/Y coordinates,
+Undo vertex, then Close outline. Closing a valid outline stages one reversible domain replacement;
+the previous holes, supports and loads are cleared because they belong to the previous domain.
+Cancel restores the committed model. Self-crossing, collapsed and touching contours are rejected.
+Run/Apply stays unavailable while an outline is being drawn. Mesh-pending geometry hides stale FE
+faces and reports its state rather than presenting the previous mesh as current.
+
+HoleFields is the shared shape/dimension form: Circle asks for radius, Rectangle for width and
+height, and Square for side length. The next canvas click sets the center. Invalid or overlapping
+holes stay in placement with an inline error. A selected hole opens the same shape fields plus
+Center X/Y and Update hole; this local dimension proposal is applied to the model draft only by
+Update hole. Reset dimensions discards the local proposal. Existing polygon holes retain vertex
+editing. Circle definitions persist as four arc endpoints and center/radius metadata; Gmsh uses
+real circular arcs while the first-order Q4 boundary consists of straight chords.
+
+Every Load entry starts placement without creating a record or selecting a default location.
+Auto placement maps the first node click to a point load and the first member/element click to a
+line load. The placement selector also offers explicit Point / Line (and Plate/Shell Surface).
+Surface line loads select the nearest exposed edge of the clicked Q4 cell; interior cells are
+rejected, and a Gmsh CAD boundary applies to all its mesh edge segments. Intensity is force/length,
+Frame uses fixed reference local directions, and surface boundaries use fixed global directions.
+Pick location on canvas preserves the load number and intensity when the kind stays the same.
+Changing kind also waits for a target click, leaving the previous load intact until then. Successful
+placement opens the new load's inspector. Escape cancels placement without creating a load.
+
+### Frame creation and section-force diagrams
+
+Every New node/member entry point enters canvas placement. Node clicks create or snap within
+10 screen pixels. Member creation accepts two empty points, existing nodes, or a combination;
+a dashed preview follows the pointer. Zero-length and duplicate members are rejected. The camera
+remains stable throughout placement. Escape exits the tool; Cancel restores the full committed model.
+
+Frame Results offers Moment M, Shear V, and Axial N filled diagrams using one common scale across
+members. Only the selected member shows end and peak values, avoiding overlapping all-member
+text. Diagram clicks and the Member section forces selector share selection; a scrollable station
+table supplies x, N, V, and M. Scientific numeric cells never wrap mid-exponent.
+
+Diagrams use recovered end actions from the last accepted state. Earlier steps show a recovery
+notice and an explicit action to return to that state. Missing end actions produce an empty state.
+N is positive in tension, x follows i to j, V = dM/dx, and M(0) = -Mi / M(L) = Mj after member-load
+correction. Nodal-only recovery uses current member length. Distributed-load corrections use the
+reference local axes and length; the canvas and table disclose the large-rotation approximation.
+Legacy internal-force archive views map to Moment for Frame. Project schemas persist the new views.
+
+ScientificField is the canonical load-component input. It accepts decimal and e/E notation and
+preserves incomplete exponent text. Non-finite inputs stay visible as invalid drafts and cannot
+be applied or sent to the solver. Cancel restores the committed finite value.
+
+### Sections, direct editing, and project files
+
+SectionPanel owns Custom A/I, Rectangle, Circle, I section, Tube, and surface thickness definitions.
+It stages valid materialized properties on assigned elements. Invalid dimensions stay visible and
+block Apply, but Cancel and discard remain available. A definition can be the default for new
+Frame members or regenerated Q4 elements. The server validates the reserved section library and
+its consistency with the actual element properties. Legacy models remain usable without metadata.
+
+SplitElementPanel accepts fractions/decimals measured from i to j, previews positions as text,
+and stages connected members with inherited material/section and interpolated distributed loads.
+Delete and Backspace invoke the same operation as Delete selected, outside fields, IME, dialogs,
+and Results. Model removal is reversible through Cancel. Referenced materials/sections and
+connected nodes require resolving their references first; generated mesh topology stays protected.
+
+Save project opens a bounded dialog with Download project and private account-save destinations.
+Model, run options, optional terminal analysis record, and the selected result view travel together.
+Opening a project validates its version, schema, and model/result fingerprints before restoring it.
+A 20 MB archive limit is separate from the existing solver-submission limit. Legacy model/restart
+files and model-only account snapshots remain supported. Save errors remain in the dialog.
+
+### Progressive disclosure and retained state
+
+Long SectionHeader descriptions use native Details disclosures. Element details and Split member
+use accessible MUI accordions. Entity connectivity, material and section remain immediately editable;
+derived properties and formulation are available in Element details. This removes read-only fields
+from the main editing path without removing evidence. Analysis loading strategy stays visible while
+Newton and step settings remain folded by default. Errors and invalidated-result notices remain
+persistent in their owning form or evidence panel. Opening Analysis from Results returns to Model
+before editing so the draft is never mistaken for the read-only result model.
 
 ### Runtime token mapping
 
@@ -214,10 +305,10 @@ geometry retain engineering roles distinct from the teal UI actions.
 
 ### Forms and overlays
 
-MUI filled TextField/Select remains the canonical field and authored select owner. Fields keep
+MUI outlined TextField/Select remains the canonical field and authored select owner. Fields keep
 persistent labels, numeric step metadata, unit adornments where the unit is already in the model,
 and inline helper/error text. Model and analysis-option edits are staged; the persistent transaction
-strip owns Apply changes and Cancel, while an app-owned three-outcome dialog guards navigation away
+strip owns Cancel and the header owns Apply changes, while an app-owned three-outcome dialog guards navigation away
 from staged work. Snackbars acknowledge completed low-risk actions; validation, solve failure, and
 invalidated results remain persistent inline.
 Tooltips supplement icon actions and never contain the only instruction. The application stylesheet
@@ -226,15 +317,15 @@ as stable gutters.
 
 The first-use beginner guide is an app-owned, keyboard-accessible six-step dialog. It opens on first
 use, can be dismissed permanently with guarded local storage, and always remains available from the
-top-level `Guide` action. Each guide step can open its corresponding workflow destination.
+`Project → Guide` action. Each guide step can open its corresponding workflow destination.
 
 Authentication uses one shared sign-in/register dialog with app-owned validation, masked password
 fields, accessible reveal controls, and a persistent explanation of Guest mode. Accounts are optional:
-Guest can model, mesh, solve, import, and export, while server-enforced saving and model history require
+Guest can model, mesh, solve, open, and download projects with results, while account saving and private history require
 an authenticated HttpOnly session. History is private per account, bounded to 24 snapshots, and uses a
 single pessimistic delete confirmation that names the snapshot and states that deletion is permanent.
 
-The Step 2 Math Core is an App Bar utility, not a fifth model workspace or a Results tab. Its bounded
+The Step 2 Math Core is a Project-menu utility, not a fifth model workspace or a Results tab. Its bounded
 dialog uses the established MUI fields and dialog geometry, pairs each core/operation selector with a
 server-owned executable JSON example, and keeps the residual convention and trial/commit boundary
 visible beside the request. Response envelopes remain literal, scrollable, and monospaced. The tool is

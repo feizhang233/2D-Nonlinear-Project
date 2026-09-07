@@ -1,4 +1,7 @@
-import InsightsRoundedIcon from '@mui/icons-material/InsightsRounded'
+import TableChartOutlinedIcon from '@mui/icons-material/TableChartOutlined'
+import CloseRoundedIcon from '@mui/icons-material/CloseRounded'
+import { Button } from '@mui/material'
+import { useEffect, useState } from 'react'
 import Box from '@mui/material/Box'
 import Paper from '@mui/material/Paper'
 import Stack from '@mui/material/Stack'
@@ -38,48 +41,99 @@ export function ResultsWorkspace({
   onStepChange,
   onSelection,
 }: ResultsWorkspaceProps) {
+  const [detailsOpen, setDetailsOpen] = useState(analysisState !== 'succeeded')
+  useEffect(() => {
+    setDetailsOpen(analysisState !== 'succeeded')
+  }, [analysisState])
   return (
-    <Box component="main" aria-label="Analysis results workspace" sx={{ flex: 1, minHeight: 0, p: 1.25, display: 'grid', gridTemplateColumns: 'minmax(480px, 1.15fr) minmax(520px, 1fr)', gap: 1.25 }}>
-      <Paper sx={{ minWidth: 0, minHeight: 0, overflow: 'hidden', border: '1px solid', borderColor: 'divider', display: 'flex', flexDirection: 'column' }}>
-        <Stack direction="row" spacing={1} sx={{ minHeight: 48, px: 1.5, alignItems: 'center', borderBottom: '1px solid', borderColor: 'divider', bgcolor: 'background.containerLow' }}>
-          <InsightsRoundedIcon color="primary" />
-          <Typography variant="subtitle2">Result visualization</Typography>
-          <Typography variant="caption" color="text.secondary">Committed model · read-only</Typography>
-        </Stack>
-        <Box sx={{ flex: 1, minHeight: 0 }}>
-          <ModelCanvas
-            readOnly
-            showResultControls
-            model={model}
-            result={record?.result ?? null}
-            selectedStep={selectedStep}
-            view={resultView}
-            selection={selection}
-            cadTool="select"
-            placement={null}
-            pendingMember={null}
-            onViewChange={onResultViewChange}
-            onSelection={onSelection}
-            onModelChange={() => undefined}
-            onPlace={() => undefined}
-            onPendingMember={() => undefined}
-          />
+    <Box
+      component="main"
+      aria-label="Analysis results workspace"
+      sx={{ flex: 1, minHeight: 0, display: 'flex', flexDirection: 'column' }}
+    >
+      <Stack
+        direction="row"
+        sx={{
+          height: 46,
+          px: 2,
+          alignItems: 'center',
+          borderBottom: '1px solid',
+          borderColor: 'divider',
+          bgcolor: 'background.paper',
+          gap: 1.5,
+        }}
+      >
+        <Typography variant="subtitle2">Results</Typography>
+        <Typography variant="caption" color="text.secondary">
+          Read-only
+        </Typography>
+        <Box sx={{ flex: 1 }} />
+        <Button
+          size="small"
+          color="inherit"
+          startIcon={detailsOpen ? <CloseRoundedIcon /> : <TableChartOutlinedIcon />}
+          aria-label={detailsOpen ? 'Hide result details' : 'Show result details'}
+          aria-expanded={detailsOpen}
+          onClick={() => setDetailsOpen((value) => !value)}
+        >
+          {detailsOpen ? 'Hide details' : 'Results & tables'}
+        </Button>
+      </Stack>
+      <Box sx={{ flex: 1, minHeight: 0, display: 'flex' }}>
+        <Box sx={{ flex: 1, minWidth: 0, minHeight: 0, display: 'flex', flexDirection: 'column' }}>
+          <Box sx={{ flex: 1, minHeight: 0 }}>
+            <ModelCanvas
+              readOnly
+              showResultControls
+              model={model}
+              result={record?.result ?? null}
+              selectedStep={selectedStep}
+              view={resultView}
+              selection={selection}
+              cadTool="select"
+              placement={null}
+              pendingMember={null}
+              onViewChange={onResultViewChange}
+              onStepChange={onStepChange}
+              onSelection={onSelection}
+              onModelChange={() => undefined}
+              onPlace={() => undefined}
+              onPendingMember={() => undefined}
+            />
+          </Box>
         </Box>
-      </Paper>
-      <Paper sx={{ minWidth: 0, minHeight: 0, overflow: 'hidden', border: '1px solid', borderColor: 'divider' }}>
-        <ResultsDock
-          standalone
-          model={model}
-          record={record}
-          state={analysisState}
-          error={error}
-          invalidated={invalidated}
-          tab={resultTab}
-          selectedStep={selectedStep}
-          onTabChange={onResultTabChange}
-          onStepChange={onStepChange}
-        />
-      </Paper>
+        {detailsOpen && (
+          <Paper
+            component="aside"
+            aria-label="Result details"
+            square
+            sx={{
+              width: 460,
+              flexShrink: 0,
+              minWidth: 0,
+              minHeight: 0,
+              overflow: 'hidden',
+              borderLeft: '1px solid',
+              borderColor: 'divider',
+            }}
+          >
+            <ResultsDock
+              standalone
+              selection={selection}
+              onSelection={onSelection}
+              model={model}
+              record={record}
+              state={analysisState}
+              error={error}
+              invalidated={invalidated}
+              tab={resultTab}
+              selectedStep={selectedStep}
+              onTabChange={onResultTabChange}
+              onStepChange={onStepChange}
+            />
+          </Paper>
+        )}
+      </Box>
     </Box>
   )
 }

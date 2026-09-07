@@ -7,6 +7,7 @@ import {
   getSketch,
   isGeneratedMesh,
   moveSketchVertex,
+  nodeForSketchVertex,
 } from './geometrySketch'
 import { applySurfaceMesh } from './meshing'
 import { cloneSampleModel } from './sampleModel'
@@ -36,7 +37,11 @@ describe('geometry sketch CAD', () => {
   })
 
   it('keeps geometry vertices after a Gmsh mesh replaces the FE nodes', () => {
-    const model = addRectangularHole(cloneSampleModel('continuum'), [1, 0.5], 0.3)
+    const model = addRectangularHole(
+      cloneSampleModel('continuum'),
+      [1, 0.5],
+      0.3,
+    )
     const response: SurfaceMeshResponse = {
       engine: 'Gmsh',
       engine_version: '4.15.2',
@@ -44,42 +49,111 @@ describe('geometry sketch CAD', () => {
       formulation: 'Q4-total-lagrangian',
       mesh_size: 0.5,
       nodes: [
-        { id: 'N1', coordinates: [0, 0] }, { id: 'N2', coordinates: [1, 0] }, { id: 'N3', coordinates: [2, 0] },
-        { id: 'N4', coordinates: [0, 0.5] }, { id: 'N5', coordinates: [1, 0.5] }, { id: 'N6', coordinates: [2, 0.5] },
-        { id: 'N7', coordinates: [0, 1] }, { id: 'N8', coordinates: [1, 1] }, { id: 'N9', coordinates: [2, 1] },
+        { id: 'N1', coordinates: [0, 0] },
+        { id: 'N2', coordinates: [1, 0] },
+        { id: 'N3', coordinates: [2, 0] },
+        { id: 'N4', coordinates: [0, 0.5] },
+        { id: 'N5', coordinates: [1, 0.5] },
+        { id: 'N6', coordinates: [2, 0.5] },
+        { id: 'N7', coordinates: [0, 1] },
+        { id: 'N8', coordinates: [1, 1] },
+        { id: 'N9', coordinates: [2, 1] },
       ],
       elements: [
-        { id: 'E1', formulation: 'Q4-total-lagrangian', node_ids: ['N1', 'N2', 'N5', 'N4'], material_id: 'M1', properties: { thickness: 0.1 } },
-        { id: 'E2', formulation: 'Q4-total-lagrangian', node_ids: ['N2', 'N3', 'N6', 'N5'], material_id: 'M1', properties: { thickness: 0.1 } },
-        { id: 'E3', formulation: 'Q4-total-lagrangian', node_ids: ['N4', 'N5', 'N8', 'N7'], material_id: 'M1', properties: { thickness: 0.1 } },
-        { id: 'E4', formulation: 'Q4-total-lagrangian', node_ids: ['N5', 'N6', 'N9', 'N8'], material_id: 'M1', properties: { thickness: 0.1 } },
+        {
+          id: 'E1',
+          formulation: 'Q4-total-lagrangian',
+          node_ids: ['N1', 'N2', 'N5', 'N4'],
+          material_id: 'M1',
+          properties: { thickness: 0.1 },
+        },
+        {
+          id: 'E2',
+          formulation: 'Q4-total-lagrangian',
+          node_ids: ['N2', 'N3', 'N6', 'N5'],
+          material_id: 'M1',
+          properties: { thickness: 0.1 },
+        },
+        {
+          id: 'E3',
+          formulation: 'Q4-total-lagrangian',
+          node_ids: ['N4', 'N5', 'N8', 'N7'],
+          material_id: 'M1',
+          properties: { thickness: 0.1 },
+        },
+        {
+          id: 'E4',
+          formulation: 'Q4-total-lagrangian',
+          node_ids: ['N5', 'N6', 'N9', 'N8'],
+          material_id: 'M1',
+          properties: { thickness: 0.1 },
+        },
       ],
       boundaries: [
-        { id: 'B1', label: 'Boundary 1', node_ids: ['N1', 'N2', 'N3'], length: 2, segments: [
-          { element_id: 'E1', local_edge: 0, node_ids: ['N1', 'N2'] },
-          { element_id: 'E2', local_edge: 0, node_ids: ['N2', 'N3'] },
-        ] },
-        { id: 'B2', label: 'Boundary 2', node_ids: ['N3', 'N6', 'N9'], length: 1, segments: [
-          { element_id: 'E2', local_edge: 1, node_ids: ['N3', 'N6'] },
-          { element_id: 'E4', local_edge: 1, node_ids: ['N6', 'N9'] },
-        ] },
-        { id: 'B3', label: 'Boundary 3', node_ids: ['N9', 'N8', 'N7'], length: 2, segments: [
-          { element_id: 'E4', local_edge: 2, node_ids: ['N9', 'N8'] },
-          { element_id: 'E3', local_edge: 2, node_ids: ['N8', 'N7'] },
-        ] },
-        { id: 'B4', label: 'Boundary 4', node_ids: ['N7', 'N4', 'N1'], length: 1, segments: [
-          { element_id: 'E3', local_edge: 3, node_ids: ['N7', 'N4'] },
-          { element_id: 'E1', local_edge: 3, node_ids: ['N4', 'N1'] },
-        ] },
+        {
+          id: 'B1',
+          label: 'Boundary 1',
+          node_ids: ['N1', 'N2', 'N3'],
+          length: 2,
+          segments: [
+            { element_id: 'E1', local_edge: 0, node_ids: ['N1', 'N2'] },
+            { element_id: 'E2', local_edge: 0, node_ids: ['N2', 'N3'] },
+          ],
+        },
+        {
+          id: 'B2',
+          label: 'Boundary 2',
+          node_ids: ['N3', 'N6', 'N9'],
+          length: 1,
+          segments: [
+            { element_id: 'E2', local_edge: 1, node_ids: ['N3', 'N6'] },
+            { element_id: 'E4', local_edge: 1, node_ids: ['N6', 'N9'] },
+          ],
+        },
+        {
+          id: 'B3',
+          label: 'Boundary 3',
+          node_ids: ['N9', 'N8', 'N7'],
+          length: 2,
+          segments: [
+            { element_id: 'E4', local_edge: 2, node_ids: ['N9', 'N8'] },
+            { element_id: 'E3', local_edge: 2, node_ids: ['N8', 'N7'] },
+          ],
+        },
+        {
+          id: 'B4',
+          label: 'Boundary 4',
+          node_ids: ['N7', 'N4', 'N1'],
+          length: 1,
+          segments: [
+            { element_id: 'E3', local_edge: 3, node_ids: ['N7', 'N4'] },
+            { element_id: 'E1', local_edge: 3, node_ids: ['N4', 'N1'] },
+          ],
+        },
       ],
     }
     const meshed = applySurfaceMesh(model, response)
     expect(isGeneratedMesh(meshed)).toBe(true)
-    expect(getSketch(meshed).vertices.length).toBe(getSketch(model).vertices.length)
-    expect(editablePlacementNodes(meshed).map((node) => node.label)).toEqual(
-      getSketch(meshed).vertices.map((_, index) => `V${index + 1}`),
+    expect(getSketch(meshed).vertices.length).toBe(
+      getSketch(model).vertices.length,
     )
-    expect(meshed.nodes.some((node) => node.extensions?.geometry_vertex_id)).toBe(true)
-    expect(geometryNeedsMesh(moveSketchVertex(meshed, getSketch(meshed).vertices[0].id, [-0.1, 0]))).toBe(true)
+    expect(editablePlacementNodes(meshed).map((node) => node.label)).toEqual([
+      'V1',
+      'V2',
+      'V3',
+      'V4',
+    ])
+    // This mock mesh contains no hole vertices; never bind them to a distant node.
+    expect(
+      nodeForSketchVertex(meshed, getSketch(meshed).vertices[4]),
+    ).toBeUndefined()
+    expect(
+      meshed.nodes.some((node) => node.extensions?.geometry_vertex_id),
+    ).toBe(true)
+    expect(
+      geometryNeedsMesh(
+        moveSketchVertex(meshed, getSketch(meshed).vertices[0].id, [-0.1, 0]),
+      ),
+    ).toBe(true)
   })
 })

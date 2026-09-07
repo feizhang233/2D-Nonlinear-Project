@@ -3,6 +3,7 @@ import type { SurfaceMeshResponse } from './domain'
 import { getSketch } from './geometrySketch'
 import { applySurfaceMesh, meshBoundaries, meshSizeForModel, meshStatusForModel, withMeshSize } from './meshing'
 import { cloneSampleModel } from './sampleModel'
+import { addSection, updateSection, setDefaultSection, sectionIdForElement } from './sections'
 
 const response: SurfaceMeshResponse = {
   engine: 'Gmsh',
@@ -42,6 +43,16 @@ const response: SurfaceMeshResponse = {
 }
 
 describe('Gmsh model bridge', () => {
+  it('applies the default thickness section to every regenerated element', () => {
+    const added = addSection(cloneSampleModel('continuum'))
+    const edited = updateSection(added.model, { id: added.id, name: 'Slab', shape: 'thickness', dimensions: { thickness: 0.24 } })
+    const model = setDefaultSection(edited, added.id)
+    const remeshed = applySurfaceMesh(model, response)
+    expect(remeshed.elements).toHaveLength(4)
+    expect(remeshed.elements.every((element) => element.properties.thickness === 0.24)).toBe(true)
+    expect(remeshed.elements.every((element) => sectionIdForElement(remeshed, element) === added.id)).toBe(true)
+    expect(response.elements[0].properties.thickness).toBe(0.1)
+  })
   it('replaces Q4 topology and propagates matching endpoint supports along a boundary', () => {
     const model = cloneSampleModel('continuum')
     const remeshed = applySurfaceMesh(model, response)

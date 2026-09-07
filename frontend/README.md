@@ -47,7 +47,8 @@ reference operation never changes the active workspace, staged model, or Results
 ## Workbench interaction
 
 The editor uses a left model navigator, a central drawing canvas, and a right
-Properties/Analysis inspector. The bottom Apply/Cancel bar commits staged changes.
+Properties inspector that opens on selection. Analysis settings opens from the header in its own dialog.
+The header button applies staged changes, then becomes Run analysis; the bottom bar cancels edits.
 All four model families keep independent documents and results.
 
 - Wheel or +/− controls: zoom about the pointer or viewport center.
@@ -55,7 +56,7 @@ All four model families keep independent documents and results.
 - Pan view, Alt + drag, or middle drag: move the view; canvas arrow keys also pan.
 - Escape: cancel a drag or leave pan/edit placement mode.
 - Node/sketch drag: preview while moving; stage one change on release.
-- Ctrl/Command + Enter: run/cancel only outside fields, menus, and dialogs.
+- Ctrl/Command + Enter: apply/run/cancel according to state, outside fields, menus, and dialogs.
 
 Generated surface mesh entities are inspectable but remain read-only. Import
 validates the model with the backend before replacing the current document.
@@ -64,3 +65,48 @@ cancellation; uncertain server completion is never automatically retried.
 
 See [the September 2026 audit](../FRONTEND_AUDIT_2026-09-05.md) for findings,
 fixes, verification, and remaining platform boundaries.
+
+## Project editing and persistence
+
+- Use the category explorer for Geometry, Materials, Sections, Supports, Loads, Mesh, Nodes and Elements.
+- Sections support custom A/I, rectangles, circles, I sections, tubes, and surface thickness. Assign to one or all elements; choose a default for new members and remeshing.
+- Select a load/support on the canvas or in the explorer, then press Delete or Backspace. The same operation is available as Delete selected. Cancel restores staged removals.
+- Select a Frame member and use Split selected / Split member. Half, quarters, thirds or custom fractions/decimals create connected members and preserve distributed loading.
+- Save project downloads model/settings and optional results, or saves a private account snapshot. Open accepts project, legacy model and restart JSON. Archived results are verified against the model before restoration.
+- Archives are limited to 20 MB. Solver submissions retain the 1 MiB limit. Remeshing applies the default section to new elements; mixed per-element assignments should be reviewed afterward.
+
+## Frame diagrams and point creation
+
+Use Node or New nodes, then click the canvas. Use Member or New elements, then click two points;
+endpoints snap to nearby existing nodes, and empty points create new nodes. Cancel restores the
+committed model. Load components accept scientific notation such as `-2.5e4`; incomplete or
+non-finite values stay invalid until corrected.
+
+After solving, choose Moment M, Shear V, or Axial N. Click a diagram to show its end/peak labels,
+or use Result tables → Member section forces for station values. Diagram and table selection
+stay synchronized. Recovery belongs to the last accepted state; earlier steps offer a return action.
+Distributed member-load correction uses reference axes and is approximate for large rotations.
+See [Frame workflow acceptance](../FRAME_WORKFLOW_UPDATE_2026-09-06.md) for conventions and checks.
+
+## Simplified workspace
+
+The compact header keeps Save, Analysis and Apply/Run in stable positions. Project groups Open,
+Export, History, Math Core, Guide and example reset. The model list expands one category at a time;
+large lists include search. Properties occupies no space when closed and retains unfinished input.
+The canvas toolbar owns drawing and placement; Sections and Split member stay in their contextual
+locations. Successful analyses foreground the result canvas; Results & tables opens the evidence
+panel, which appears automatically for progress and failures. See
+[the UI redesign acceptance](../SIMPLE_UI_REDESIGN_2026-09-06.md).
+
+### CAD and load placement
+
+Use **Load**, then click a node for a point load or a member / exposed Q4 edge for a line load.
+The placement selector can constrain the kind. Load intensities support decimal and `e` notation.
+The same first-click rule applies to **Loads → New load** and **Pick location on canvas**.
+
+In a surface workspace, **Outline** starts a polygon sketch. Click vertices (Shift aligns an edge),
+or enter exact X/Y, then **Close outline**. This replaces the domain and its old holes/supports/loads;
+**Cancel** restores the committed model. **Hole** offers Circle (radius), Rectangle (width/height),
+or Square (side), then a canvas click places its center. Select a hole to update its dimensions.
+Generate a new mesh from **Mesh** after geometry changes. Circular CAD edges use Gmsh arcs;
+first-order Q4 elements approximate the curved boundary with straight edge segments.
