@@ -1,12 +1,12 @@
 # Nonlinear Studio
 
-基于 React、FastAPI 和 Python 的有限元工作台，提供 Frame、Continuum、Plate、Shell 建模、准静态非线性分析与结果查看，并集成独立的数学参考工具。
+A React, FastAPI, and Python finite-element workbench for Frame, Continuum, Plate, and Shell modeling, quasi-static nonlinear analysis, and independent mathematical reference calculations.
 
-[在线应用](https://nonlinear.feizhang233.com) · [详细文档](docs/README.md) · [模型示例](examples/README.md)
+### [🚀 Try Nonlinear Studio Online →](https://nonlinear.feizhang233.com)
 
-## 快速启动
+## Quick start
 
-需要 Python 3.11+、Node.js 22+ 和 npm。在仓库根目录执行：
+Requirements: Python 3.11+, Node.js 22+, and npm. From the repository root:
 
 ```bash
 python3 -m venv .venv
@@ -16,34 +16,34 @@ npm --prefix frontend ci
 nonlinear-api
 ```
 
-另开终端运行 `npm --prefix frontend run dev`，访问 [工作台](http://127.0.0.1:5173)；[API 文档](http://127.0.0.1:8000/docs)提供完整请求与响应定义。Windows 激活命令为 `.venv\Scripts\Activate.ps1`。
+In another terminal, run `npm --prefix frontend run dev`. Open the [workbench](http://127.0.0.1:5173) or [API documentation](http://127.0.0.1:8000/docs). On Windows, activate the environment with `.venv\Scripts\Activate.ps1`.
 
-## 应用模块与使用
+## Application modules
 
-| 模块 | 用途与操作 |
+| Module | Use |
 | --- | --- |
-| 建模 | 切换四类工作区，通过画布、模型树和属性表编辑；Frame 支持截面分配、杆件拆分，面模型支持轮廓与孔洞 |
-| 材料与边界 | 设置材料、截面或厚度、约束，以及当前模型支持的节点／杆件／边界／面荷载 |
-| 网格 | Frame 使用显式杆件；Continuum、Plate、Shell 通过 Gmsh 生成 Q4 网格，几何修改后重新划分 |
-| 分析 | 设置控制方式、步长和容差，运行分析并查看进度；支持取消与从已提交状态续算 |
-| Results | 查看变形、反力、内力／应力、荷载—位移曲线、收敛记录及失败原因 |
-| 项目 | 导入／导出 JSON，可保存当前模型及结果；登录后使用私人服务端历史记录 |
-| Math Core | 选择数学核心与 operation，载入示例参数、执行计算并查看诊断信息 |
+| Modeling | Edit geometry through the canvas, model tree, and property panels; assign Frame sections, split members, or define surface outlines and holes |
+| Materials and boundaries | Set materials, sections or thicknesses, supports, and supported nodal, member, edge, or surface loads |
+| Meshing | Use explicit Frame members or generate Q4 surface meshes with Gmsh; remesh after changing surface geometry |
+| Analysis | Configure control methods, increments, and tolerances; run, monitor, cancel, or resume from a committed state |
+| Results | Inspect deformation, reactions, internal forces/stresses, load–displacement curves, convergence, and failures |
+| Projects | Import/export model JSON or save a project with results; sign in for private server-side history |
+| Math Core | Select a reference core and operation, load example parameters, execute, and inspect diagnostics |
 
-典型流程：**选择模型 → 编辑几何／材料／边界 → 划分网格 → Apply → Run → Results → 保存**。编辑先进入草稿，Apply 提交、Cancel 撤销；提交修改后旧结果失效。四类工作区各自保留模型与分析状态，基础建模和计算无需登录。
+Workflow: **Select family → Geometry/materials/boundaries → Mesh → Apply → Run → Results → Save**. Edits remain in a draft until Apply; Cancel discards them. Applying changes invalidates old results. Each family keeps its own workspace, and basic modeling and analysis require no account.
 
-## 数学结构与使用边界
+## Mathematical structure
 
-主分析链为 `ModelInput → ModelAdapter → 非线性求解器 → SolveResult`。适配器负责单元组装、内外力、切线和响应恢复；统一求解器负责迭代、步长调整及状态提交。
+The main analysis chain is `ModelInput → ModelAdapter → Nonlinear solver → SolveResult`. Adapters assemble element forces and tangents and recover responses; the shared solver manages equilibrium iterations, increments, and state transactions.
 
-| 模型 | 数学形式 | 节点自由度 | 适用边界 |
+| Family | Formulation | Nodal DOFs | Scope |
 | --- | --- | --- | --- |
-| Frame | 两节点共回转 Euler–Bernoulli 梁 | UX、UY、RZ | 大刚体转动、小应变，不含剪切变形 |
-| Continuum | Total Lagrangian Q4 + Saint-Venant–Kirchhoff 弹性 | UX、UY | 平面应变 |
-| Plate | von Kármán Q4 + MITC4 横向剪切 | UX、UY、UZ、RX、RY | 中等转动、小应变 |
-| Shell | 共回转平面 Q4 + Reissner–Mindlin/QLLL、钻转稳定化 | UX、UY、UZ、RX、RY、RZ | 初始平面壳、小局部应变 |
+| Frame | Two-node corotational Euler–Bernoulli | UX, UY, RZ | Large rigid rotation, small strain; no shear deformation |
+| Continuum | Total Lagrangian Q4, Saint-Venant–Kirchhoff elasticity | UX, UY | Plane strain |
+| Plate | von Kármán Q4 with MITC4 transverse shear | UX, UY, UZ, RX, RY | Moderate rotation, small strain |
+| Shell | Corotational flat Q4, Reissner–Mindlin/QLLL, drilling stabilization | UX, UY, UZ, RX, RY, RZ | Initially flat surfaces, small local strain |
 
-全局平衡采用：
+The global equilibrium convention is:
 
 $$
 \mathbf r=\mathbf f_{ext}-\mathbf f_{int},\qquad
@@ -51,54 +51,56 @@ $$
 \mathbf K_t\Delta\mathbf u=\mathbf r.
 $$
 
-常规增载使用荷载控制；指定节点位移使用位移控制；追踪极限点附近路径可使用球形弧长法。支持完整／修正 Newton、线搜索、自适应增量与失败缩步。每次迭代从已提交状态计算 trial，全局收敛后 commit，失败则 rollback。
+Use **load control** for prescribed load increments, **displacement control** for a selected nodal DOF, and **spherical arc length** to follow paths near limit points. Full/modified Newton, line search, adaptive stepping, and cutback are supported. Trials start from the committed baseline; convergence permits commit, while rejected steps roll back.
 
-**Step 2 Math Core** 提供四组独立参考计算：
+**Step 2 Math Core** exposes four independent reference toolsets:
 
-| 核心 ID | 用途 |
+| Core ID | Operations cover |
 | --- | --- |
-| `plate_shell_buckling` | 线性屈曲、板临界荷载、初始缺陷构造 |
-| `shell_instability` | 临界点分类、屈曲参考与 Koiter 缺陷关系 |
-| `constitutive_nonlinearity` | 材料点更新、算法切线与试算状态 |
-| `general_nonlinear_shell` | 壳运动学、截面、载荷与状态基础运算 |
+| `plate_shell_buckling` | Linear buckling, critical plate loads, initial imperfections |
+| `shell_instability` | Critical-point classification, buckling references, Koiter imperfection relations |
+| `constitutive_nonlinearity` | Material-point updates, algorithmic tangents, trial states |
+| `general_nonlinear_shell` | Shell kinematics, sections, loads, and state primitives |
 
-在工具栏打开 **Math Core** 即可使用；程序入口为 `GET /api/v1/math-cores` 和 `POST /api/v1/math-cores/execute`，请求结构为 `{core, operation, parameters}`。执行后检查 `status`、`error` 和 `diagnostics`，不能只依据 HTTP 状态码判断成功。Python／CLI 示例见 [统一接口](Step%202%20Math%20Core/INTERFACE.md)。
+Open **Math Core** in the toolbar, or use `GET /api/v1/math-cores` and `POST /api/v1/math-cores/execute` with `{core, operation, parameters}`. Check `status`, `error`, and `diagnostics`, even after HTTP success. See the [interface contract](Step%202%20Math%20Core/INTERFACE.md) for Python usage and parameter definitions.
 
-这些参考运算保留各自的符号和验证范围，不修改当前模型，也不自动成为主求解器的材料或壳单元能力。主分析目前不含接触、动力学、生产级塑性或通用曲壳；数学推导与验证入口见 [数学核心指南](2D-Nonlinear-Project_Math-Core-Guide) 和 [计算审计](docs/MATH_CORE_CALCULATION_AUDIT.md)。
+Reference operations preserve their own sign conventions and verification limits. They do not modify the active model or automatically extend the main solver. Main analyses do not currently include contact, dynamics, production plasticity, or general curved shells.
 
-## 数据结构
+## Data structures
 
-公开模型合同版本为 `1.0.0`，由 Python Pydantic 定义，前端使用对应 TypeScript 类型。
+The public model contract is version `1.0.0`, defined with Python Pydantic and corresponding frontend TypeScript types.
 
-| 结构 | 主要字段与关系 |
+| Structure | Fields and relationships |
 | --- | --- |
-| `ModelInput` | `schema_version`、`model_id`、`name`、`model_family`、`units`，以及下列实体和 `analysis`、`extensions` |
-| 节点／单元／材料 | `nodes: {id, coordinates}`；`elements: {id, formulation, node_ids, material_id, properties}`；`materials: {id, model, parameters}` |
-| 荷载／约束 | `loads` 通过 `node_id` 或 `element_id` 定位，包含 `kind`、`components`；`constraints` 使用 `{id, node_id, dof, value}` |
-| `analysis` | 控制方法、Newton 方法、容差、步长、线搜索及位移／弧长控制参数 |
-| `extensions` | CAD 几何、截面库等扩展信息；几何轮廓与生成的有限元节点／单元分开保存 |
-| `SolveResult` | 模型哈希、求解器版本、状态、`steps`、`failures`、`post_result`；每步包含迭代记录与响应 |
-| `AnalysisRecord` | API 任务 ID、状态、进度，以及 `result` 或 `error` |
-| 重启数据 | `committed_state` 保存已收敛位移、荷载因子、历史及身份信息；弧长续算另含增量方向 |
-| `ProjectDocument` | `{studio_project_version, model, workspace}`；`workspace` 保存运行选项、可选分析记录和结果视图 |
+| `ModelInput` | `schema_version`, `model_id`, `name`, `model_family`, `units`, entity collections, `analysis`, and `extensions` |
+| Nodes / elements / materials | Nodes store `id` and `coordinates`; elements link `node_ids` and `material_id` with `formulation` and `properties`; materials store `model` and `parameters` |
+| Loads / constraints | Loads identify a target and carry `kind` and `components`; constraints use `{id, node_id, dof, value}` |
+| `analysis` | Control method, Newton method, tolerances, stepping, line search, and displacement/arc-length options |
+| `extensions` | CAD geometry, section libraries, and other extensions; geometry remains separate from generated FE nodes/elements |
+| `SolveResult` | Model hash, solver version, status, `steps`, `failures`, and `post_result`; steps contain iterations and responses |
+| `AnalysisRecord` | API task ID, status, progress, and `result` or `error` |
+| Restart | `committed_state` stores converged displacement, load factor, history, and identity; arc-length restart also retains increment direction |
+| `ProjectDocument` | `{studio_project_version, model, workspace}`; workspace contains run options, an optional analysis record, and result-view settings |
 
-实体通过 ID 关联；重复 ID、无效引用和不兼容自由度会在执行前报错。全局自由度按“节点顺序 → 模型自由度顺序”排列。单位标签不自动换算，输入数值需使用自洽单位制。
+Entities reference one another by ID. Validation rejects duplicate IDs, invalid references, and incompatible DOFs. Global vectors follow node order, then family DOF order. Unit labels do not convert values: inputs must use a consistent unit system.
 
-前端状态为 `StudioState.workspaces[ModelFamily] → WorkspaceState`，包含正式模型、草稿、`modelRevision` 和分析记录；版本检查防止旧异步结果覆盖新模型。项目 JSON 保存当前工作区，服务端账户与历史使用 SQLite，异步任务保存在单个 API 进程内。
+Frontend state is `StudioState.workspaces[ModelFamily] → WorkspaceState`, containing the model, draft, revision, and analysis record. Revision checks prevent stale asynchronous results from replacing newer model state. A project file saves the current workspace; SQLite stores accounts and saved history, while asynchronous jobs live in one API process.
 
-字段详情见 [模型定义](src/nonlinear_core/model.py)、[结果定义](src/nonlinear_core/result.py)、[API／项目定义](src/nonlinear_api/schemas.py) 和 [JSON Schema](schemas/model-input-1.0.0.schema.json)。
+See [model types](src/nonlinear_core/model.py), [result types](src/nonlinear_core/result.py), [API/project types](src/nonlinear_api/schemas.py), and the [JSON Schema](schemas/model-input-1.0.0.schema.json).
 
-## 代码导航与验证
+## Repository and checks
 
 ```text
-frontend/src/             工作台、画布、编辑状态与结果展示
-src/nonlinear_api/        HTTP 接口、网格、任务服务与账户存储
-src/nonlinear_core/       数据合同、适配器、单元、求解器及状态事务
-src/reused_cores/         带来源记录的线性 Frame 基础代码
-Step 2 Math Core/        四组参考核心、统一接口与验证入口
-examples/ · tests/        输入示例、单元／集成／数值验证
-schemas/ · docs/          公开合同与详细说明
+frontend/src/             Workbench, canvas, editing state, and results
+src/nonlinear_api/        HTTP endpoints, meshing, jobs, and account storage
+src/nonlinear_core/       Contracts, adapters, elements, solvers, and state
+src/reused_cores/         Provenance-tracked linear Frame foundation
+Step 2 Math Core/        Reference implementations and unified interface
+tests/                   Unit, integration, and numerical verification
+schemas/ · scripts/       Public contracts, audit, and release tooling
 ```
+
+Study guides, reference books, generated reports, and local deliverables are excluded from Git. Runtime code, build/deployment configuration, API documentation, tests, and required fixtures remain versioned.
 
 ```bash
 python -m pytest

@@ -22,3 +22,41 @@ dependencies/
 /examples/
 /2D-Nonlinear-Project_逐步开发计划.md
 /2D-Nonlinear-Project_Math-Core-Guide/
+
+# Local work products and design/review notes (keep source and CI fixtures).
+/.codex_work/
+/deliverables/
+/DESIGN.md
+/UX-CONTRACT.md
+/*_UPDATE_*.md
+/*_AUDIT_*.md
+/*_REDESIGN_*.md
+/premium-audit.json
+
+# Step 2 reading packages and generated evidence are not runtime inputs.
+# Keep Python implementations, package metadata, tests, and interface docs.
+/Step 2 Math Core/**/四项目数学核心演算/
+/Step 2 Math Core/**/01_核心算法/
+/Step 2 Math Core/**/02_算法局限/
+/Step 2 Math Core/**/03_验证题目与答案/
+/Step 2 Math Core/**/04_完整参考/
+/Step 2 Math Core/**/04_参考资料/
+/Step 2 Math Core/**/05_参考资料/
+/Step 2 Math Core/**/05_来源映射/
+/Step 2 Math Core/**/06_来源映射/
+/Step 2 Math Core/**/06_学习路线/
+/Step 2 Math Core/**/07_学习路线/
+/Step 2 Math Core/**/06_生成脚本/
+/Step 2 Math Core/**/07_可复现脚本/
+/Step 2 Math Core/**/08_可复现脚本/
+/Step 2 Math Core/**/validate_package.py
+/Step 2 Math Core/**/artifacts/
+/Step 2 Math Core/**/results/
+/Step 2 Math Core/**/output/
+/Step 2 Math Core/**/AI_CONTENT_INDEX.json
+/Step 2 Math Core/**/AI_USAGE.md
+/Step 2 Math Core/**/CONTENT_INDEX.md
+/Step 2 Math Core/**/FILE_MANIFEST.sha256
+/Step 2 Math Core/**/AGENTS.md
+/Step 2 Math Core/*/*/README.md
+/Step 2 Math Core/PACKAGE_INDEX.json
