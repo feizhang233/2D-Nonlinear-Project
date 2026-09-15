@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 from collections.abc import Mapping
+from dataclasses import asdict
 from typing import Any
 
 import numpy as np
@@ -49,14 +50,15 @@ def describe_core(core_id: str) -> CoreMetadata:
 def execute(request: MathCoreRequest | Mapping[str, Any]) -> MathCoreResponse:
     """Execute a request and always return a stable success/error envelope."""
 
-    raw = request if isinstance(request, Mapping) else {}
+    raw = asdict(request) if isinstance(request, MathCoreRequest) else request
+    raw = raw if isinstance(raw, Mapping) else {}
     core_hint = str(raw.get("core", "")) if isinstance(raw, Mapping) else ""
     operation_hint = str(raw.get("operation", "")) if isinstance(raw, Mapping) else ""
     request_id_hint = raw.get("request_id") if isinstance(raw, Mapping) else None
 
     try:
         parsed = (
-            request
+            MathCoreRequest.from_mapping(asdict(request))
             if isinstance(request, MathCoreRequest)
             else MathCoreRequest.from_mapping(request)
         )

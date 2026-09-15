@@ -67,6 +67,15 @@ class MathCoreRequest:
     def from_mapping(cls, value: Mapping[str, Any]) -> MathCoreRequest:
         if not isinstance(value, Mapping):
             raise InterfaceError("INVALID_REQUEST", "request must be a mapping")
+        unknown = sorted(
+            set(value) - {"schema_version", "request_id", "core", "operation", "parameters"}
+        )
+        if unknown:
+            raise InterfaceError(
+                "INVALID_REQUEST",
+                "request contains unsupported fields",
+                details={"unknown": unknown},
+            )
         schema_version = value.get("schema_version", SCHEMA_VERSION)
         if schema_version != SCHEMA_VERSION:
             raise InterfaceError(
@@ -78,14 +87,18 @@ class MathCoreRequest:
         operation = value.get("operation")
         parameters = value.get("parameters", {})
         request_id = value.get("request_id")
-        if not isinstance(core, str) or not core:
-            raise InterfaceError("INVALID_REQUEST", "core must be a non-empty string")
-        if not isinstance(operation, str) or not operation:
-            raise InterfaceError("INVALID_REQUEST", "operation must be a non-empty string")
+        if not isinstance(core, str) or not 1 <= len(core) <= 80:
+            raise InterfaceError("INVALID_REQUEST", "core must contain 1 to 80 characters")
+        if not isinstance(operation, str) or not 1 <= len(operation) <= 80:
+            raise InterfaceError("INVALID_REQUEST", "operation must contain 1 to 80 characters")
         if not isinstance(parameters, Mapping):
             raise InterfaceError("INVALID_REQUEST", "parameters must be a mapping")
-        if request_id is not None and not isinstance(request_id, str):
-            raise InterfaceError("INVALID_REQUEST", "request_id must be a string or null")
+        if request_id is not None and (
+            not isinstance(request_id, str) or not 1 <= len(request_id) <= 160
+        ):
+            raise InterfaceError(
+                "INVALID_REQUEST", "request_id must contain 1 to 160 characters or be null"
+            )
         return cls(
             core=core,
             operation=operation,
@@ -132,9 +145,11 @@ def to_jsonable(value: Any) -> Any:
     if isinstance(value, Enum):
         return to_jsonable(value.value)
     if isinstance(value, np.ndarray):
-        return value.tolist()
+        return to_jsonable(value.tolist())
+    if isinstance(value, np.floating):
+        return to_jsonable(float(value))
     if isinstance(value, np.generic):
-        return value.item()
+        return to_jsonable(value.item())
     if isinstance(value, Path):
         return str(value)
     if isinstance(value, Mapping):

@@ -260,7 +260,7 @@ correction. Nodal-only recovery uses current member length. Distributed-load cor
 reference local axes and length; the canvas and table disclose the large-rotation approximation.
 Legacy internal-force archive views map to Moment for Frame. Project schemas persist the new views.
 
-ScientificField is the canonical load-component input. It accepts decimal and e/E notation and
+ScientificField is the canonical numeric input for load components and analysis settings. It accepts decimal and e/E notation and
 preserves incomplete exponent text. Non-finite inputs stay visible as invalid drafts and cannot
 be applied or sent to the solver. Cancel restores the committed finite value.
 

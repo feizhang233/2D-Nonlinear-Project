@@ -236,3 +236,27 @@ HTTP 层保留 1 MiB 全局请求上限，并额外限制参数值数量和嵌�
 - 原数学包版本单独记录在 `diagnostics.core_version`；
 - `PACKAGE_INDEX.json` 是路径和验证入口的机器可读权威清单；
 - 原包内部文件移动后，必须先更新清单与适配路径，再运行全部统一接口测试。
+
+## Contract alignment (2026-09-15)
+
+`OperationSpec` is the single source of required and optional operation parameter names.
+`CoreAdapter.run` validates those names before dispatch. Registry construction rejects missing
+handlers, duplicate operation/parameter names, and examples that contradict the published
+contract. Nested material/state/options validation remains owned by its adapter and source core.
+
+Python mapping and `MathCoreRequest` calls validate the same envelope fields as HTTP requests:
+core/operation identifiers contain 1–80 characters; request IDs are null or 1–160 characters;
+unknown envelope fields are rejected. HTTP schema failures retain HTTP 422; direct Python
+validation failures retain the stable error envelope. Parameters must contain finite numbers.
+NumPy arrays/scalars use the same recursive JSON serialization as ordinary Python values;
+nonfinite diagnostic results become `null`, including values nested inside NumPy arrays.
+
+The frontend derives required/optional keys and input size/depth limits from the server catalog.
+Changing core, operation, parameters, resetting the example, or closing the dialog invalidates
+an outstanding response. Aborting the browser request does not guarantee server cancellation.
+Calculation errors with HTTP 200 retain `status="error"`; HTTP success alone is not numerical
+success. The tool remains independent of the active structural model and solver state.
+
+Repeated operation names across different cores are intentionally retained: they identify
+separate algorithms with different assumptions and numerical evidence. Always route by both
+`core` and `operation`, and preserve each core's sign convention and limitations.

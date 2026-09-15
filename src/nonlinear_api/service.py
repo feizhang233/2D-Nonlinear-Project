@@ -466,6 +466,22 @@ class AnalysisService:
 
     def _validate_control_request(self, model: ModelInput, payload: AnalysisRequest) -> None:
         control = model.analysis.control_method
+        if model.analysis.line_search.enabled:
+            if control is ControlMethod.ARC_LENGTH:
+                self._input_problem(
+                    "CONTROL_PARAMETER_INVALID",
+                    "line search is not supported for arc-length control",
+                    "$.model.analysis.line_search.enabled",
+                )
+            # None of the registered structural adapters declares conservative=true.
+            # Orthogonality remains available to direct-core callers with that evidence.
+            if model.analysis.line_search.method.value == "orthogonality":
+                self._input_problem(
+                    "CONTROL_PARAMETER_INVALID",
+                    "structural adapters do not declare conservative response metadata; "
+                    "use backtracking line search or disable line search",
+                    "$.model.analysis.line_search.method",
+                )
         if control is ControlMethod.LOAD:
             if payload.number_of_steps is not None:
                 self._input_problem(

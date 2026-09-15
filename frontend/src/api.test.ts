@@ -55,3 +55,22 @@ describe('API transport failures', () => {
     await expect(cancelled).rejects.toMatchObject({ name: 'AbortError' })
   })
 })
+
+describe('analysis control payloads', () => {
+  afterEach(() => vi.restoreAllMocks())
+  it.each(MODEL_FAMILY_ORDER.flatMap(family => (['load', 'displacement', 'arc_length'] as const).map(control => ({ family, control }))))('sends only the $control run parameter for $family', async ({ family, control }) => {
+    const fetchMock = vi.spyOn(globalThis, 'fetch').mockResolvedValue(new Response('{}', { status: 201 }))
+    const model = cloneSampleModel(family)
+    model.analysis.control_method = control
+    await runAnalysis(model, { targetLoadFactor: 2.5, numberOfSteps: 7 }, null)
+    const payload = JSON.parse(String(fetchMock.mock.calls[0][1]?.body))
+    expect(payload.model.analysis.control_method).toBe(control)
+    if (control === 'load') {
+      expect(payload.target_load_factor).toBe(2.5)
+      expect(payload).not.toHaveProperty('number_of_steps')
+    } else {
+      expect(payload.number_of_steps).toBe(7)
+      expect(payload).not.toHaveProperty('target_load_factor')
+    }
+  })
+})

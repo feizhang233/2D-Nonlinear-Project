@@ -42,6 +42,20 @@ class CoreAdapter:
     metadata: CoreMetadata
     handlers: Mapping[str, Handler]
 
+    def __post_init__(self) -> None:
+        names = [spec.name for spec in self.metadata.operations]
+        if len(names) != len(set(names)) or set(names) != set(self.handlers):
+            raise ValueError("operation metadata must match registered handlers exactly")
+        for spec in self.metadata.operations:
+            parameters = spec.required_parameters + spec.optional_parameters
+            if len(parameters) != len(set(parameters)):
+                raise ValueError(f"duplicate parameters in {spec.name}")
+            _arguments(
+                spec.example_parameters,
+                required=spec.required_parameters,
+                optional=spec.optional_parameters,
+            )
+
     def run(self, operation: str, parameters: Mapping[str, Any]) -> Any:
         try:
             handler = self.handlers[operation]
@@ -51,7 +65,23 @@ class CoreAdapter:
                 f"core {self.metadata.core_id!r} does not support operation {operation!r}",
                 details={"supported": sorted(self.handlers)},
             ) from exc
-        return handler(parameters)
+        spec = next(spec for spec in self.metadata.operations if spec.name == operation)
+        values = _arguments(
+            parameters, required=spec.required_parameters, optional=spec.optional_parameters
+        )
+        _validate_finite(values)
+        return handler(values)
+
+
+def _validate_finite(value: Any) -> None:
+    if isinstance(value, Mapping):
+        for item in value.values():
+            _validate_finite(item)
+    elif isinstance(value, (list, tuple, np.ndarray)):
+        for item in np.asarray(value).flat if isinstance(value, np.ndarray) else value:
+            _validate_finite(item)
+    elif isinstance(value, (float, np.floating)) and not np.isfinite(value):
+        raise InterfaceError("INVALID_PARAMETERS", "parameters must contain only finite numbers")
 
 
 def _import_from(root: Path, module_name: str):
@@ -99,7 +129,6 @@ def _mapping(value: Any, *, name: str) -> dict[str, Any]:
 
 
 def _plate_verify(parameters: Mapping[str, Any]) -> dict[str, Any]:
-    _arguments(parameters)
     verification = _import_from(PLATE_ROOT, "plate_shell_buckling_core.verification")
     records = verification.run_validation_suite()
     return {
@@ -111,7 +140,7 @@ def _plate_verify(parameters: Mapping[str, Any]) -> dict[str, Any]:
 
 
 def _plate_analysis_level(parameters: Mapping[str, Any]) -> dict[str, Any]:
-    values = _arguments(parameters, required=("question_kind",))
+    values = dict(parameters)
     contracts = _import_from(PLATE_ROOT, "plate_shell_buckling_core.contracts")
     level = contracts.analysis_level_for(values["question_kind"])
     return {
@@ -121,11 +150,7 @@ def _plate_analysis_level(parameters: Mapping[str, Any]) -> dict[str, Any]:
 
 
 def _plate_linear_buckling(parameters: Mapping[str, Any]) -> dict[str, Any]:
-    values = _arguments(
-        parameters,
-        required=("material_stiffness", "geometric_stiffness"),
-        optional=("spectral_tolerance",),
-    )
+    values = dict(parameters)
     lba = _import_from(PLATE_ROOT, "plate_shell_buckling_core.lba")
     pairs = lba.solve_generalized_buckling(
         values.pop("material_stiffness"),
@@ -140,28 +165,19 @@ def _plate_linear_buckling(parameters: Mapping[str, Any]) -> dict[str, Any]:
 
 
 def _plate_uniaxial(parameters: Mapping[str, Any]) -> Any:
-    values = _arguments(
-        parameters,
-        required=("a_mm", "b_mm", "thickness_mm", "young_mpa", "poisson"),
-        optional=("max_m", "max_n"),
-    )
+    values = dict(parameters)
     lba = _import_from(PLATE_ROOT, "plate_shell_buckling_core.lba")
     return lba.uniaxial_rectangular_plate(**values)
 
 
 def _plate_imperfection(parameters: Mapping[str, Any]) -> Any:
-    values = _arguments(
-        parameters,
-        required=("normal_mode", "amplitude_mm", "sign"),
-        optional=("fixed_mask",),
-    )
+    values = dict(parameters)
     imperfections = _import_from(PLATE_ROOT, "plate_shell_buckling_core.imperfections")
     normal_mode = values.pop("normal_mode")
     return imperfections.map_normal_imperfection(normal_mode, **values)
 
 
 def _instability_verify(parameters: Mapping[str, Any]) -> dict[str, Any]:
-    _arguments(parameters)
     _import_from(INSTABILITY_ROOT / "src", "shell_instability_math")
     runner = _import_from(INSTABILITY_ROOT, "run_validation_problems")
     results, _markdown = runner.calculate()
@@ -176,11 +192,7 @@ def _instability_verify(parameters: Mapping[str, Any]) -> dict[str, Any]:
 
 
 def _instability_linear_buckling(parameters: Mapping[str, Any]) -> dict[str, Any]:
-    values = _arguments(
-        parameters,
-        required=("material_stiffness", "geometric_stiffness"),
-        optional=("positive_only", "zero_tolerance"),
-    )
+    values = dict(parameters)
     buckling = _import_from(INSTABILITY_ROOT / "src", "shell_instability_math.buckling")
     material = values.pop("material_stiffness")
     geometric = values.pop("geometric_stiffness")
@@ -193,16 +205,7 @@ def _instability_linear_buckling(parameters: Mapping[str, Any]) -> dict[str, Any
 
 
 def _instability_classify(parameters: Mapping[str, Any]) -> Any:
-    values = _arguments(
-        parameters,
-        required=("tangent", "reference_load", "right_null_vector"),
-        optional=(
-            "left_null_vector",
-            "projection_tolerance",
-            "singular_value_tolerance",
-            "null_residual_tolerance",
-        ),
-    )
+    values = dict(parameters)
     critical = _import_from(INSTABILITY_ROOT / "src", "shell_instability_math.critical")
     tangent = values.pop("tangent")
     reference_load = values.pop("reference_load")
@@ -211,11 +214,7 @@ def _instability_classify(parameters: Mapping[str, Any]) -> Any:
 
 
 def _instability_koiter(parameters: Mapping[str, Any]) -> dict[str, Any]:
-    values = _arguments(
-        parameters,
-        required=("imperfection_magnitudes",),
-        optional=("coefficient",),
-    )
+    values = dict(parameters)
     koiter = _import_from(INSTABILITY_ROOT / "src", "shell_instability_math.koiter")
     magnitudes = values.pop("imperfection_magnitudes")
     return {
@@ -225,16 +224,7 @@ def _instability_koiter(parameters: Mapping[str, Any]) -> dict[str, Any]:
 
 
 def _instability_cylinder(parameters: Mapping[str, Any]) -> Any:
-    values = _arguments(
-        parameters,
-        required=(
-            "elastic_modulus_mpa",
-            "poisson_ratio",
-            "radius_mm",
-            "thickness_mm",
-            "length_mm",
-        ),
-    )
+    values = dict(parameters)
     benchmarks = _import_from(INSTABILITY_ROOT / "src", "shell_instability_math.benchmarks")
     return benchmarks.cylinder_axial_buckling(**values)
 
@@ -244,7 +234,6 @@ def _constitutive_module():
 
 
 def _constitutive_verify(parameters: Mapping[str, Any]) -> dict[str, Any]:
-    _arguments(parameters)
     results = _constitutive_module().run_reference_checks()
     verification_ids = sorted(key for key in results if key.startswith("V"))
     return {
@@ -268,11 +257,7 @@ def _combined_state(module: Any, value: Any):
 
 
 def _constitutive_material_update(parameters: Mapping[str, Any]) -> dict[str, Any]:
-    values = _arguments(
-        parameters,
-        required=("model", "total_strain", "committed_state", "material"),
-        optional=("options",),
-    )
+    values = dict(parameters)
     module = _constitutive_module()
     model = values["model"]
     material = _mapping(values["material"], name="material")
@@ -344,7 +329,6 @@ def _material_response(
 
 
 def _general_verify(parameters: Mapping[str, Any]) -> dict[str, Any]:
-    _arguments(parameters)
     verification = _import_from(GENERAL_SHELL_ROOT, "general_nonlinear_shell_math.verification")
     records = verification.run_all_verifications()
     status_counts: dict[str, int] = {}
@@ -363,11 +347,7 @@ def _general_verify(parameters: Mapping[str, Any]) -> dict[str, Any]:
 
 
 def _general_rotation(parameters: Mapping[str, Any]) -> dict[str, Any]:
-    values = _arguments(
-        parameters,
-        required=("current_rotation", "increment"),
-        optional=("increment_type",),
-    )
+    values = dict(parameters)
     rotations = _import_from(GENERAL_SHELL_ROOT, "general_nonlinear_shell_math.rotations")
     current = values.pop("current_rotation")
     increment = values.pop("increment")
@@ -376,10 +356,7 @@ def _general_rotation(parameters: Mapping[str, Any]) -> dict[str, Any]:
 
 
 def _general_material_update(parameters: Mapping[str, Any]) -> dict[str, Any]:
-    values = _arguments(
-        parameters,
-        required=("total_strain", "committed_state", "material"),
-    )
+    values = dict(parameters)
     materials = _import_from(GENERAL_SHELL_ROOT, "general_nonlinear_shell_math.materials")
     state_values = _mapping(values["committed_state"], name="committed_state")
     state = materials.MaterialState1D(**state_values)
@@ -401,7 +378,7 @@ def _general_material_update(parameters: Mapping[str, Any]) -> dict[str, Any]:
 
 
 def _general_follower_load(parameters: Mapping[str, Any]) -> dict[str, Any]:
-    values = _arguments(parameters, required=("x1", "x2", "pressure"))
+    values = dict(parameters)
     loads = _import_from(GENERAL_SHELL_ROOT, "general_nonlinear_shell_math.loads")
     return {
         "external_force": loads.follower_line_force(**values),
@@ -411,25 +388,13 @@ def _general_follower_load(parameters: Mapping[str, Any]) -> dict[str, Any]:
 
 
 def _general_plane_stress(parameters: Mapping[str, Any]) -> Any:
-    values = _arguments(
-        parameters,
-        required=(
-            "active_active",
-            "active_thickness",
-            "thickness_active",
-            "thickness_thickness",
-        ),
-    )
+    values = dict(parameters)
     section = _import_from(GENERAL_SHELL_ROOT, "general_nonlinear_shell_math.section")
     return section.condense_plane_stress(**values)
 
 
 def _general_arc_length(parameters: Mapping[str, Any]) -> Any:
-    values = _arguments(
-        parameters,
-        required=("q_n", "load_factor_n", "arc_length"),
-        optional=("beta", "reference_load", "direction", "tolerance", "max_iterations"),
-    )
+    values = dict(parameters)
     continuation = _import_from(GENERAL_SHELL_ROOT, "general_nonlinear_shell_math.continuation")
     return continuation.solve_scalar_arc_length_step(**values)
 

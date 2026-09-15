@@ -157,5 +157,30 @@ class VerificationTests(unittest.TestCase):
                 json.dumps(response.to_dict(), allow_nan=False)
 
 
+class ContractAlignmentTests(unittest.TestCase):
+    def test_numpy_nonfinite_results_use_json_null_recursively(self):
+        from step2_math_core.contracts import to_jsonable
+
+        result = to_jsonable(
+            {"values": np.array([1.0, np.inf, np.nan]), "scalar": np.float32(np.inf)}
+        )
+        self.assertEqual(result, {"values": [1.0, None, None], "scalar": None})
+        json.dumps(result, allow_nan=False)
+
+    def test_dataclass_requests_cannot_bypass_mapping_validation(self):
+        from step2_math_core.contracts import MathCoreRequest
+
+        for patch in ({"schema_version": "bad"}, {"request_id": ""}, {"core": "x" * 81}):
+            request = {"core": "plate_shell_buckling", "operation": "verify", **patch}
+            mapped = execute(request)
+            typed = execute(MathCoreRequest(**request))
+            self.assertFalse(mapped.ok)
+            self.assertEqual(mapped.error.code, typed.error.code)
+        self.assertEqual(
+            execute({"core": "plate_shell_buckling", "operation": "verify", "typo": 1}).error.code,
+            "INVALID_REQUEST",
+        )
+
+
 if __name__ == "__main__":
     unittest.main()

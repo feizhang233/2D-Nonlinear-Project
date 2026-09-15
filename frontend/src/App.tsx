@@ -60,6 +60,7 @@ import {
 import { waitForPoll } from './asyncTasks'
 import { AnalysisSettingsDialog } from './components/AnalysisSettingsDialog'
 import { hasNonFiniteNumber } from './inputValidation'
+import { analysisSettingsError } from './analysisValidation'
 import { AuthDialog, type AuthDialogMode } from './components/AuthDialog'
 import { DraftActionBar } from './components/DraftActionBar'
 import { GeometryPanel } from './components/GeometryPanel'
@@ -166,7 +167,7 @@ export default function App() {
     (isSurfaceFamily(model) ? sketchError(getSketch(model)) : null) ??
     (hasNonFiniteNumber(model) || hasNonFiniteNumber(runOptions)
       ? 'Complete the numeric field. Scientific notation such as -2.5e4 is supported.'
-      : null)
+      : null) ?? analysisSettingsError(model, runOptions)
   const [toast, setToast] = useState<Toast | null>(null)
   const [meshing, setMeshing] = useState(false)
   const [meshError, setMeshError] = useState<string | null>(null)

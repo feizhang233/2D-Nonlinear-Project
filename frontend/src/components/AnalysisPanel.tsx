@@ -18,6 +18,8 @@ import type { ControlMethod, Dof, ModelInput, RunOptions } from '../domain'
 import { nodeDisplayLabel } from '../entityLabels'
 import { dofsForModel, MODEL_FAMILIES } from '../modelFamilies'
 import { SectionHeader } from './chrome'
+import { ScientificField } from './ScientificField'
+import { analysisSettingsError } from '../analysisValidation'
 
 interface AnalysisPanelProps {
   model: ModelInput
@@ -26,12 +28,13 @@ interface AnalysisPanelProps {
   onRunOptionsChange: (options: Partial<RunOptions>) => void
 }
 
-const numeric = (value: string, fallback: number) => Number.isFinite(Number(value)) ? Number(value) : fallback
-
 export function AnalysisPanel({ model, runOptions, onModelChange, onRunOptionsChange }: AnalysisPanelProps) {
   const options = model.analysis
+  const settingsError = analysisSettingsError(model, runOptions)
   const family = MODEL_FAMILIES[model.model_family]
   const dofs = dofsForModel(model)
+  const isFree = (nodeId: string, dof: Dof) => !model.constraints.some(constraint => constraint.node_id === nodeId && constraint.dof === dof)
+  const controlNodes = model.nodes.filter(node => dofs.some(dof => isFree(node.id, dof)))
   const patchAnalysis = (patch: Partial<ModelInput['analysis']>) => onModelChange({ ...model, analysis: { ...options, ...patch } })
   const setControl = (control: ControlMethod) => {
     const analysis = structuredClone(options)
@@ -40,7 +43,7 @@ export function AnalysisPanel({ model, runOptions, onModelChange, onRunOptionsCh
     delete analysis.arc_length
     if (control === 'displacement') {
       const loaded = model.loads.flatMap((load) => dofs
-        .filter((dof) => load.node_id && Math.abs(load.components[dof] ?? 0) > 0)
+        .filter((dof) => load.node_id && isFree(load.node_id, dof) && Math.abs(load.components[dof] ?? 0) > 0)
         .map((dof) => ({ node_id: load.node_id as string, dof, value: load.components[dof] ?? 0 })))[0]
       const free = model.nodes.flatMap((node) => dofs.map((dof) => ({ node_id: node.id, dof })))
         .find((candidate) => !model.constraints.some((constraint) => constraint.node_id === candidate.node_id && constraint.dof === candidate.dof))
@@ -66,47 +69,46 @@ export function AnalysisPanel({ model, runOptions, onModelChange, onRunOptionsCh
       />
       <ToggleButtonGroup exclusive fullWidth size="small" value={options.control_method} onChange={(_, value: ControlMethod | null) => value && setControl(value)}>
         <ToggleButton value="load">Load</ToggleButton>
-        <ToggleButton value="displacement">Displacement</ToggleButton>
+        <ToggleButton value="displacement" disabled={!controlNodes.length}>Displacement</ToggleButton>
         <ToggleButton value="arc_length">Arc length</ToggleButton>
       </ToggleButtonGroup>
+      {settingsError && <Alert severity="error">{settingsError}</Alert>}
 
       {options.control_method === 'load' && (
-        <TextField
-          type="number"
+        <ScientificField
           label="Target load factor"
           value={runOptions.targetLoadFactor}
-          slotProps={{ htmlInput: { step: 'any' } }}
-          onChange={(event) => onRunOptionsChange({ targetLoadFactor: numeric(event.target.value, runOptions.targetLoadFactor) })}
+          onValueChange={(value) => onRunOptionsChange({ targetLoadFactor: value })}
           helperText="The adaptive solver advances from the zero state or imported committed state to this load factor."
         />
       )}
       {options.control_method === 'displacement' && options.displacement_control && (
         <Stack spacing={1.5}>
           <Stack direction="row" spacing={1}>
-            <TextField select fullWidth label="Control node" value={options.displacement_control.target.node_id} onChange={(event) => patchAnalysis({ displacement_control: { ...options.displacement_control!, target: { ...options.displacement_control!.target, node_id: event.target.value } } })}>
-              {model.nodes.map((node) => <MenuItem value={node.id} key={node.id}>{nodeDisplayLabel(model, node.id)}</MenuItem>)}
+            <TextField select fullWidth label="Control node" value={options.displacement_control.target.node_id} onChange={(event) => patchAnalysis({ displacement_control: { ...options.displacement_control!, target: { ...options.displacement_control!.target, node_id: event.target.value, dof: isFree(event.target.value, options.displacement_control!.target.dof) ? options.displacement_control!.target.dof : dofs.find(dof => isFree(event.target.value, dof))! } } })}>
+              {controlNodes.map((node) => <MenuItem value={node.id} key={node.id}>{nodeDisplayLabel(model, node.id)}</MenuItem>)}
             </TextField>
             <TextField select fullWidth label="Degree of freedom" value={options.displacement_control.target.dof} onChange={(event) => patchAnalysis({ displacement_control: { ...options.displacement_control!, target: { ...options.displacement_control!.target, dof: event.target.value as Dof } } })}>
-              {dofs.map((dof) => <MenuItem value={dof} key={dof}>{dof}</MenuItem>)}
+              {dofs.filter(dof => isFree(options.displacement_control!.target.node_id, dof)).map((dof) => <MenuItem value={dof} key={dof}>{dof}</MenuItem>)}
             </TextField>
           </Stack>
           <Stack direction="row" spacing={1}>
-            <TextField type="number" label="Displacement increment" value={options.displacement_control.increment} slotProps={{ htmlInput: { step: 'any' } }} onChange={(event) => patchAnalysis({ displacement_control: { ...options.displacement_control!, increment: numeric(event.target.value, options.displacement_control!.increment) } })} />
-            <TextField type="number" label="Steps" value={runOptions.numberOfSteps} slotProps={{ htmlInput: { min: 1, step: 1 } }} onChange={(event) => onRunOptionsChange({ numberOfSteps: Math.max(1, Math.round(numeric(event.target.value, runOptions.numberOfSteps))) })} />
+            <ScientificField nonZero label="Displacement increment" value={options.displacement_control.increment} onValueChange={(value) => patchAnalysis({ displacement_control: { ...options.displacement_control!, increment: value } })} />
+            <ScientificField integer min={1} max={Math.min(10000, options.step_control.max_steps)} label="Steps" value={runOptions.numberOfSteps} onValueChange={(value) => onRunOptionsChange({ numberOfSteps: value })} />
           </Stack>
         </Stack>
       )}
       {options.control_method === 'arc_length' && options.arc_length && (
         <Stack spacing={1.5}>
           <Stack direction="row" spacing={1}>
-            <TextField type="number" label="Arc-length radius" value={options.arc_length.radius} slotProps={{ htmlInput: { step: 'any' } }} onChange={(event) => patchAnalysis({ arc_length: { ...options.arc_length!, radius: numeric(event.target.value, options.arc_length!.radius) } })} />
-            <TextField type="number" label="Steps" value={runOptions.numberOfSteps} slotProps={{ htmlInput: { min: 1, step: 1 } }} onChange={(event) => onRunOptionsChange({ numberOfSteps: Math.max(1, Math.round(numeric(event.target.value, runOptions.numberOfSteps))) })} />
+            <ScientificField exclusiveMin={0} label="Arc-length radius" value={options.arc_length.radius} onValueChange={(value) => patchAnalysis({ arc_length: { ...options.arc_length!, radius: value } })} />
+            <ScientificField integer min={1} max={Math.min(10000, options.step_control.max_steps)} label="Steps" value={runOptions.numberOfSteps} onValueChange={(value) => onRunOptionsChange({ numberOfSteps: value })} />
           </Stack>
           <Stack direction="row" spacing={1}>
-            <TextField type="number" label="Minimum radius" value={options.arc_length.min_radius} slotProps={{ htmlInput: { step: 'any' } }} onChange={(event) => patchAnalysis({ arc_length: { ...options.arc_length!, min_radius: numeric(event.target.value, options.arc_length!.min_radius) } })} />
-            <TextField type="number" label="Maximum radius" value={options.arc_length.max_radius} slotProps={{ htmlInput: { step: 'any' } }} onChange={(event) => patchAnalysis({ arc_length: { ...options.arc_length!, max_radius: numeric(event.target.value, options.arc_length!.max_radius) } })} />
+            <ScientificField exclusiveMin={0} label="Minimum radius" value={options.arc_length.min_radius} onValueChange={(value) => patchAnalysis({ arc_length: { ...options.arc_length!, min_radius: value } })} />
+            <ScientificField exclusiveMin={0} label="Maximum radius" value={options.arc_length.max_radius} onValueChange={(value) => patchAnalysis({ arc_length: { ...options.arc_length!, max_radius: value } })} />
           </Stack>
-          <TextField type="number" label="Load scaling β" value={options.arc_length.beta} slotProps={{ htmlInput: { step: 'any' } }} onChange={(event) => patchAnalysis({ arc_length: { ...options.arc_length!, beta: numeric(event.target.value, options.arc_length!.beta) } })} />
+          <ScientificField exclusiveMin={0} label="Load scaling β" value={options.arc_length.beta} onValueChange={(value) => patchAnalysis({ arc_length: { ...options.arc_length!, beta: value } })} />
           <Alert severity="info">Arc-length convergence only shows that the augmented equilibrium equations satisfy the specified tolerances. It does not prove stability, branch uniqueness, or branch switching.</Alert>
         </Stack>
       )}
@@ -127,16 +129,23 @@ export function AnalysisPanel({ model, runOptions, onModelChange, onRunOptionsCh
                 <MenuItem value="full">Full Newton</MenuItem>
                 <MenuItem value="modified">Modified Newton</MenuItem>
               </TextField>
-              <TextField type="number" fullWidth label="Maximum iterations" value={options.max_iterations} slotProps={{ htmlInput: { min: 1, step: 1 } }} onChange={(event) => patchAnalysis({ max_iterations: Math.max(1, Math.round(numeric(event.target.value, options.max_iterations))) })} />
+              <ScientificField integer min={1} label="Maximum iterations" value={options.max_iterations} onValueChange={(value) => patchAnalysis({ max_iterations: value })} />
             </Stack>
-            {(['residual', 'displacement', 'energy'] as const).map((key) => (
-              <TextField
+            {([
+              ['residual', 'Residual tolerance'],
+              ['displacement', 'Displacement correction tolerance'],
+              ['energy', 'Energy tolerance'],
+              ['linear_solver', 'Linear solver tolerance'],
+              ['force_floor', 'Force normalization floor'],
+              ['displacement_floor', 'Displacement normalization floor'],
+              ['energy_floor', 'Energy normalization floor'],
+            ] as const).map(([key, label]) => (
+              <ScientificField
                 key={key}
-                type="number"
-                label={`${key === 'residual' ? 'Residual' : key === 'displacement' ? 'Displacement correction' : 'Energy'} tolerance`}
+                exclusiveMin={0}
+                label={label}
                 value={options.tolerances[key]}
-                slotProps={{ htmlInput: { step: 'any', min: 0 } }}
-                onChange={(event) => patchAnalysis({ tolerances: { ...options.tolerances, [key]: numeric(event.target.value, options.tolerances[key]) } })}
+                onValueChange={(value) => patchAnalysis({ tolerances: { ...options.tolerances, [key]: value } })}
               />
             ))}
           </Stack>
@@ -149,16 +158,34 @@ export function AnalysisPanel({ model, runOptions, onModelChange, onRunOptionsCh
         </AccordionSummary>
         <AccordionDetails>
           <Stack spacing={1.5}>
+            {options.control_method !== 'arc_length' && <>
             <Stack direction="row" spacing={1}>
-              <TextField type="number" label="Initial step size" value={options.step_control.initial_step} slotProps={{ htmlInput: { step: 'any' } }} onChange={(event) => patchAnalysis({ step_control: { ...options.step_control, initial_step: numeric(event.target.value, options.step_control.initial_step) } })} />
-              <TextField type="number" label="Minimum step size" value={options.step_control.min_step} slotProps={{ htmlInput: { step: 'any' } }} onChange={(event) => patchAnalysis({ step_control: { ...options.step_control, min_step: numeric(event.target.value, options.step_control.min_step) } })} />
+              <ScientificField exclusiveMin={0} label={options.control_method === 'displacement' ? 'Initial step scale' : 'Initial load step'} value={options.step_control.initial_step} onValueChange={(value) => patchAnalysis({ step_control: { ...options.step_control, initial_step: value } })} />
+              <ScientificField exclusiveMin={0} label={options.control_method === 'displacement' ? 'Minimum step scale' : 'Minimum load step'} value={options.step_control.min_step} onValueChange={(value) => patchAnalysis({ step_control: { ...options.step_control, min_step: value } })} />
+            </Stack>
+            <ScientificField exclusiveMin={0} label={options.control_method === 'displacement' ? 'Maximum step scale' : 'Maximum load step'} value={options.step_control.max_step} onValueChange={(value) => patchAnalysis({ step_control: { ...options.step_control, max_step: value } })} />
+            {options.control_method === 'displacement' && <Typography variant="caption" color="text.secondary">The initial increment comes from Displacement increment. Minimum and maximum increments use the step scale divided by Initial step scale.</Typography>}
+            </>}
+            <ScientificField integer min={1} label="Maximum accepted steps" value={options.step_control.max_steps} onValueChange={(value) => patchAnalysis({ step_control: { ...options.step_control, max_steps: value } })} />
+            <Stack direction="row" spacing={1}>
+              <ScientificField exclusiveMin={0} exclusiveMax={1} label="Cutback factor" value={options.step_control.cutback_factor} onValueChange={(value) => patchAnalysis({ step_control: { ...options.step_control, cutback_factor: value } })} />
+              <ScientificField integer min={0} label="Maximum retries" value={options.step_control.max_retries} onValueChange={(value) => patchAnalysis({ step_control: { ...options.step_control, max_retries: value } })} />
             </Stack>
             <Stack direction="row" spacing={1}>
-              <TextField type="number" label="Cutback factor" value={options.step_control.cutback_factor} slotProps={{ htmlInput: { step: 'any' } }} onChange={(event) => patchAnalysis({ step_control: { ...options.step_control, cutback_factor: numeric(event.target.value, options.step_control.cutback_factor) } })} />
-              <TextField type="number" label="Maximum retries" value={options.step_control.max_retries} slotProps={{ htmlInput: { step: 1 } }} onChange={(event) => patchAnalysis({ step_control: { ...options.step_control, max_retries: Math.max(0, Math.round(numeric(event.target.value, options.step_control.max_retries))) } })} />
+              <ScientificField min={1} label="Growth factor" value={options.step_control.growth_factor} onValueChange={(value) => patchAnalysis({ step_control: { ...options.step_control, growth_factor: value } })} />
+              <ScientificField integer min={1} label="Target iterations" value={options.step_control.target_iterations} onValueChange={(value) => patchAnalysis({ step_control: { ...options.step_control, target_iterations: value } })} />
             </Stack>
             <Typography variant="caption" color="text.secondary">Load, displacement, and arc-length control use bounded cutback based on the failure class. Committed state updates only after an accepted step.</Typography>
             <FormControlLabel control={<Switch checked={options.line_search.enabled} disabled={options.control_method === 'arc_length'} onChange={(event) => patchAnalysis({ line_search: { ...options.line_search, enabled: event.target.checked } })} />} label="Enable line search" />
+            {options.line_search.enabled && options.control_method !== 'arc_length' && <>
+              <TextField select fullWidth label="Line search method" value={options.line_search.method} onChange={(event) => patchAnalysis({ line_search: { ...options.line_search, method: event.target.value as 'backtracking' | 'orthogonality' } })}>
+                <MenuItem value="backtracking">Backtracking</MenuItem>
+                <MenuItem value="orthogonality" disabled>Orthogonality (unavailable for structural models)</MenuItem>
+              </TextField>
+              <ScientificField integer min={1} label="Line search iterations" value={options.line_search.max_iterations} onValueChange={(value) => patchAnalysis({ line_search: { ...options.line_search, max_iterations: value } })} />
+              <ScientificField exclusiveMin={0} exclusiveMax={1} label="Minimum line search factor" value={options.line_search.min_alpha} onValueChange={(value) => patchAnalysis({ line_search: { ...options.line_search, min_alpha: value } })} />
+              <ScientificField exclusiveMin={0} exclusiveMax={1} label="Line search reduction factor" value={options.line_search.reduction_factor} onValueChange={(value) => patchAnalysis({ line_search: { ...options.line_search, reduction_factor: value } })} />
+            </>}
             {options.control_method === 'arc_length' && <Typography variant="caption" color="text.secondary">Line search is unavailable with arc-length control.</Typography>}
           </Stack>
         </AccordionDetails>

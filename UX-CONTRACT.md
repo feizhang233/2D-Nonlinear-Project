@@ -228,3 +228,19 @@ repeated permanent toolbars or information cards.
   material/section definitions, uses true circle arcs, removes construction-only nodes and binds
   boundary segments using CAD curve membership rather than geometric nearest-edge guessing.
 - The owned UI remains English; Gmsh boundary labels now use the same language.
+
+## Mathematical interface alignment (2026-09-15)
+
+- Math Core parameter keys/examples and value/depth limits come from the server catalog.
+  Edits, core/operation changes, resets, close/reopen invalidate old execution responses.
+  HTTP 200 operation errors remain errors. Browser abort only stops waiting for a result.
+- AnalysisPanel exposes settings supported by the structural adapters through its existing disclosures. Arc length uses
+  its radius bounds; the unused common initial/minimum/maximum step fields are hidden there.
+  Displacement control labels the shared step fields as scales and explains their ratios.
+- Shared ScientificField owns numeric drafts, range/integer corrections and scientific notation.
+  AnalysisSettingsDialog mounts on first use and stays mounted across close/reopen. analysisSettingsError is shared by
+  the dialog and all Apply paths for cross-field ranges and run step limits. No silent rounding.
+- Displacement control targets an existing unconstrained family DOF; line search exposes backtracking for load/displacement control. Orthogonality requires
+  conservative response evidence absent from the current structural adapters, so the UI disables
+  it and the API rejects enabled requests before queueing. Direct-core conservative callers retain
+  the original orthogonality algorithm.

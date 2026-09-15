@@ -76,3 +76,53 @@ def test_math_core_operation_errors_remain_machine_readable_and_input_is_bounded
     assert oversized.json()["error"]["code"] == "MATH_CORE_INPUT_LIMIT_EXCEEDED"
     assert missing.status_code == 404
     assert missing.json()["error"]["code"] == "UNKNOWN_CORE"
+
+
+def test_catalog_detail_and_every_operation_share_the_executable_parameter_contract():
+    """Use the HTTP catalog exactly as the frontend does, including failure envelopes."""
+    import json
+
+    with TestClient(create_app()) as client:
+        catalog = client.get("/api/v1/math-cores").json()
+        for core in catalog["cores"]:
+            assert client.get(f"/api/v1/math-cores/{core['core_id']}").json() == core
+            for operation in core["operations"]:
+                request = {
+                    "core": core["core_id"],
+                    "operation": operation["name"],
+                    "parameters": operation["example_parameters"],
+                    "request_id": "alignment",
+                }
+                result = client.post("/api/v1/math-cores/execute", json=request)
+                assert result.status_code == 200, result.text
+                payload = result.json()
+                assert payload["status"] == "ok", payload
+                assert payload["core"] == request["core"]
+                assert payload["operation"] == request["operation"]
+                assert payload["request_id"] == "alignment"
+                json.dumps(payload, allow_nan=False)
+                invalid = {**request, "parameters": {**request["parameters"], "typo": True}}
+                error = client.post("/api/v1/math-cores/execute", json=invalid).json()
+                assert error["error"]["code"] == "UNKNOWN_PARAMETER", error
+                for required in operation["required_parameters"]:
+                    parameters = dict(request["parameters"])
+                    parameters.pop(required)
+                    error = client.post(
+                        "/api/v1/math-cores/execute", json={**request, "parameters": parameters}
+                    ).json()
+                    assert error["error"]["code"] == "MISSING_PARAMETER", error
+                    assert required in error["error"]["details"]["missing"]
+
+
+def test_nonfinite_parameters_return_a_core_error_before_calculation():
+    from nonlinear_api.math_cores import execute_math_core
+
+    result = execute_math_core(
+        {
+            "core": "general_nonlinear_shell",
+            "operation": "arc_length_step",
+            "parameters": {"q_n": float("inf"), "load_factor_n": 0.0, "arc_length": 0.1},
+        }
+    )
+    assert result["status"] == "error"
+    assert result["error"]["code"] == "INVALID_PARAMETERS"

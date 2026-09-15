@@ -285,3 +285,31 @@ def test_spa_fallback_keeps_assets_out_of_html_and_contains_paths(tmp_path, monk
             assert response.status_code == 404
             assert "outside frontend" not in response.text
             assert "Studio test" not in response.text
+
+
+def test_structural_line_search_rejects_unsupported_methods_before_queueing():
+    with TestClient(create_app()) as client:
+        model = _model()
+        model["analysis"]["line_search"] = {"enabled": True, "method": "orthogonality"}
+        response = client.post(
+            "/api/v1/analyses",
+            json={
+                "model": model,
+                "execution_mode": "asynchronous",
+                "target_load_factor": 0.1,
+            },
+        )
+        assert response.status_code == 422
+        assert response.json()["error"]["code"] == "CONTROL_PARAMETER_INVALID"
+        assert response.json()["error"]["location"] == "$.model.analysis.line_search.method"
+        assert "backtracking" in response.json()["error"]["message"]
+        model["analysis"]["control_method"] = "arc_length"
+        model["analysis"]["arc_length"] = {
+            "radius": 0.05,
+            "min_radius": 0.001,
+            "max_radius": 0.1,
+        }
+        model["analysis"]["line_search"]["method"] = "backtracking"
+        response = client.post("/api/v1/analyses", json={"model": model, "number_of_steps": 1})
+        assert response.status_code == 422
+        assert response.json()["error"]["location"] == "$.model.analysis.line_search.enabled"

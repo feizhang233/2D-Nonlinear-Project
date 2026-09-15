@@ -64,7 +64,7 @@ it('opens independent analysis settings and preserves staged options on return t
   fireEvent.click(screen.getByRole('button', { name: 'Analysis settings' }))
   expect(screen.getByRole('dialog', { name: 'Analysis settings' })).toBeTruthy()
   fireEvent.change(
-    screen.getByRole('spinbutton', { name: 'Target load factor' }),
+    screen.getByRole('textbox', { name: 'Target load factor' }),
     { target: { value: '0.5' } },
   )
   fireEvent.click(screen.getByRole('button', { name: 'Back to model' }))
@@ -72,7 +72,7 @@ it('opens independent analysis settings and preserves staged options on return t
   fireEvent.click(screen.getByRole('button', { name: 'Analysis settings' }))
   expect(
     (
-      screen.getByRole('spinbutton', {
+      screen.getByRole('textbox', {
         name: 'Target load factor',
       }) as HTMLInputElement
     ).value,

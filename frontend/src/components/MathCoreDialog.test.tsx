@@ -82,3 +82,50 @@ describe('MathCoreDialog', () => {
     expect((editor as HTMLTextAreaElement).value).toBe('{bad json')
   })
 })
+
+it.each(['edit', 'operation', 'reset', 'close'] as const)('ignores an old result after %s while running', async (action) => {
+  let complete!: (response: Response) => void
+  let executeSignal: AbortSignal | null | undefined
+  vi.spyOn(globalThis, 'fetch').mockImplementation(async (url, init) => {
+    if (String(url).endsWith('/execute')) {
+      executeSignal = init?.signal
+      return new Promise<Response>(resolve => { complete = resolve })
+    }
+    return new Response(JSON.stringify(catalog))
+  })
+  const view = render(<ThemeProvider theme={studioTheme}><MathCoreDialog open onClose={() => undefined} /></ThemeProvider>)
+  await screen.findByRole('textbox', { name: 'Parameters (JSON)' })
+  fireEvent.click(screen.getByRole('button', { name: 'Run operation' }))
+  await waitFor(() => expect(complete).toBeTypeOf('function'))
+  if (action === 'edit') fireEvent.change(screen.getByRole('textbox', { name: 'Parameters (JSON)' }), { target: { value: '{"typo": 1}' } })
+  if (action === 'reset') fireEvent.click(screen.getByRole('button', { name: 'Reset example' }))
+  if (action === 'operation') {
+    fireEvent.mouseDown(screen.getByRole('combobox', { name: 'Operation' }))
+    fireEvent.click(await screen.findByRole('option', { name: 'linear_buckling' }))
+  }
+  if (action === 'close') {
+    view.rerender(<ThemeProvider theme={studioTheme}><MathCoreDialog open={false} onClose={() => undefined} /></ThemeProvider>)
+    view.rerender(<ThemeProvider theme={studioTheme}><MathCoreDialog open onClose={() => undefined} /></ThemeProvider>)
+    await screen.findByRole('textbox', { name: 'Parameters (JSON)' })
+  }
+  expect(executeSignal?.aborted).toBe(true)
+  complete(new Response(JSON.stringify({ schema_version: '1.0.0', request_id: null, core: 'plate_shell_buckling', operation: 'verify', status: 'ok', data: { obsolete: true }, diagnostics: {}, error: null })))
+  await waitFor(() => expect(screen.getByRole('button', { name: 'Run operation' }).hasAttribute('disabled')).toBe(false))
+  expect(screen.queryByText('Completed')).toBeNull()
+  expect(screen.queryByText(/"obsolete"/)).toBeNull()
+  cleanup()
+  vi.restoreAllMocks()
+})
+
+it('preserves HTTP 200 operation errors instead of reporting completion', async () => {
+  vi.spyOn(globalThis, 'fetch').mockImplementation(async (url) => new Response(JSON.stringify(
+    String(url).endsWith('/execute') ? { schema_version: '1.0.0', request_id: null, core: 'plate_shell_buckling', operation: 'verify', status: 'error', data: null, diagnostics: {}, error: { code: 'NUMERICAL_FAILURE', message: 'Singular matrix', details: {} } } : catalog,
+  )))
+  render(<ThemeProvider theme={studioTheme}><MathCoreDialog open onClose={() => undefined} /></ThemeProvider>)
+  await screen.findByRole('textbox', { name: 'Parameters (JSON)' })
+  fireEvent.click(screen.getByRole('button', { name: 'Run operation' }))
+  expect(await screen.findByText('Singular matrix')).toBeTruthy()
+  expect(screen.queryByText('Completed')).toBeNull()
+  cleanup()
+  vi.restoreAllMocks()
+})

@@ -17,6 +17,7 @@ import Typography from '@mui/material/Typography'
 import { useEffect, useMemo, useRef, useState, type FormEvent } from 'react'
 import { executeMathCore, listMathCores } from '../api'
 import type { JsonValue, MathCoreCatalog, MathCoreResponse } from '../mathCore'
+import { validateMathCoreParameters } from '../mathCore'
 import { EmptyState, SectionHeader } from './chrome'
 
 interface Props {
@@ -41,6 +42,14 @@ export function MathCoreDialog({ open, onClose }: Props) {
   const executionRequestRef = useRef<AbortController | null>(null)
   const editorRef = useRef<HTMLInputElement | null>(null)
 
+  const invalidateExecution = () => {
+    executionRequestRef.current?.abort()
+    executionRequestRef.current = null
+    setRunning(false)
+    setExecutionError(null)
+    setResponse(null)
+  }
+
   const selectedCore = useMemo(
     () => catalog?.cores.find((core) => core.core_id === selectedCoreId) ?? null,
     [catalog, selectedCoreId],
@@ -51,14 +60,13 @@ export function MathCoreDialog({ open, onClose }: Props) {
   )
 
   const selectCore = (coreId: string, nextCatalog = catalog) => {
+    invalidateExecution()
     const core = nextCatalog?.cores.find((item) => item.core_id === coreId)
     const operation = core?.operations[0]
     setSelectedCoreId(coreId)
     setSelectedOperationName(operation?.name ?? '')
     setParameters(formatParameters(operation?.example_parameters ?? {}))
     setEditorError(null)
-    setExecutionError(null)
-    setResponse(null)
   }
 
   const loadCatalog = () => {
@@ -91,7 +99,11 @@ export function MathCoreDialog({ open, onClose }: Props) {
     setResponse(null)
     setExecutionError(null)
     loadCatalog()
-    return () => catalogRequestRef.current?.abort()
+    return () => {
+      catalogRequestRef.current?.abort()
+      executionRequestRef.current?.abort()
+      executionRequestRef.current = null
+    }
     // The dialog intentionally reloads the server-owned catalog on every open.
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [open])
@@ -102,25 +114,23 @@ export function MathCoreDialog({ open, onClose }: Props) {
   }, [])
 
   const selectOperation = (operationName: string) => {
+    invalidateExecution()
     const operation = selectedCore?.operations.find((item) => item.name === operationName)
     setSelectedOperationName(operationName)
     setParameters(formatParameters(operation?.example_parameters ?? {}))
     setEditorError(null)
-    setExecutionError(null)
-    setResponse(null)
   }
 
   const resetExample = () => {
+    invalidateExecution()
     setParameters(formatParameters(selectedOperation?.example_parameters ?? {}))
     setEditorError(null)
-    setExecutionError(null)
-    setResponse(null)
     editorRef.current?.focus()
   }
 
   const execute = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault()
-    if (running || !selectedCore || !selectedOperation) return
+    if (executionRequestRef.current || !selectedCore || !selectedOperation || !catalog) return
     let parsed: unknown
     try {
       parsed = JSON.parse(parameters)
@@ -134,8 +144,15 @@ export function MathCoreDialog({ open, onClose }: Props) {
       editorRef.current?.focus()
       return
     }
+    const validationError = validateMathCoreParameters(
+      parsed as Record<string, JsonValue>, selectedOperation, catalog.limits,
+    )
+    if (validationError) {
+      setEditorError(validationError)
+      editorRef.current?.focus()
+      return
+    }
 
-    executionRequestRef.current?.abort()
     const controller = new AbortController()
     executionRequestRef.current = controller
     setRunning(true)
@@ -144,7 +161,7 @@ export function MathCoreDialog({ open, onClose }: Props) {
     setResponse(null)
     try {
       const nextResponse = await executeMathCore({
-        schema_version: '1.0.0',
+        schema_version: catalog.schema_version,
         core: selectedCore.core_id,
         operation: selectedOperation.name,
         parameters: parsed as Record<string, JsonValue>,
@@ -165,8 +182,7 @@ export function MathCoreDialog({ open, onClose }: Props) {
 
   const close = () => {
     catalogRequestRef.current?.abort()
-    executionRequestRef.current?.abort()
-    setRunning(false)
+    invalidateExecution()
     onClose()
   }
 
@@ -249,10 +265,9 @@ export function MathCoreDialog({ open, onClose }: Props) {
                 error={Boolean(editorError)}
                 helperText={editorError ?? 'Edit the executable example or run it as provided.'}
                 onChange={(event) => {
+                  invalidateExecution()
                   setParameters(event.target.value)
                   setEditorError(null)
-                  setExecutionError(null)
-                  setResponse(null)
                 }}
                 slotProps={{
                   htmlInput: { spellCheck: false, 'aria-describedby': 'math-core-parameters-help' },
