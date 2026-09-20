@@ -27,7 +27,7 @@ import {
   type SectionShape,
 } from '../sections'
 
-export const SECTION_SHAPES: Record<SectionShape, string> = {
+const SECTION_SHAPES: Record<SectionShape, string> = {
   custom: 'Custom',
   rectangle: 'Rectangle',
   circle: 'Circle',
@@ -205,7 +205,7 @@ function Definition({
         <Alert severity="error">{error}</Alert>
       ) : (
         section.shape !== 'custom' && (
-          <Box sx={{ p: 1.5, border: '1px solid', borderColor: 'divider' }}>
+          <Box sx={{ p: 1.5, border: '1px solid', borderColor: 'divider', borderRadius: 1 }}>
             {Object.entries(values).map(([key, value]) => (
               <Stack
                 key={key}

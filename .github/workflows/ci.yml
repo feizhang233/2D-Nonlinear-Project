@@ -39,6 +39,8 @@ jobs:
           python-version: ${{ matrix.python-version }}
           cache: pip
           cache-dependency-path: nonlinear/pyproject.toml
+      - name: Install Gmsh system library
+        run: sudo apt-get update && sudo apt-get install -y libglu1-mesa
       - name: Install project and frozen core revisions
         run: |
           python -m pip install -e dependencies/continuum -e dependencies/frame -e dependencies/plate -e dependencies/shell
@@ -50,6 +52,7 @@ jobs:
           python scripts/run_math_core_audit.py --check
           python scripts/generate_release_evidence.py --check
           python scripts/check_release.py
+          python scripts/generate_frontend_contracts.py --check
       - name: Lint and test
         working-directory: nonlinear
         run: |
@@ -69,11 +72,23 @@ jobs:
 
   frontend:
     runs-on: ubuntu-latest
+    env:
+      NONLINEAR_TEST_PYTHON: python
     defaults:
       run:
         working-directory: frontend
     steps:
       - uses: actions/checkout@v4
+      - uses: actions/checkout@v4
+        with:
+          repository: feizhang233/2d-plate-analysis-api
+          ref: c30bee97a8efa7d1a0d9732bee84fef4f7383913
+          path: dependencies/plate
+      - uses: actions/checkout@v4
+        with:
+          repository: feizhang233/2D-Shell-Project
+          ref: 814f68c038f5e72f4c886f00baf064b2794e097a
+          path: dependencies/shell
       - uses: actions/setup-node@v4
         with:
           node-version: "22"
@@ -85,7 +100,12 @@ jobs:
           python-version: "3.12"
           cache: pip
           cache-dependency-path: pyproject.toml
-      - run: python -m pip install -e ..
+      - name: Install HTTP test and nonlinear recovery dependencies
+        run: |
+          sudo apt-get update && sudo apt-get install -y libglu1-mesa
+          python -m pip install -e ../dependencies/plate -e ../dependencies/shell
+          python -m pip install -e '..[dev]'
+          python -m pip check
       - run: npm test -- --run
       - run: npm run typecheck
       - run: npm run build

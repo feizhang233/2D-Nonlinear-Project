@@ -15,6 +15,12 @@ const secondary = '#256b8b'
 const ink = '#253037'
 const muted = '#68747b'
 
+// One border family across 2D, Frame 3D and Continuum 3D.
+const borderColor = '#e2e7e4'
+const controlRadius = 6
+const borderWidth = 1
+const emphasisWidth = 2
+
 export const studioTheme = createTheme({
   cssVariables: true,
   palette: {
@@ -35,14 +41,14 @@ export const studioTheme = createTheme({
       containerHighest: '#d5e2dc',
     },
     text: { primary: ink, secondary: muted },
-    divider: '#e2e7e4',
+    divider: borderColor,
     action: {
       selected: alpha(primary, 0.12),
       hover: alpha(primary, 0.06),
       focus: alpha(primary, 0.16),
     },
   },
-  shape: { borderRadius: 6 },
+  shape: { borderRadius: controlRadius },
   spacing: 8,
   typography: {
     fontFamily: '"Avenir Next", "Segoe UI", system-ui, -apple-system, sans-serif',
@@ -89,6 +95,11 @@ export const studioTheme = createTheme({
   components: {
     MuiCssBaseline: {
       styleOverrides: {
+        ':root': {
+          '--studio-control-radius': `${controlRadius}px`,
+          '--studio-border-width': `${borderWidth}px`,
+          '--studio-emphasis-width': `${emphasisWidth}px`,
+        },
         body: {
           margin: 0,
           minWidth: 0,
@@ -97,7 +108,7 @@ export const studioTheme = createTheme({
           backgroundColor: '#f4f6f5',
         },
         textarea: { resize: 'none' },
-        ':focus-visible': { outline: '2px solid #35635d', outlineOffset: 2 },
+        ':focus-visible': { outline: `${emphasisWidth}px solid ${primary}`, outlineOffset: 2 },
         '*': {
           boxSizing: 'border-box',
           scrollbarColor: '#aab2c2 #f7f9f8',
@@ -108,7 +119,7 @@ export const studioTheme = createTheme({
         '*::-webkit-scrollbar-thumb': {
           backgroundColor: '#aeb7ca',
           border: '2px solid #f7f9f8',
-          borderRadius: 8,
+          borderRadius: controlRadius,
         },
         '*::-webkit-scrollbar-thumb:hover': { backgroundColor: '#8d98ae' },
         '*::-webkit-scrollbar-thumb:active': { backgroundColor: '#6f7c95' },
@@ -128,7 +139,8 @@ export const studioTheme = createTheme({
       defaultProps: { elevation: 0 },
       styleOverrides: {
         root: { backgroundImage: 'none' },
-        rounded: { borderRadius: 8 },
+        rounded: { borderRadius: controlRadius },
+        outlined: { border: `${borderWidth}px solid ${borderColor}` },
       },
     },
     MuiAppBar: {
@@ -148,21 +160,29 @@ export const studioTheme = createTheme({
     MuiButton: {
       defaultProps: { disableElevation: true },
       styleOverrides: {
-        root: { borderRadius: 6, whiteSpace: 'nowrap', paddingInline: 14, minHeight: 36 },
-        sizeLarge: { borderRadius: 6, minHeight: 38, paddingInline: 18 },
-        sizeSmall: { borderRadius: 6, minHeight: 30, paddingInline: 12 },
+        root: { borderRadius: controlRadius, whiteSpace: 'nowrap', paddingInline: 14, minHeight: 36 },
+        sizeLarge: { borderRadius: controlRadius, minHeight: 38, paddingInline: 18 },
+        sizeSmall: { borderRadius: controlRadius, minHeight: 30, paddingInline: 12 },
         contained: { boxShadow: 'none' },
+        outlined: {
+          borderWidth,
+          borderColor,
+          '&:hover': { borderColor: 'currentColor', borderWidth },
+          '&.MuiButton-colorError': { borderColor: 'var(--mui-palette-error-main)' },
+          '&.MuiButton-colorWarning': { borderColor: 'var(--mui-palette-warning-main)' },
+          '&.Mui-disabled': { borderColor },
+        },
       },
     },
     MuiIconButton: {
       styleOverrides: {
-        root: { borderRadius: 6 },
-        sizeSmall: { borderRadius: 6 },
+        root: { borderRadius: controlRadius },
+        sizeSmall: { borderRadius: controlRadius },
       },
     },
     MuiFab: {
       styleOverrides: {
-        root: { borderRadius: 6, boxShadow: '0 2px 8px rgba(36, 54, 159, 0.28)' },
+        root: { borderRadius: controlRadius, boxShadow: '0 2px 8px rgba(36, 54, 159, 0.28)' },
       },
     },
     MuiTextField: {
@@ -185,10 +205,14 @@ export const studioTheme = createTheme({
     MuiOutlinedInput: {
       styleOverrides: {
         root: {
-          borderRadius: 5,
+          borderRadius: controlRadius,
           backgroundColor: '#ffffff',
           fontSize: 13,
-          '& .MuiOutlinedInput-notchedOutline': { borderColor: '#d7dfdb' },
+          '& .MuiOutlinedInput-notchedOutline': { borderColor, borderWidth },
+          '&:hover .MuiOutlinedInput-notchedOutline': { borderColor: 'var(--mui-palette-primary-light)' },
+          '&.Mui-focused .MuiOutlinedInput-notchedOutline': { borderColor: primary, borderWidth: emphasisWidth },
+          '&.Mui-error .MuiOutlinedInput-notchedOutline': { borderColor: 'var(--mui-palette-error-main)' },
+          '&.Mui-disabled .MuiOutlinedInput-notchedOutline': { borderColor, borderWidth },
           '&.Mui-disabled': { backgroundColor: '#f7f9f8' },
         },
       },
@@ -200,7 +224,7 @@ export const studioTheme = createTheme({
     MuiFilledInput: {
       styleOverrides: {
         root: {
-          borderRadius: 8,
+          borderRadius: controlRadius,
           backgroundColor: '#f0f4f2',
           '&:before': { display: 'none' },
           '&:after': { borderBottomWidth: 2 },
@@ -213,17 +237,19 @@ export const studioTheme = createTheme({
 
     MuiTooltip: {
       defaultProps: { arrow: true, enterDelay: 400 },
+      styleOverrides: { tooltip: { borderRadius: controlRadius } },
     },
     MuiChip: {
       styleOverrides: {
-        root: { fontWeight: 600, borderRadius: 5, fontVariantNumeric: 'tabular-nums' },
-        sizeSmall: { height: 22, borderRadius: 4, fontSize: 11 },
+        root: { fontWeight: 600, borderRadius: controlRadius, fontVariantNumeric: 'tabular-nums' },
+        sizeSmall: { height: 22, borderRadius: controlRadius, fontSize: 11 },
+        outlined: { borderWidth, '&.MuiChip-colorDefault': { borderColor } },
       },
     },
     MuiListItemButton: {
       styleOverrides: {
         root: ({ theme }) => ({
-          borderRadius: 6,
+          borderRadius: controlRadius,
           marginInline: 4,
           '&.Mui-selected': {
             backgroundColor: alpha(theme.palette.primary.main, 0.12),
@@ -255,7 +281,7 @@ export const studioTheme = createTheme({
       styleOverrides: {
         root: {
           backgroundColor: '#f0f4f2',
-          borderRadius: 6,
+          borderRadius: controlRadius,
           padding: 3,
           gap: 0,
         },
@@ -266,7 +292,7 @@ export const studioTheme = createTheme({
       styleOverrides: {
         root: {
           border: 0,
-          borderRadius: '5px !important',
+          borderRadius: `${controlRadius}px !important`,
           textTransform: 'none',
           whiteSpace: 'nowrap',
           fontWeight: 500,
@@ -285,12 +311,12 @@ export const studioTheme = createTheme({
     MuiAlert: {
       defaultProps: { variant: 'standard' },
       styleOverrides: {
-        root: { borderRadius: 6 },
+        root: { borderRadius: controlRadius },
       },
     },
     MuiTableCell: {
       styleOverrides: {
-        root: { fontVariantNumeric: 'tabular-nums' },
+        root: { fontVariantNumeric: 'tabular-nums', borderBottom: `${borderWidth}px solid ${borderColor}` },
         head: { fontWeight: 600, backgroundColor: '#f7f9f8', color: muted },
       },
     },
@@ -335,7 +361,8 @@ export const studioTheme = createTheme({
     MuiMenu: {
       styleOverrides: {
         paper: {
-          borderRadius: 6,
+          borderRadius: controlRadius,
+          border: `${borderWidth}px solid ${borderColor}`,
           padding: 4,
           boxShadow: '0px 4px 8px 3px rgba(26, 35, 54, 0.06), 0px 1px 3px rgba(26, 35, 54, 0.08)',
         },
@@ -343,12 +370,12 @@ export const studioTheme = createTheme({
     },
     MuiMenuItem: {
       styleOverrides: {
-        root: { borderRadius: 8, minHeight: 40 },
+        root: { borderRadius: controlRadius, minHeight: 40 },
       },
     },
     MuiDivider: {
       styleOverrides: {
-        root: { borderColor: '#e2e7e4' },
+        root: { borderColor, borderBottomWidth: borderWidth, '&.MuiDivider-vertical': { borderBottomWidth: 0, borderRightWidth: borderWidth } },
       },
     },
     MuiFormControlLabel: {

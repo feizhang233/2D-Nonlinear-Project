@@ -1,0 +1,14 @@
+{
+  "nodes": [{"id": 1, "x": 0, "y": 0, "z": 0}, {"id": 2, "x": 2, "y": 0, "z": 0},
+            {"id": 3, "x": 2, "y": 3, "z": 0}],
+  "elements": [
+    {"id": 1, "node_i": 1, "node_j": 2, "E": 200000000000, "G": 80000000000,
+     "A": 0.01, "Iy": 0.000008, "Iz": 0.000005, "J": 0.00001, "reference_vector": [0, 1, 0]},
+    {"id": 2, "node_i": 2, "node_j": 3, "E": 200000000000, "G": 80000000000,
+     "A": 0.01, "Iy": 0.000008, "Iz": 0.000005, "J": 0.00001, "reference_vector": [0, 0, 1]}
+  ],
+  "supports": [{"node_id": 1, "u": true, "v": true, "w": true, "rx": true, "ry": true, "rz": true}],
+  "nodal_loads": [{"node_id": 3, "fz": 1000}],
+  "number_of_points": 101,
+  "include_plots": false
+}

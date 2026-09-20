@@ -1,0 +1,1618 @@
+{
+  "schema_version": "continuum3d-1",
+  "name": "Uniaxial solid specimen",
+  "nodes": [
+    {
+      "id": 1,
+      "x": 0,
+      "y": 0,
+      "z": 0
+    },
+    {
+      "id": 2,
+      "x": 0,
+      "y": 0,
+      "z": 0.5
+    },
+    {
+      "id": 3,
+      "x": 0,
+      "y": 0,
+      "z": 1
+    },
+    {
+      "id": 4,
+      "x": 0,
+      "y": 0.5,
+      "z": 0
+    },
+    {
+      "id": 5,
+      "x": 0,
+      "y": 0.5,
+      "z": 0.5
+    },
+    {
+      "id": 6,
+      "x": 0,
+      "y": 0.5,
+      "z": 1
+    },
+    {
+      "id": 7,
+      "x": 0,
+      "y": 1,
+      "z": 0
+    },
+    {
+      "id": 8,
+      "x": 0,
+      "y": 1,
+      "z": 0.5
+    },
+    {
+      "id": 9,
+      "x": 0,
+      "y": 1,
+      "z": 1
+    },
+    {
+      "id": 10,
+      "x": 0.5,
+      "y": 0,
+      "z": 0
+    },
+    {
+      "id": 11,
+      "x": 0.5,
+      "y": 0,
+      "z": 0.5
+    },
+    {
+      "id": 12,
+      "x": 0.5,
+      "y": 0,
+      "z": 1
+    },
+    {
+      "id": 13,
+      "x": 0.5,
+      "y": 0.5,
+      "z": 0
+    },
+    {
+      "id": 14,
+      "x": 0.5,
+      "y": 0.5,
+      "z": 0.5
+    },
+    {
+      "id": 15,
+      "x": 0.5,
+      "y": 0.5,
+      "z": 1
+    },
+    {
+      "id": 16,
+      "x": 0.5,
+      "y": 1,
+      "z": 0
+    },
+    {
+      "id": 17,
+      "x": 0.5,
+      "y": 1,
+      "z": 0.5
+    },
+    {
+      "id": 18,
+      "x": 0.5,
+      "y": 1,
+      "z": 1
+    },
+    {
+      "id": 19,
+      "x": 1,
+      "y": 0,
+      "z": 0
+    },
+    {
+      "id": 20,
+      "x": 1,
+      "y": 0,
+      "z": 0.5
+    },
+    {
+      "id": 21,
+      "x": 1,
+      "y": 0,
+      "z": 1
+    },
+    {
+      "id": 22,
+      "x": 1,
+      "y": 0.5,
+      "z": 0
+    },
+    {
+      "id": 23,
+      "x": 1,
+      "y": 0.5,
+      "z": 0.5
+    },
+    {
+      "id": 24,
+      "x": 1,
+      "y": 0.5,
+      "z": 1
+    },
+    {
+      "id": 25,
+      "x": 1,
+      "y": 1,
+      "z": 0
+    },
+    {
+      "id": 26,
+      "x": 1,
+      "y": 1,
+      "z": 0.5
+    },
+    {
+      "id": 27,
+      "x": 1,
+      "y": 1,
+      "z": 1
+    },
+    {
+      "id": 28,
+      "x": 1.5,
+      "y": 0,
+      "z": 0
+    },
+    {
+      "id": 29,
+      "x": 1.5,
+      "y": 0,
+      "z": 0.5
+    },
+    {
+      "id": 30,
+      "x": 1.5,
+      "y": 0,
+      "z": 1
+    },
+    {
+      "id": 31,
+      "x": 1.5,
+      "y": 0.5,
+      "z": 0
+    },
+    {
+      "id": 32,
+      "x": 1.5,
+      "y": 0.5,
+      "z": 0.5
+    },
+    {
+      "id": 33,
+      "x": 1.5,
+      "y": 0.5,
+      "z": 1
+    },
+    {
+      "id": 34,
+      "x": 1.5,
+      "y": 1,
+      "z": 0
+    },
+    {
+      "id": 35,
+      "x": 1.5,
+      "y": 1,
+      "z": 0.5
+    },
+    {
+      "id": 36,
+      "x": 1.5,
+      "y": 1,
+      "z": 1
+    },
+    {
+      "id": 37,
+      "x": 2,
+      "y": 0,
+      "z": 0
+    },
+    {
+      "id": 38,
+      "x": 2,
+      "y": 0,
+      "z": 0.5
+    },
+    {
+      "id": 39,
+      "x": 2,
+      "y": 0,
+      "z": 1
+    },
+    {
+      "id": 40,
+      "x": 2,
+      "y": 0.5,
+      "z": 0
+    },
+    {
+      "id": 41,
+      "x": 2,
+      "y": 0.5,
+      "z": 0.5
+    },
+    {
+      "id": 42,
+      "x": 2,
+      "y": 0.5,
+      "z": 1
+    },
+    {
+      "id": 43,
+      "x": 2,
+      "y": 1,
+      "z": 0
+    },
+    {
+      "id": 44,
+      "x": 2,
+      "y": 1,
+      "z": 0.5
+    },
+    {
+      "id": 45,
+      "x": 2,
+      "y": 1,
+      "z": 1
+    }
+  ],
+  "elements": [
+    {
+      "id": 1,
+      "kind": "tet4",
+      "nodes": [
+        1,
+        10,
+        13,
+        14
+      ],
+      "material_id": 1
+    },
+    {
+      "id": 2,
+      "kind": "tet4",
+      "nodes": [
+        1,
+        13,
+        4,
+        14
+      ],
+      "material_id": 1
+    },
+    {
+      "id": 3,
+      "kind": "tet4",
+      "nodes": [
+        1,
+        4,
+        5,
+        14
+      ],
+      "material_id": 1
+    },
+    {
+      "id": 4,
+      "kind": "tet4",
+      "nodes": [
+        1,
+        5,
+        2,
+        14
+      ],
+      "material_id": 1
+    },
+    {
+      "id": 5,
+      "kind": "tet4",
+      "nodes": [
+        1,
+        2,
+        11,
+        14
+      ],
+      "material_id": 1
+    },
+    {
+      "id": 6,
+      "kind": "tet4",
+      "nodes": [
+        1,
+        11,
+        10,
+        14
+      ],
+      "material_id": 1
+    },
+    {
+      "id": 7,
+      "kind": "tet4",
+      "nodes": [
+        2,
+        11,
+        14,
+        15
+      ],
+      "material_id": 1
+    },
+    {
+      "id": 8,
+      "kind": "tet4",
+      "nodes": [
+        2,
+        14,
+        5,
+        15
+      ],
+      "material_id": 1
+    },
+    {
+      "id": 9,
+      "kind": "tet4",
+      "nodes": [
+        2,
+        5,
+        6,
+        15
+      ],
+      "material_id": 1
+    },
+    {
+      "id": 10,
+      "kind": "tet4",
+      "nodes": [
+        2,
+        6,
+        3,
+        15
+      ],
+      "material_id": 1
+    },
+    {
+      "id": 11,
+      "kind": "tet4",
+      "nodes": [
+        2,
+        3,
+        12,
+        15
+      ],
+      "material_id": 1
+    },
+    {
+      "id": 12,
+      "kind": "tet4",
+      "nodes": [
+        2,
+        12,
+        11,
+        15
+      ],
+      "material_id": 1
+    },
+    {
+      "id": 13,
+      "kind": "tet4",
+      "nodes": [
+        4,
+        13,
+        16,
+        17
+      ],
+      "material_id": 1
+    },
+    {
+      "id": 14,
+      "kind": "tet4",
+      "nodes": [
+        4,
+        16,
+        7,
+        17
+      ],
+      "material_id": 1
+    },
+    {
+      "id": 15,
+      "kind": "tet4",
+      "nodes": [
+        4,
+        7,
+        8,
+        17
+      ],
+      "material_id": 1
+    },
+    {
+      "id": 16,
+      "kind": "tet4",
+      "nodes": [
+        4,
+        8,
+        5,
+        17
+      ],
+      "material_id": 1
+    },
+    {
+      "id": 17,
+      "kind": "tet4",
+      "nodes": [
+        4,
+        5,
+        14,
+        17
+      ],
+      "material_id": 1
+    },
+    {
+      "id": 18,
+      "kind": "tet4",
+      "nodes": [
+        4,
+        14,
+        13,
+        17
+      ],
+      "material_id": 1
+    },
+    {
+      "id": 19,
+      "kind": "tet4",
+      "nodes": [
+        5,
+        14,
+        17,
+        18
+      ],
+      "material_id": 1
+    },
+    {
+      "id": 20,
+      "kind": "tet4",
+      "nodes": [
+        5,
+        17,
+        8,
+        18
+      ],
+      "material_id": 1
+    },
+    {
+      "id": 21,
+      "kind": "tet4",
+      "nodes": [
+        5,
+        8,
+        9,
+        18
+      ],
+      "material_id": 1
+    },
+    {
+      "id": 22,
+      "kind": "tet4",
+      "nodes": [
+        5,
+        9,
+        6,
+        18
+      ],
+      "material_id": 1
+    },
+    {
+      "id": 23,
+      "kind": "tet4",
+      "nodes": [
+        5,
+        6,
+        15,
+        18
+      ],
+      "material_id": 1
+    },
+    {
+      "id": 24,
+      "kind": "tet4",
+      "nodes": [
+        5,
+        15,
+        14,
+        18
+      ],
+      "material_id": 1
+    },
+    {
+      "id": 25,
+      "kind": "tet4",
+      "nodes": [
+        10,
+        19,
+        22,
+        23
+      ],
+      "material_id": 1
+    },
+    {
+      "id": 26,
+      "kind": "tet4",
+      "nodes": [
+        10,
+        22,
+        13,
+        23
+      ],
+      "material_id": 1
+    },
+    {
+      "id": 27,
+      "kind": "tet4",
+      "nodes": [
+        10,
+        13,
+        14,
+        23
+      ],
+      "material_id": 1
+    },
+    {
+      "id": 28,
+      "kind": "tet4",
+      "nodes": [
+        10,
+        14,
+        11,
+        23
+      ],
+      "material_id": 1
+    },
+    {
+      "id": 29,
+      "kind": "tet4",
+      "nodes": [
+        10,
+        11,
+        20,
+        23
+      ],
+      "material_id": 1
+    },
+    {
+      "id": 30,
+      "kind": "tet4",
+      "nodes": [
+        10,
+        20,
+        19,
+        23
+      ],
+      "material_id": 1
+    },
+    {
+      "id": 31,
+      "kind": "tet4",
+      "nodes": [
+        11,
+        20,
+        23,
+        24
+      ],
+      "material_id": 1
+    },
+    {
+      "id": 32,
+      "kind": "tet4",
+      "nodes": [
+        11,
+        23,
+        14,
+        24
+      ],
+      "material_id": 1
+    },
+    {
+      "id": 33,
+      "kind": "tet4",
+      "nodes": [
+        11,
+        14,
+        15,
+        24
+      ],
+      "material_id": 1
+    },
+    {
+      "id": 34,
+      "kind": "tet4",
+      "nodes": [
+        11,
+        15,
+        12,
+        24
+      ],
+      "material_id": 1
+    },
+    {
+      "id": 35,
+      "kind": "tet4",
+      "nodes": [
+        11,
+        12,
+        21,
+        24
+      ],
+      "material_id": 1
+    },
+    {
+      "id": 36,
+      "kind": "tet4",
+      "nodes": [
+        11,
+        21,
+        20,
+        24
+      ],
+      "material_id": 1
+    },
+    {
+      "id": 37,
+      "kind": "tet4",
+      "nodes": [
+        13,
+        22,
+        25,
+        26
+      ],
+      "material_id": 1
+    },
+    {
+      "id": 38,
+      "kind": "tet4",
+      "nodes": [
+        13,
+        25,
+        16,
+        26
+      ],
+      "material_id": 1
+    },
+    {
+      "id": 39,
+      "kind": "tet4",
+      "nodes": [
+        13,
+        16,
+        17,
+        26
+      ],
+      "material_id": 1
+    },
+    {
+      "id": 40,
+      "kind": "tet4",
+      "nodes": [
+        13,
+        17,
+        14,
+        26
+      ],
+      "material_id": 1
+    },
+    {
+      "id": 41,
+      "kind": "tet4",
+      "nodes": [
+        13,
+        14,
+        23,
+        26
+      ],
+      "material_id": 1
+    },
+    {
+      "id": 42,
+      "kind": "tet4",
+      "nodes": [
+        13,
+        23,
+        22,
+        26
+      ],
+      "material_id": 1
+    },
+    {
+      "id": 43,
+      "kind": "tet4",
+      "nodes": [
+        14,
+        23,
+        26,
+        27
+      ],
+      "material_id": 1
+    },
+    {
+      "id": 44,
+      "kind": "tet4",
+      "nodes": [
+        14,
+        26,
+        17,
+        27
+      ],
+      "material_id": 1
+    },
+    {
+      "id": 45,
+      "kind": "tet4",
+      "nodes": [
+        14,
+        17,
+        18,
+        27
+      ],
+      "material_id": 1
+    },
+    {
+      "id": 46,
+      "kind": "tet4",
+      "nodes": [
+        14,
+        18,
+        15,
+        27
+      ],
+      "material_id": 1
+    },
+    {
+      "id": 47,
+      "kind": "tet4",
+      "nodes": [
+        14,
+        15,
+        24,
+        27
+      ],
+      "material_id": 1
+    },
+    {
+      "id": 48,
+      "kind": "tet4",
+      "nodes": [
+        14,
+        24,
+        23,
+        27
+      ],
+      "material_id": 1
+    },
+    {
+      "id": 49,
+      "kind": "tet4",
+      "nodes": [
+        19,
+        28,
+        31,
+        32
+      ],
+      "material_id": 1
+    },
+    {
+      "id": 50,
+      "kind": "tet4",
+      "nodes": [
+        19,
+        31,
+        22,
+        32
+      ],
+      "material_id": 1
+    },
+    {
+      "id": 51,
+      "kind": "tet4",
+      "nodes": [
+        19,
+        22,
+        23,
+        32
+      ],
+      "material_id": 1
+    },
+    {
+      "id": 52,
+      "kind": "tet4",
+      "nodes": [
+        19,
+        23,
+        20,
+        32
+      ],
+      "material_id": 1
+    },
+    {
+      "id": 53,
+      "kind": "tet4",
+      "nodes": [
+        19,
+        20,
+        29,
+        32
+      ],
+      "material_id": 1
+    },
+    {
+      "id": 54,
+      "kind": "tet4",
+      "nodes": [
+        19,
+        29,
+        28,
+        32
+      ],
+      "material_id": 1
+    },
+    {
+      "id": 55,
+      "kind": "tet4",
+      "nodes": [
+        20,
+        29,
+        32,
+        33
+      ],
+      "material_id": 1
+    },
+    {
+      "id": 56,
+      "kind": "tet4",
+      "nodes": [
+        20,
+        32,
+        23,
+        33
+      ],
+      "material_id": 1
+    },
+    {
+      "id": 57,
+      "kind": "tet4",
+      "nodes": [
+        20,
+        23,
+        24,
+        33
+      ],
+      "material_id": 1
+    },
+    {
+      "id": 58,
+      "kind": "tet4",
+      "nodes": [
+        20,
+        24,
+        21,
+        33
+      ],
+      "material_id": 1
+    },
+    {
+      "id": 59,
+      "kind": "tet4",
+      "nodes": [
+        20,
+        21,
+        30,
+        33
+      ],
+      "material_id": 1
+    },
+    {
+      "id": 60,
+      "kind": "tet4",
+      "nodes": [
+        20,
+        30,
+        29,
+        33
+      ],
+      "material_id": 1
+    },
+    {
+      "id": 61,
+      "kind": "tet4",
+      "nodes": [
+        22,
+        31,
+        34,
+        35
+      ],
+      "material_id": 1
+    },
+    {
+      "id": 62,
+      "kind": "tet4",
+      "nodes": [
+        22,
+        34,
+        25,
+        35
+      ],
+      "material_id": 1
+    },
+    {
+      "id": 63,
+      "kind": "tet4",
+      "nodes": [
+        22,
+        25,
+        26,
+        35
+      ],
+      "material_id": 1
+    },
+    {
+      "id": 64,
+      "kind": "tet4",
+      "nodes": [
+        22,
+        26,
+        23,
+        35
+      ],
+      "material_id": 1
+    },
+    {
+      "id": 65,
+      "kind": "tet4",
+      "nodes": [
+        22,
+        23,
+        32,
+        35
+      ],
+      "material_id": 1
+    },
+    {
+      "id": 66,
+      "kind": "tet4",
+      "nodes": [
+        22,
+        32,
+        31,
+        35
+      ],
+      "material_id": 1
+    },
+    {
+      "id": 67,
+      "kind": "tet4",
+      "nodes": [
+        23,
+        32,
+        35,
+        36
+      ],
+      "material_id": 1
+    },
+    {
+      "id": 68,
+      "kind": "tet4",
+      "nodes": [
+        23,
+        35,
+        26,
+        36
+      ],
+      "material_id": 1
+    },
+    {
+      "id": 69,
+      "kind": "tet4",
+      "nodes": [
+        23,
+        26,
+        27,
+        36
+      ],
+      "material_id": 1
+    },
+    {
+      "id": 70,
+      "kind": "tet4",
+      "nodes": [
+        23,
+        27,
+        24,
+        36
+      ],
+      "material_id": 1
+    },
+    {
+      "id": 71,
+      "kind": "tet4",
+      "nodes": [
+        23,
+        24,
+        33,
+        36
+      ],
+      "material_id": 1
+    },
+    {
+      "id": 72,
+      "kind": "tet4",
+      "nodes": [
+        23,
+        33,
+        32,
+        36
+      ],
+      "material_id": 1
+    },
+    {
+      "id": 73,
+      "kind": "tet4",
+      "nodes": [
+        28,
+        37,
+        40,
+        41
+      ],
+      "material_id": 1
+    },
+    {
+      "id": 74,
+      "kind": "tet4",
+      "nodes": [
+        28,
+        40,
+        31,
+        41
+      ],
+      "material_id": 1
+    },
+    {
+      "id": 75,
+      "kind": "tet4",
+      "nodes": [
+        28,
+        31,
+        32,
+        41
+      ],
+      "material_id": 1
+    },
+    {
+      "id": 76,
+      "kind": "tet4",
+      "nodes": [
+        28,
+        32,
+        29,
+        41
+      ],
+      "material_id": 1
+    },
+    {
+      "id": 77,
+      "kind": "tet4",
+      "nodes": [
+        28,
+        29,
+        38,
+        41
+      ],
+      "material_id": 1
+    },
+    {
+      "id": 78,
+      "kind": "tet4",
+      "nodes": [
+        28,
+        38,
+        37,
+        41
+      ],
+      "material_id": 1
+    },
+    {
+      "id": 79,
+      "kind": "tet4",
+      "nodes": [
+        29,
+        38,
+        41,
+        42
+      ],
+      "material_id": 1
+    },
+    {
+      "id": 80,
+      "kind": "tet4",
+      "nodes": [
+        29,
+        41,
+        32,
+        42
+      ],
+      "material_id": 1
+    },
+    {
+      "id": 81,
+      "kind": "tet4",
+      "nodes": [
+        29,
+        32,
+        33,
+        42
+      ],
+      "material_id": 1
+    },
+    {
+      "id": 82,
+      "kind": "tet4",
+      "nodes": [
+        29,
+        33,
+        30,
+        42
+      ],
+      "material_id": 1
+    },
+    {
+      "id": 83,
+      "kind": "tet4",
+      "nodes": [
+        29,
+        30,
+        39,
+        42
+      ],
+      "material_id": 1
+    },
+    {
+      "id": 84,
+      "kind": "tet4",
+      "nodes": [
+        29,
+        39,
+        38,
+        42
+      ],
+      "material_id": 1
+    },
+    {
+      "id": 85,
+      "kind": "tet4",
+      "nodes": [
+        31,
+        40,
+        43,
+        44
+      ],
+      "material_id": 1
+    },
+    {
+      "id": 86,
+      "kind": "tet4",
+      "nodes": [
+        31,
+        43,
+        34,
+        44
+      ],
+      "material_id": 1
+    },
+    {
+      "id": 87,
+      "kind": "tet4",
+      "nodes": [
+        31,
+        34,
+        35,
+        44
+      ],
+      "material_id": 1
+    },
+    {
+      "id": 88,
+      "kind": "tet4",
+      "nodes": [
+        31,
+        35,
+        32,
+        44
+      ],
+      "material_id": 1
+    },
+    {
+      "id": 89,
+      "kind": "tet4",
+      "nodes": [
+        31,
+        32,
+        41,
+        44
+      ],
+      "material_id": 1
+    },
+    {
+      "id": 90,
+      "kind": "tet4",
+      "nodes": [
+        31,
+        41,
+        40,
+        44
+      ],
+      "material_id": 1
+    },
+    {
+      "id": 91,
+      "kind": "tet4",
+      "nodes": [
+        32,
+        41,
+        44,
+        45
+      ],
+      "material_id": 1
+    },
+    {
+      "id": 92,
+      "kind": "tet4",
+      "nodes": [
+        32,
+        44,
+        35,
+        45
+      ],
+      "material_id": 1
+    },
+    {
+      "id": 93,
+      "kind": "tet4",
+      "nodes": [
+        32,
+        35,
+        36,
+        45
+      ],
+      "material_id": 1
+    },
+    {
+      "id": 94,
+      "kind": "tet4",
+      "nodes": [
+        32,
+        36,
+        33,
+        45
+      ],
+      "material_id": 1
+    },
+    {
+      "id": 95,
+      "kind": "tet4",
+      "nodes": [
+        32,
+        33,
+        42,
+        45
+      ],
+      "material_id": 1
+    },
+    {
+      "id": 96,
+      "kind": "tet4",
+      "nodes": [
+        32,
+        42,
+        41,
+        45
+      ],
+      "material_id": 1
+    }
+  ],
+  "materials": [
+    {
+      "id": 1,
+      "E": 200000000000,
+      "nu": 0.3
+    }
+  ],
+  "constraints": [
+    {
+      "node_id": 1,
+      "dof": "ux",
+      "value": 0
+    },
+    {
+      "node_id": 2,
+      "dof": "ux",
+      "value": 0
+    },
+    {
+      "node_id": 3,
+      "dof": "ux",
+      "value": 0
+    },
+    {
+      "node_id": 4,
+      "dof": "ux",
+      "value": 0
+    },
+    {
+      "node_id": 5,
+      "dof": "ux",
+      "value": 0
+    },
+    {
+      "node_id": 6,
+      "dof": "ux",
+      "value": 0
+    },
+    {
+      "node_id": 7,
+      "dof": "ux",
+      "value": 0
+    },
+    {
+      "node_id": 8,
+      "dof": "ux",
+      "value": 0
+    },
+    {
+      "node_id": 9,
+      "dof": "ux",
+      "value": 0
+    },
+    {
+      "node_id": 1,
+      "dof": "uy",
+      "value": 0
+    },
+    {
+      "node_id": 2,
+      "dof": "uy",
+      "value": 0
+    },
+    {
+      "node_id": 3,
+      "dof": "uy",
+      "value": 0
+    },
+    {
+      "node_id": 10,
+      "dof": "uy",
+      "value": 0
+    },
+    {
+      "node_id": 11,
+      "dof": "uy",
+      "value": 0
+    },
+    {
+      "node_id": 12,
+      "dof": "uy",
+      "value": 0
+    },
+    {
+      "node_id": 19,
+      "dof": "uy",
+      "value": 0
+    },
+    {
+      "node_id": 20,
+      "dof": "uy",
+      "value": 0
+    },
+    {
+      "node_id": 21,
+      "dof": "uy",
+      "value": 0
+    },
+    {
+      "node_id": 28,
+      "dof": "uy",
+      "value": 0
+    },
+    {
+      "node_id": 29,
+      "dof": "uy",
+      "value": 0
+    },
+    {
+      "node_id": 30,
+      "dof": "uy",
+      "value": 0
+    },
+    {
+      "node_id": 37,
+      "dof": "uy",
+      "value": 0
+    },
+    {
+      "node_id": 38,
+      "dof": "uy",
+      "value": 0
+    },
+    {
+      "node_id": 39,
+      "dof": "uy",
+      "value": 0
+    },
+    {
+      "node_id": 1,
+      "dof": "uz",
+      "value": 0
+    },
+    {
+      "node_id": 4,
+      "dof": "uz",
+      "value": 0
+    },
+    {
+      "node_id": 7,
+      "dof": "uz",
+      "value": 0
+    },
+    {
+      "node_id": 10,
+      "dof": "uz",
+      "value": 0
+    },
+    {
+      "node_id": 13,
+      "dof": "uz",
+      "value": 0
+    },
+    {
+      "node_id": 16,
+      "dof": "uz",
+      "value": 0
+    },
+    {
+      "node_id": 19,
+      "dof": "uz",
+      "value": 0
+    },
+    {
+      "node_id": 22,
+      "dof": "uz",
+      "value": 0
+    },
+    {
+      "node_id": 25,
+      "dof": "uz",
+      "value": 0
+    },
+    {
+      "node_id": 28,
+      "dof": "uz",
+      "value": 0
+    },
+    {
+      "node_id": 31,
+      "dof": "uz",
+      "value": 0
+    },
+    {
+      "node_id": 34,
+      "dof": "uz",
+      "value": 0
+    },
+    {
+      "node_id": 37,
+      "dof": "uz",
+      "value": 0
+    },
+    {
+      "node_id": 40,
+      "dof": "uz",
+      "value": 0
+    },
+    {
+      "node_id": 43,
+      "dof": "uz",
+      "value": 0
+    }
+  ],
+  "nodal_loads": [],
+  "tractions": [
+    {
+      "element_id": 73,
+      "face": 2,
+      "traction": [
+        1000000,
+        0,
+        0
+      ]
+    },
+    {
+      "element_id": 78,
+      "face": 2,
+      "traction": [
+        1000000,
+        0,
+        0
+      ]
+    },
+    {
+      "element_id": 79,
+      "face": 2,
+      "traction": [
+        1000000,
+        0,
+        0
+      ]
+    },
+    {
+      "element_id": 84,
+      "face": 2,
+      "traction": [
+        1000000,
+        0,
+        0
+      ]
+    },
+    {
+      "element_id": 85,
+      "face": 2,
+      "traction": [
+        1000000,
+        0,
+        0
+      ]
+    },
+    {
+      "element_id": 90,
+      "face": 2,
+      "traction": [
+        1000000,
+        0,
+        0
+      ]
+    },
+    {
+      "element_id": 91,
+      "face": 2,
+      "traction": [
+        1000000,
+        0,
+        0
+      ]
+    },
+    {
+      "element_id": 96,
+      "face": 2,
+      "traction": [
+        1000000,
+        0,
+        0
+      ]
+    }
+  ],
+  "body_force": [
+    0,
+    0,
+    0
+  ]
+}

@@ -296,8 +296,8 @@ export function ModelNavigator({
                         borderLeftColor:
                           selection.id === entry.id
                             ? 'primary.main'
-                            : 'divider',
-                        borderRadius: 0,
+                            : 'transparent',
+                        borderRadius: 1,
                         overflowWrap: 'anywhere',
                       }}
                     >

@@ -25,9 +25,9 @@ typography:
   mono:
     fontFamily: "ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace"
 rounded:
-  DEFAULT: "0.5rem"
+  DEFAULT: "0.375rem"
   control: "0.375rem"
-  compact: "0.3125rem"
+  compact: "0.375rem"
 spacing:
   control-gap: "0.5rem"
   content-gap: "0.75rem"
@@ -362,3 +362,136 @@ very large or small magnitudes. Plot colors always have legends, axis labels, an
 - **Don't:** expose a model-family option that only changes copy while submitting a Frame payload.
 - **Don't:** imply full 3D shell rendering, stability proof, or unsupported constitutive behavior
   from the current projected visualization.
+
+## Dimension and solid workspaces
+
+The shared WorkspaceSwitcher places a compact 2D/3D segmented control immediately
+before Frame. Both dimensions show the same four family names. 3D enables Frame,
+Continuum, Plate and Shell. Each spatial entry opens its own implemented, bounded
+linear-static model; the Shell guide states the planar-facet scope. Dimensions
+select independent documents; they never convert geometry or merge data.
+Changing dimension keeps the family selection consistent in both directions.
+`workspaces.ts` owns family mapping; `useSpatialNavigation` and `SpatialWorkspaces`
+own the active and visited spatial workspaces. Visited workbenches remain mounted
+to preserve camera state and unfinished field text. Solid, Plate and Shell share
+the document lifecycle in `useSpatialDocument`: bounded undo, atomic validated
+imports, local persistence and revision-guarded requests. Frame keeps its CAD draft
+document lifecycle and uses the same transport and stale-import protection.
+
+Continuum 3D reuses the existing MUI theme, ScientificField, DataTable, 56 px header,
+38 px family row, 232 px navigator, 320 px Properties panel and 34 px footer. The
+canvas displays closed solid faces with restrained green/blue mesh edges; red arrows
+indicate vector loads. Result colors use secondary-to-error theme colors with numeric
+legends and tables. No global design tokens or competing component systems are added.
+
+The workbench retains the 1120 px desktop floor and document horizontal scrolling on
+narrow screens. Properties and tables scroll independently. Solid property drafts
+use explicit Apply/Cancel and are preserved while the mounted workspace is hidden.
+Table-backed node/element selection is the keyboard alternative to direct canvas picks.
+See CONTINUUM3D_INTEGRATION.md for the model, API and bounded verification contract.
+
+## Frame 3D workspace
+
+Frame 3D is an independent **linear-static** document, selected by Frame in 3D mode. It reuses the
+existing `WorkspaceSwitcher`, MUI theme, ScientificField, 56 px header, 38 px family
+row, 68 px category rail with a 220 px optional object list, and 320 px optional Properties inspector. The runtime theme
+continues to own every UI color and font; spatial CSS aliases its CSS variables.
+The original four nonlinear families retain their solver and project contracts.
+
+The spatial modeling variant adds XY/XZ/YZ working planes and linked plane/orthographic
+views, with exact XYZ entry and camera buttons as keyboard alternatives to drawing
+and dragging. Spatial property forms commit complete assignments with their own Apply
+buttons and a 50-edit undo history, following the reference space-frame workflow.
+This is distinct from the existing nonlinear analysis draft transaction because the
+space-frame API accepts a separate, complete linear-static request. Materials and
+sections remain independent assignments. Partial scientific input stays visible and
+invalid values never reach a committed model. Model edits discard old result evidence.
+
+Model mode shows editable geometry; Results mode shows recovered deformation and six
+section-force quantities. The result table dock uses the full plot width below the
+linked views, with 20-row pagination and internal scrolling. Analysis errors remain
+in that dock; only the header owns the primary Run/Cancel action. Selecting another
+workspace preserves each document, results, camera and unfinished property fields.
+
+The 1120 px desktop floor and document horizontal scrolling remain canonical. The
+spatial inspector uses a bounded drawer below 1050 px, keeping numeric forms reachable.
+There are no new global design tokens. The default space-frame persistence is local
+browser storage plus portable JSON; the nonlinear private account archive is unchanged.
+
+### Frame 3D model navigation
+
+`SpatialNavigator` owns a fixed icon-and-label rail: geometry first, assignments second,
+and Tables anchored at the bottom. It borrows the compact tool organization of the
+reference Frame Studio while retaining Studio's muted green palette, flat surfaces,
+fine dividers and shared MUI controls. The rail stays usable when the object list is
+collapsed; selecting a category reopens its list. Only the list scrolls during browsing.
+
+Object rows show coordinates, connectivity/length, or assignment details. Selection uses
+a tinted surface, a leading rule and a checkmark, shared with the canvas and Properties.
+New node/member is a separate action that clears selection before entering drawing mode;
+Finish drawing returns to selection. Materials and sections list member assignments,
+not invented library records. Supports and loads open the corresponding selected object's
+editor. Search remains available for short lists, preserves each category's filter,
+and has a focus-restoring clear action and an explicit empty state. No new color tokens.
+
+## Shared border language
+
+All workspaces use the same border family, owned by `frontend/src/theme.ts`:
+1 px solid `divider` (#e2e7e4) for neutral boundaries, and 6 px radius for controls,
+menus, dialogs, rounded containers and object rows. Docked panel junctions remain
+square and use a single separating edge. Status dots and engineering geometry keep
+their intrinsic shapes. Tables use the same divider as panel edges and inputs.
+
+Focus uses a 2 px primary outline; selected object rows use a 2 px primary leading
+rule with a tinted surface. Hover strengthens a control's border without changing
+its width. Errors retain an error-colored boundary and text; disabled controls use
+the neutral divider. No screen adds its own radius scale or neutral border color.
+Spatial CSS reads `--studio-control-radius`, `--studio-border-width` and
+`--studio-emphasis-width` from the shared theme baseline, and color from MUI tokens.
+
+
+## Spatial plate workspace
+
+Plate 3D follows the same 56 px header, 38 px family row, 232 px navigator, 320 px
+Properties panel, 460 px result evidence panel and 34 px footer as the solid
+workspace. It reuses theme.ts without introducing colors, fonts or radius tokens.
+The shared SurfaceCanvas owns solid and plate orbit/pan/zoom, projection, face
+selection, load arrows, contour scale and camera controls. Domain wrappers own
+physical quantities, units and recovery semantics. Plate faces remain single
+midsurfaces; rendering thickness as solid cells would misrepresent this model.
+
+The fixed primary slot owns Apply changes / Run analysis / Cancel. ScientificField
+retains raw exponent input across close/reopen and dimensional navigation. Models
+remain mounted independently. The result table selector uses the authored MUI
+select because five evidence sets exceed the compact panel's horizontal tab space.
+Table cells retain scientific values and internal horizontal scrolling. Moment
+and stress plots explicitly say local axes and element mean; raw Gauss points
+remain in tables. Nodal normal deflection is labeled |w| in the magnitude contour.
+
+Reconcile: existing theme, flat borders, shell dimensions and shared controls match.
+The previous disabled Plate 3D entry now opens a bounded MITC4 model. Shell 3D
+now has its own bounded flat-facet workspace. No other visual-system change is introduced. See PLATE3D_INTEGRATION.md.
+
+## Spatial shell workspace
+
+Shell 3D extends the established engineering workbench without new visual tokens.
+It shares the 56 px header, 38 px family row, 232 px navigator, 320 px properties
+panel, 460 px result panel and 34 px footer. Runtime theme.ts owns colors, type,
+6 px controls and flat border treatment. SurfaceCanvas, ScientificField, DataTable
+and WorkspaceSwitcher retain their canonical visual and keyboard behaviors.
+
+ShellCanvas supplies facet-local resultants and dead normal pressures. Selected
+facets reveal local axes, because Nx or Mx from different facets cannot be read as
+a single global direction. The scale selector matches Plate's authored MUI selector.
+The result selector groups seven evidence sets without crowding horizontal tabs.
+The canvas fills the available center height; result tables scroll internally.
+
+useSpatialDocument centralizes bounded history, portable JSON, atomic host-validated
+imports and cancellation guards. The fixed primary slot switches between Apply
+changes / Run analysis / Cancel. Invalid drafts survive workspace navigation;
+Cancel changes restores the form. The desktop floor remains 1120 px with reachable
+document horizontal overflow, including at narrow widths.
+
+Reconcile: all four 3D family entries are now active. Folded planar surfaces and
+six-DOF evidence are Shell-specific domain content; no new palette, card language
+or alternate input system is introduced. See SHELL3D_INTEGRATION.md.

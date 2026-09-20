@@ -234,7 +234,7 @@ export function MathCoreDialog({ open, onClose }: Props) {
                   {selectedOperation.required_parameters.length === 0 && <Chip size="small" color="success" variant="outlined" label="No parameters required" />}
                 </Stack>
               </Box>
-              <Paper variant="outlined" sx={{ p: 1.5, borderRadius: 2, bgcolor: 'background.containerLow' }}>
+              <Paper variant="outlined" sx={{ p: 1.5, borderRadius: 1, bgcolor: 'background.containerLow' }}>
                 <Typography variant="overline" color="text.secondary">Residual convention</Typography>
                 <Typography variant="body2" sx={{ fontFamily: 'ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace', overflowWrap: 'anywhere' }}>
                   {selectedCore.residual_convention}
@@ -289,7 +289,7 @@ export function MathCoreDialog({ open, onClose }: Props) {
                 {executionError ? (
                   <Alert severity="error" role="alert">{executionError}</Alert>
                 ) : response ? (
-                  <Paper variant="outlined" sx={{ overflow: 'hidden', borderRadius: 2 }}>
+                  <Paper variant="outlined" sx={{ overflow: 'hidden', borderRadius: 1 }}>
                     <Stack direction="row" sx={{ px: 1.5, py: 1, alignItems: 'center', justifyContent: 'space-between', bgcolor: 'background.containerLow', borderBottom: '1px solid', borderColor: 'divider' }}>
                       <Typography variant="subtitle2">Response envelope</Typography>
                       <Chip size="small" color={response.status === 'ok' ? 'success' : 'error'} label={response.status === 'ok' ? 'Completed' : response.error?.code ?? 'Error'} />
@@ -302,7 +302,7 @@ export function MathCoreDialog({ open, onClose }: Props) {
                     </Box>
                   </Paper>
                 ) : (
-                  <Paper variant="outlined" sx={{ borderRadius: 2 }}>
+                  <Paper variant="outlined" sx={{ borderRadius: 1 }}>
                     <EmptyState icon={<FunctionsRoundedIcon />} title="No operation result yet" body="Run the selected reference operation to inspect its stable response envelope and diagnostics." />
                   </Paper>
                 )}

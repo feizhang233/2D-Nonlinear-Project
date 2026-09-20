@@ -552,6 +552,70 @@
         "title": "DisplacementControlOptions",
         "type": "object"
       },
+      "DistributedLoadInput": {
+        "additionalProperties": false,
+        "properties": {
+          "coordinate_system": {
+            "default": "local",
+            "enum": [
+              "local",
+              "global"
+            ],
+            "title": "Coordinate System",
+            "type": "string"
+          },
+          "element_id": {
+            "exclusiveMinimum": 0.0,
+            "title": "Element Id",
+            "type": "integer"
+          },
+          "mx_i": {
+            "default": 0.0,
+            "title": "Mx I",
+            "type": "number"
+          },
+          "mx_j": {
+            "default": 0.0,
+            "title": "Mx J",
+            "type": "number"
+          },
+          "qx_i": {
+            "default": 0.0,
+            "title": "Qx I",
+            "type": "number"
+          },
+          "qx_j": {
+            "default": 0.0,
+            "title": "Qx J",
+            "type": "number"
+          },
+          "qy_i": {
+            "default": 0.0,
+            "title": "Qy I",
+            "type": "number"
+          },
+          "qy_j": {
+            "default": 0.0,
+            "title": "Qy J",
+            "type": "number"
+          },
+          "qz_i": {
+            "default": 0.0,
+            "title": "Qz I",
+            "type": "number"
+          },
+          "qz_j": {
+            "default": 0.0,
+            "title": "Qz J",
+            "type": "number"
+          }
+        },
+        "required": [
+          "element_id"
+        ],
+        "title": "DistributedLoadInput",
+        "type": "object"
+      },
       "Dof": {
         "enum": [
           "UX",
@@ -584,7 +648,179 @@
         "title": "DofRef",
         "type": "object"
       },
-      "ElementInput": {
+      "ElementFieldsOutput": {
+        "additionalProperties": false,
+        "properties": {
+          "axial_displacement": {
+            "items": {
+              "type": "number"
+            },
+            "title": "Axial Displacement",
+            "type": "array"
+          },
+          "axial_force": {
+            "items": {
+              "type": "number"
+            },
+            "title": "Axial Force",
+            "type": "array"
+          },
+          "bending_moment_y": {
+            "items": {
+              "type": "number"
+            },
+            "title": "Bending Moment Y",
+            "type": "array"
+          },
+          "bending_moment_z": {
+            "items": {
+              "type": "number"
+            },
+            "title": "Bending Moment Z",
+            "type": "array"
+          },
+          "normal_stress": {
+            "items": {
+              "items": {
+                "type": "number"
+              },
+              "type": "array"
+            },
+            "title": "Normal Stress",
+            "type": "array"
+          },
+          "rotation_x": {
+            "items": {
+              "type": "number"
+            },
+            "title": "Rotation X",
+            "type": "array"
+          },
+          "rotation_y": {
+            "items": {
+              "type": "number"
+            },
+            "title": "Rotation Y",
+            "type": "array"
+          },
+          "rotation_z": {
+            "items": {
+              "type": "number"
+            },
+            "title": "Rotation Z",
+            "type": "array"
+          },
+          "shear_force_y": {
+            "items": {
+              "type": "number"
+            },
+            "title": "Shear Force Y",
+            "type": "array"
+          },
+          "shear_force_z": {
+            "items": {
+              "type": "number"
+            },
+            "title": "Shear Force Z",
+            "type": "array"
+          },
+          "torsional_moment": {
+            "items": {
+              "type": "number"
+            },
+            "title": "Torsional Moment",
+            "type": "array"
+          },
+          "transverse_displacement_y": {
+            "items": {
+              "type": "number"
+            },
+            "title": "Transverse Displacement Y",
+            "type": "array"
+          },
+          "transverse_displacement_z": {
+            "items": {
+              "type": "number"
+            },
+            "title": "Transverse Displacement Z",
+            "type": "array"
+          },
+          "x_deformed": {
+            "items": {
+              "type": "number"
+            },
+            "title": "X Deformed",
+            "type": "array"
+          },
+          "x_global": {
+            "items": {
+              "type": "number"
+            },
+            "title": "X Global",
+            "type": "array"
+          },
+          "x_local": {
+            "items": {
+              "type": "number"
+            },
+            "title": "X Local",
+            "type": "array"
+          },
+          "y_deformed": {
+            "items": {
+              "type": "number"
+            },
+            "title": "Y Deformed",
+            "type": "array"
+          },
+          "y_global": {
+            "items": {
+              "type": "number"
+            },
+            "title": "Y Global",
+            "type": "array"
+          },
+          "z_deformed": {
+            "items": {
+              "type": "number"
+            },
+            "title": "Z Deformed",
+            "type": "array"
+          },
+          "z_global": {
+            "items": {
+              "type": "number"
+            },
+            "title": "Z Global",
+            "type": "array"
+          }
+        },
+        "required": [
+          "x_local",
+          "axial_displacement",
+          "transverse_displacement_y",
+          "transverse_displacement_z",
+          "rotation_x",
+          "rotation_y",
+          "rotation_z",
+          "axial_force",
+          "shear_force_y",
+          "shear_force_z",
+          "torsional_moment",
+          "bending_moment_y",
+          "bending_moment_z",
+          "x_global",
+          "y_global",
+          "z_global",
+          "x_deformed",
+          "y_deformed",
+          "z_deformed",
+          "normal_stress"
+        ],
+        "title": "ElementFieldsOutput",
+        "type": "object"
+      },
+      "ElementInput-Output": {
         "additionalProperties": false,
         "properties": {
           "extensions": {
@@ -637,6 +873,233 @@
           "material_id"
         ],
         "title": "ElementInput",
+        "type": "object"
+      },
+      "ElementResult": {
+        "additionalProperties": false,
+        "properties": {
+          "element_id": {
+            "exclusiveMinimum": 0.0,
+            "title": "Element Id",
+            "type": "integer"
+          },
+          "points": {
+            "items": {
+              "$ref": "#/components/schemas/PointResult"
+            },
+            "title": "Points",
+            "type": "array"
+          },
+          "volume": {
+            "title": "Volume",
+            "type": "number"
+          }
+        },
+        "required": [
+          "element_id",
+          "volume",
+          "points"
+        ],
+        "title": "ElementResult",
+        "type": "object"
+      },
+      "ElementResultOutput": {
+        "additionalProperties": false,
+        "properties": {
+          "element_id": {
+            "title": "Element Id",
+            "type": "integer"
+          },
+          "fields": {
+            "$ref": "#/components/schemas/ElementFieldsOutput"
+          },
+          "length": {
+            "title": "Length",
+            "type": "number"
+          },
+          "local_axes": {
+            "items": {
+              "items": {
+                "type": "number"
+              },
+              "type": "array"
+            },
+            "title": "Local Axes",
+            "type": "array"
+          },
+          "local_displacements": {
+            "items": {
+              "type": "number"
+            },
+            "title": "Local Displacements",
+            "type": "array"
+          },
+          "local_end_forces": {
+            "items": {
+              "type": "number"
+            },
+            "title": "Local End Forces",
+            "type": "array"
+          },
+          "strain_energy": {
+            "title": "Strain Energy",
+            "type": "number"
+          },
+          "validation": {
+            "$ref": "#/components/schemas/ElementValidationOutput"
+          }
+        },
+        "required": [
+          "element_id",
+          "length",
+          "local_axes",
+          "local_displacements",
+          "local_end_forces",
+          "fields",
+          "strain_energy",
+          "validation"
+        ],
+        "title": "ElementResultOutput",
+        "type": "object"
+      },
+      "ElementValidationOutput": {
+        "additionalProperties": false,
+        "properties": {
+          "endpoint_rotation_error": {
+            "title": "Endpoint Rotation Error",
+            "type": "number"
+          },
+          "endpoint_translation_error": {
+            "title": "Endpoint Translation Error",
+            "type": "number"
+          },
+          "energy_absolute_error": {
+            "title": "Energy Absolute Error",
+            "type": "number"
+          },
+          "energy_residual_ratio": {
+            "title": "Energy Residual Ratio",
+            "type": "number"
+          },
+          "energy_roundoff_bound": {
+            "title": "Energy Roundoff Bound",
+            "type": "number"
+          },
+          "force_residual": {
+            "items": {
+              "type": "number"
+            },
+            "title": "Force Residual",
+            "type": "array"
+          },
+          "maximum_normalized_residual": {
+            "title": "Maximum Normalized Residual",
+            "type": "number"
+          },
+          "moment_residual": {
+            "items": {
+              "type": "number"
+            },
+            "title": "Moment Residual",
+            "type": "array"
+          },
+          "passed": {
+            "title": "Passed",
+            "type": "boolean"
+          },
+          "release_residual": {
+            "title": "Release Residual",
+            "type": "number"
+          }
+        },
+        "required": [
+          "force_residual",
+          "moment_residual",
+          "maximum_normalized_residual",
+          "endpoint_translation_error",
+          "endpoint_rotation_error",
+          "release_residual",
+          "energy_residual_ratio",
+          "energy_absolute_error",
+          "energy_roundoff_bound",
+          "passed"
+        ],
+        "title": "ElementValidationOutput",
+        "type": "object"
+      },
+      "EquilibriumChecks": {
+        "additionalProperties": false,
+        "properties": {
+          "force_balance": {
+            "maxItems": 3,
+            "minItems": 3,
+            "prefixItems": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "number"
+              },
+              {
+                "type": "number"
+              }
+            ],
+            "title": "Force Balance",
+            "type": "array"
+          },
+          "moment_balance": {
+            "maxItems": 3,
+            "minItems": 3,
+            "prefixItems": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "number"
+              },
+              {
+                "type": "number"
+              }
+            ],
+            "title": "Moment Balance",
+            "type": "array"
+          },
+          "passed": {
+            "title": "Passed",
+            "type": "boolean"
+          },
+          "relative_energy_error": {
+            "title": "Relative Energy Error",
+            "type": "number"
+          },
+          "relative_force_error": {
+            "title": "Relative Force Error",
+            "type": "number"
+          },
+          "relative_moment_error": {
+            "title": "Relative Moment Error",
+            "type": "number"
+          },
+          "relative_recovery_energy_error": {
+            "title": "Relative Recovery Energy Error",
+            "type": "number"
+          },
+          "relative_residual": {
+            "title": "Relative Residual",
+            "type": "number"
+          }
+        },
+        "required": [
+          "passed",
+          "relative_residual",
+          "force_balance",
+          "moment_balance",
+          "relative_force_error",
+          "relative_moment_error",
+          "relative_energy_error",
+          "relative_recovery_energy_error"
+        ],
+        "title": "EquilibriumChecks",
         "type": "object"
       },
       "ExecutionMode": {
@@ -722,6 +1185,159 @@
           "message"
         ],
         "title": "FailureRecord",
+        "type": "object"
+      },
+      "FrameCapabilities": {
+        "additionalProperties": false,
+        "properties": {
+          "analysis": {
+            "const": "linear-static",
+            "title": "Analysis",
+            "type": "string"
+          },
+          "dofs_per_node": {
+            "items": {
+              "enum": [
+                "u",
+                "v",
+                "w",
+                "rx",
+                "ry",
+                "rz"
+              ],
+              "type": "string"
+            },
+            "title": "Dofs Per Node",
+            "type": "array"
+          },
+          "max_elements": {
+            "title": "Max Elements",
+            "type": "integer"
+          },
+          "max_field_values": {
+            "title": "Max Field Values",
+            "type": "integer"
+          },
+          "max_nodes": {
+            "title": "Max Nodes",
+            "type": "integer"
+          },
+          "scope": {
+            "title": "Scope",
+            "type": "string"
+          },
+          "theories": {
+            "items": {
+              "enum": [
+                "euler_bernoulli",
+                "timoshenko"
+              ],
+              "type": "string"
+            },
+            "title": "Theories",
+            "type": "array"
+          }
+        },
+        "required": [
+          "analysis",
+          "max_nodes",
+          "max_elements",
+          "scope",
+          "dofs_per_node",
+          "theories",
+          "max_field_values"
+        ],
+        "title": "FrameCapabilities",
+        "type": "object"
+      },
+      "GlobalValidationOutput": {
+        "additionalProperties": false,
+        "properties": {
+          "energy_absolute_error": {
+            "title": "Energy Absolute Error",
+            "type": "number"
+          },
+          "energy_residual_ratio": {
+            "title": "Energy Residual Ratio",
+            "type": "number"
+          },
+          "energy_roundoff_bound": {
+            "title": "Energy Roundoff Bound",
+            "type": "number"
+          },
+          "external_work": {
+            "title": "External Work",
+            "type": "number"
+          },
+          "force_balance": {
+            "items": {
+              "type": "number"
+            },
+            "title": "Force Balance",
+            "type": "array"
+          },
+          "force_balance_ratio": {
+            "title": "Force Balance Ratio",
+            "type": "number"
+          },
+          "free_dof_residual_ratio": {
+            "title": "Free Dof Residual Ratio",
+            "type": "number"
+          },
+          "free_force_residual_ratio": {
+            "title": "Free Force Residual Ratio",
+            "type": "number"
+          },
+          "free_moment_residual_ratio": {
+            "title": "Free Moment Residual Ratio",
+            "type": "number"
+          },
+          "moment_balance": {
+            "items": {
+              "type": "number"
+            },
+            "title": "Moment Balance",
+            "type": "array"
+          },
+          "moment_balance_ratio": {
+            "title": "Moment Balance Ratio",
+            "type": "number"
+          },
+          "passed": {
+            "title": "Passed",
+            "type": "boolean"
+          },
+          "scaled_condition_number": {
+            "title": "Scaled Condition Number",
+            "type": "number"
+          },
+          "stiffness_symmetry_ratio": {
+            "title": "Stiffness Symmetry Ratio",
+            "type": "number"
+          },
+          "strain_energy": {
+            "title": "Strain Energy",
+            "type": "number"
+          }
+        },
+        "required": [
+          "stiffness_symmetry_ratio",
+          "free_dof_residual_ratio",
+          "free_force_residual_ratio",
+          "free_moment_residual_ratio",
+          "force_balance",
+          "moment_balance",
+          "force_balance_ratio",
+          "moment_balance_ratio",
+          "strain_energy",
+          "external_work",
+          "energy_residual_ratio",
+          "energy_absolute_error",
+          "energy_roundoff_bound",
+          "scaled_condition_number",
+          "passed"
+        ],
+        "title": "GlobalValidationOutput",
         "type": "object"
       },
       "HTTPValidationError": {
@@ -1483,7 +2099,7 @@
           },
           "elements": {
             "items": {
-              "$ref": "#/components/schemas/ElementInput"
+              "$ref": "#/components/schemas/ElementInput-Output"
             },
             "minItems": 1,
             "title": "Elements",
@@ -1529,7 +2145,7 @@
           },
           "nodes": {
             "items": {
-              "$ref": "#/components/schemas/NodeInput"
+              "$ref": "#/components/schemas/NodeInput-Output"
             },
             "minItems": 1,
             "title": "Nodes",
@@ -1624,7 +2240,173 @@
         "title": "NewtonMethod",
         "type": "string"
       },
-      "NodeInput": {
+      "NodalDisplacementOutput": {
+        "additionalProperties": false,
+        "properties": {
+          "node_id": {
+            "title": "Node Id",
+            "type": "integer"
+          },
+          "rx": {
+            "title": "Rx",
+            "type": "number"
+          },
+          "ry": {
+            "title": "Ry",
+            "type": "number"
+          },
+          "rz": {
+            "title": "Rz",
+            "type": "number"
+          },
+          "u": {
+            "title": "U",
+            "type": "number"
+          },
+          "v": {
+            "title": "V",
+            "type": "number"
+          },
+          "w": {
+            "title": "W",
+            "type": "number"
+          }
+        },
+        "required": [
+          "node_id",
+          "u",
+          "v",
+          "w",
+          "rx",
+          "ry",
+          "rz"
+        ],
+        "title": "NodalDisplacementOutput",
+        "type": "object"
+      },
+      "NodalLoadInput": {
+        "additionalProperties": false,
+        "properties": {
+          "fx": {
+            "default": 0.0,
+            "title": "Fx",
+            "type": "number"
+          },
+          "fy": {
+            "default": 0.0,
+            "title": "Fy",
+            "type": "number"
+          },
+          "fz": {
+            "default": 0.0,
+            "title": "Fz",
+            "type": "number"
+          },
+          "mx": {
+            "default": 0.0,
+            "title": "Mx",
+            "type": "number"
+          },
+          "my": {
+            "default": 0.0,
+            "title": "My",
+            "type": "number"
+          },
+          "mz": {
+            "default": 0.0,
+            "title": "Mz",
+            "type": "number"
+          },
+          "node_id": {
+            "exclusiveMinimum": 0.0,
+            "title": "Node Id",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "node_id"
+        ],
+        "title": "NodalLoadInput",
+        "type": "object"
+      },
+      "NodalReactionOutput": {
+        "additionalProperties": false,
+        "properties": {
+          "fx": {
+            "title": "Fx",
+            "type": "number"
+          },
+          "fy": {
+            "title": "Fy",
+            "type": "number"
+          },
+          "fz": {
+            "title": "Fz",
+            "type": "number"
+          },
+          "mx": {
+            "title": "Mx",
+            "type": "number"
+          },
+          "my": {
+            "title": "My",
+            "type": "number"
+          },
+          "mz": {
+            "title": "Mz",
+            "type": "number"
+          },
+          "node_id": {
+            "title": "Node Id",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "node_id",
+          "fx",
+          "fy",
+          "fz",
+          "mx",
+          "my",
+          "mz"
+        ],
+        "title": "NodalReactionOutput",
+        "type": "object"
+      },
+      "NodalResult": {
+        "additionalProperties": false,
+        "properties": {
+          "node_id": {
+            "exclusiveMinimum": 0.0,
+            "title": "Node Id",
+            "type": "integer"
+          },
+          "value": {
+            "maxItems": 3,
+            "minItems": 3,
+            "prefixItems": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "number"
+              },
+              {
+                "type": "number"
+              }
+            ],
+            "title": "Value",
+            "type": "array"
+          }
+        },
+        "required": [
+          "node_id",
+          "value"
+        ],
+        "title": "NodalResult",
+        "type": "object"
+      },
+      "NodeInput-Output": {
         "additionalProperties": false,
         "properties": {
           "coordinates": {
@@ -1655,6 +2437,1098 @@
           "coordinates"
         ],
         "title": "NodeInput",
+        "type": "object"
+      },
+      "PlateCapabilities": {
+        "additionalProperties": false,
+        "properties": {
+          "analysis": {
+            "const": "linear-static",
+            "title": "Analysis",
+            "type": "string"
+          },
+          "dofs": {
+            "items": {
+              "enum": [
+                "w",
+                "theta_x",
+                "theta_y"
+              ],
+              "type": "string"
+            },
+            "title": "Dofs",
+            "type": "array"
+          },
+          "formulation": {
+            "const": "MITC4",
+            "title": "Formulation",
+            "type": "string"
+          },
+          "integration": {
+            "const": "2x2",
+            "title": "Integration",
+            "type": "string"
+          },
+          "max_elements": {
+            "title": "Max Elements",
+            "type": "integer"
+          },
+          "max_nodes": {
+            "title": "Max Nodes",
+            "type": "integer"
+          },
+          "scope": {
+            "title": "Scope",
+            "type": "string"
+          },
+          "units": {
+            "const": "m-N-Pa-rad",
+            "title": "Units",
+            "type": "string"
+          }
+        },
+        "required": [
+          "analysis",
+          "max_nodes",
+          "max_elements",
+          "scope",
+          "formulation",
+          "units",
+          "dofs",
+          "integration"
+        ],
+        "title": "PlateCapabilities",
+        "type": "object"
+      },
+      "PlateConstraint-Input": {
+        "additionalProperties": false,
+        "properties": {
+          "dof": {
+            "enum": [
+              "w",
+              "theta_x",
+              "theta_y"
+            ],
+            "title": "Dof",
+            "type": "string"
+          },
+          "node_id": {
+            "exclusiveMinimum": 0.0,
+            "title": "Node Id",
+            "type": "integer"
+          },
+          "value": {
+            "default": 0.0,
+            "title": "Value",
+            "type": "number"
+          }
+        },
+        "required": [
+          "node_id",
+          "dof"
+        ],
+        "title": "PlateConstraint",
+        "type": "object"
+      },
+      "PlateConstraint-Output": {
+        "additionalProperties": false,
+        "properties": {
+          "dof": {
+            "enum": [
+              "w",
+              "theta_x",
+              "theta_y"
+            ],
+            "title": "Dof",
+            "type": "string"
+          },
+          "node_id": {
+            "exclusiveMinimum": 0.0,
+            "title": "Node Id",
+            "type": "integer"
+          },
+          "value": {
+            "default": 0.0,
+            "title": "Value",
+            "type": "number"
+          }
+        },
+        "required": [
+          "node_id",
+          "dof",
+          "value"
+        ],
+        "title": "PlateConstraint",
+        "type": "object"
+      },
+      "PlateElement": {
+        "additionalProperties": false,
+        "properties": {
+          "id": {
+            "exclusiveMinimum": 0.0,
+            "title": "Id",
+            "type": "integer"
+          },
+          "nodes": {
+            "maxItems": 4,
+            "minItems": 4,
+            "prefixItems": [
+              {
+                "exclusiveMinimum": 0.0,
+                "type": "integer"
+              },
+              {
+                "exclusiveMinimum": 0.0,
+                "type": "integer"
+              },
+              {
+                "exclusiveMinimum": 0.0,
+                "type": "integer"
+              },
+              {
+                "exclusiveMinimum": 0.0,
+                "type": "integer"
+              }
+            ],
+            "title": "Nodes",
+            "type": "array"
+          }
+        },
+        "required": [
+          "id",
+          "nodes"
+        ],
+        "title": "PlateElement",
+        "type": "object"
+      },
+      "PlateElementResult": {
+        "additionalProperties": false,
+        "properties": {
+          "area": {
+            "title": "Area",
+            "type": "number"
+          },
+          "element_id": {
+            "exclusiveMinimum": 0.0,
+            "title": "Element Id",
+            "type": "integer"
+          },
+          "points": {
+            "items": {
+              "$ref": "#/components/schemas/PlatePointResult"
+            },
+            "title": "Points",
+            "type": "array"
+          }
+        },
+        "required": [
+          "element_id",
+          "area",
+          "points"
+        ],
+        "title": "PlateElementResult",
+        "type": "object"
+      },
+      "PlateMaterial-Input": {
+        "additionalProperties": false,
+        "properties": {
+          "E": {
+            "default": 210000000000.0,
+            "exclusiveMinimum": 0.0,
+            "title": "E",
+            "type": "number"
+          },
+          "nu": {
+            "default": 0.3,
+            "exclusiveMaximum": 0.5,
+            "exclusiveMinimum": -1.0,
+            "title": "Nu",
+            "type": "number"
+          },
+          "shear_factor": {
+            "default": 0.8333333333333334,
+            "exclusiveMinimum": 0.0,
+            "title": "Shear Factor",
+            "type": "number"
+          },
+          "thickness": {
+            "default": 0.02,
+            "exclusiveMinimum": 0.0,
+            "title": "Thickness",
+            "type": "number"
+          }
+        },
+        "title": "PlateMaterial",
+        "type": "object"
+      },
+      "PlateMaterial-Output": {
+        "additionalProperties": false,
+        "properties": {
+          "E": {
+            "default": 210000000000.0,
+            "exclusiveMinimum": 0.0,
+            "title": "E",
+            "type": "number"
+          },
+          "nu": {
+            "default": 0.3,
+            "exclusiveMaximum": 0.5,
+            "exclusiveMinimum": -1.0,
+            "title": "Nu",
+            "type": "number"
+          },
+          "shear_factor": {
+            "default": 0.8333333333333334,
+            "exclusiveMinimum": 0.0,
+            "title": "Shear Factor",
+            "type": "number"
+          },
+          "thickness": {
+            "default": 0.02,
+            "exclusiveMinimum": 0.0,
+            "title": "Thickness",
+            "type": "number"
+          }
+        },
+        "required": [
+          "E",
+          "nu",
+          "thickness",
+          "shear_factor"
+        ],
+        "title": "PlateMaterial",
+        "type": "object"
+      },
+      "PlateModel-Input": {
+        "additionalProperties": false,
+        "properties": {
+          "constraints": {
+            "items": {
+              "$ref": "#/components/schemas/PlateConstraint-Input"
+            },
+            "maxItems": 600,
+            "title": "Constraints",
+            "type": "array"
+          },
+          "elements": {
+            "items": {
+              "$ref": "#/components/schemas/PlateElement"
+            },
+            "maxItems": 400,
+            "minItems": 1,
+            "title": "Elements",
+            "type": "array"
+          },
+          "material": {
+            "$ref": "#/components/schemas/PlateMaterial-Input"
+          },
+          "name": {
+            "default": "Spatial plate",
+            "maxLength": 120,
+            "minLength": 1,
+            "title": "Name",
+            "type": "string"
+          },
+          "nodal_loads": {
+            "items": {
+              "$ref": "#/components/schemas/PlateNodalLoad"
+            },
+            "maxItems": 1200,
+            "title": "Nodal Loads",
+            "type": "array"
+          },
+          "nodes": {
+            "items": {
+              "$ref": "#/components/schemas/SpatialNode"
+            },
+            "maxItems": 200,
+            "minItems": 4,
+            "title": "Nodes",
+            "type": "array"
+          },
+          "plane": {
+            "$ref": "#/components/schemas/PlatePlane-Input"
+          },
+          "pressures": {
+            "items": {
+              "$ref": "#/components/schemas/PlatePressure"
+            },
+            "maxItems": 1200,
+            "title": "Pressures",
+            "type": "array"
+          },
+          "schema_version": {
+            "const": "plate3d-1",
+            "default": "plate3d-1",
+            "title": "Schema Version",
+            "type": "string"
+          }
+        },
+        "required": [
+          "nodes",
+          "elements"
+        ],
+        "title": "PlateModel",
+        "type": "object"
+      },
+      "PlateModel-Output": {
+        "additionalProperties": false,
+        "properties": {
+          "constraints": {
+            "items": {
+              "$ref": "#/components/schemas/PlateConstraint-Output"
+            },
+            "maxItems": 600,
+            "title": "Constraints",
+            "type": "array"
+          },
+          "elements": {
+            "items": {
+              "$ref": "#/components/schemas/PlateElement"
+            },
+            "maxItems": 400,
+            "minItems": 1,
+            "title": "Elements",
+            "type": "array"
+          },
+          "material": {
+            "$ref": "#/components/schemas/PlateMaterial-Output"
+          },
+          "name": {
+            "default": "Spatial plate",
+            "maxLength": 120,
+            "minLength": 1,
+            "title": "Name",
+            "type": "string"
+          },
+          "nodal_loads": {
+            "items": {
+              "$ref": "#/components/schemas/PlateNodalLoad"
+            },
+            "maxItems": 1200,
+            "title": "Nodal Loads",
+            "type": "array"
+          },
+          "nodes": {
+            "items": {
+              "$ref": "#/components/schemas/SpatialNode"
+            },
+            "maxItems": 200,
+            "minItems": 4,
+            "title": "Nodes",
+            "type": "array"
+          },
+          "plane": {
+            "$ref": "#/components/schemas/PlatePlane-Output"
+          },
+          "pressures": {
+            "items": {
+              "$ref": "#/components/schemas/PlatePressure"
+            },
+            "maxItems": 1200,
+            "title": "Pressures",
+            "type": "array"
+          },
+          "schema_version": {
+            "const": "plate3d-1",
+            "default": "plate3d-1",
+            "title": "Schema Version",
+            "type": "string"
+          }
+        },
+        "required": [
+          "schema_version",
+          "name",
+          "plane",
+          "material",
+          "nodes",
+          "elements",
+          "constraints",
+          "nodal_loads",
+          "pressures"
+        ],
+        "title": "PlateModel",
+        "type": "object"
+      },
+      "PlateNodalLoad": {
+        "additionalProperties": false,
+        "properties": {
+          "node_id": {
+            "exclusiveMinimum": 0.0,
+            "title": "Node Id",
+            "type": "integer"
+          },
+          "value": {
+            "maxItems": 3,
+            "minItems": 3,
+            "prefixItems": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "number"
+              },
+              {
+                "type": "number"
+              }
+            ],
+            "title": "Value",
+            "type": "array"
+          }
+        },
+        "required": [
+          "node_id",
+          "value"
+        ],
+        "title": "PlateNodalLoad",
+        "type": "object"
+      },
+      "PlateNodalResult": {
+        "additionalProperties": false,
+        "properties": {
+          "displacement": {
+            "maxItems": 3,
+            "minItems": 3,
+            "prefixItems": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "number"
+              },
+              {
+                "type": "number"
+              }
+            ],
+            "title": "Displacement",
+            "type": "array"
+          },
+          "force": {
+            "maxItems": 3,
+            "minItems": 3,
+            "prefixItems": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "number"
+              },
+              {
+                "type": "number"
+              }
+            ],
+            "title": "Force",
+            "type": "array"
+          },
+          "local": {
+            "maxItems": 3,
+            "minItems": 3,
+            "prefixItems": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "number"
+              },
+              {
+                "type": "number"
+              }
+            ],
+            "title": "Local",
+            "type": "array"
+          },
+          "moment": {
+            "maxItems": 3,
+            "minItems": 3,
+            "prefixItems": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "number"
+              },
+              {
+                "type": "number"
+              }
+            ],
+            "title": "Moment",
+            "type": "array"
+          },
+          "node_id": {
+            "exclusiveMinimum": 0.0,
+            "title": "Node Id",
+            "type": "integer"
+          },
+          "reaction": {
+            "maxItems": 3,
+            "minItems": 3,
+            "prefixItems": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "number"
+              },
+              {
+                "type": "number"
+              }
+            ],
+            "title": "Reaction",
+            "type": "array"
+          },
+          "rotation": {
+            "maxItems": 3,
+            "minItems": 3,
+            "prefixItems": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "number"
+              },
+              {
+                "type": "number"
+              }
+            ],
+            "title": "Rotation",
+            "type": "array"
+          }
+        },
+        "required": [
+          "node_id",
+          "local",
+          "displacement",
+          "rotation",
+          "reaction",
+          "force",
+          "moment"
+        ],
+        "title": "PlateNodalResult",
+        "type": "object"
+      },
+      "PlatePlane-Input": {
+        "additionalProperties": false,
+        "properties": {
+          "ex": {
+            "default": [
+              1.0,
+              0.0,
+              0.0
+            ],
+            "maxItems": 3,
+            "minItems": 3,
+            "prefixItems": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "number"
+              },
+              {
+                "type": "number"
+              }
+            ],
+            "title": "Ex",
+            "type": "array"
+          },
+          "ey": {
+            "default": [
+              0.0,
+              1.0,
+              0.0
+            ],
+            "maxItems": 3,
+            "minItems": 3,
+            "prefixItems": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "number"
+              },
+              {
+                "type": "number"
+              }
+            ],
+            "title": "Ey",
+            "type": "array"
+          },
+          "origin": {
+            "default": [
+              0.0,
+              0.0,
+              0.0
+            ],
+            "maxItems": 3,
+            "minItems": 3,
+            "prefixItems": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "number"
+              },
+              {
+                "type": "number"
+              }
+            ],
+            "title": "Origin",
+            "type": "array"
+          }
+        },
+        "title": "PlatePlane",
+        "type": "object"
+      },
+      "PlatePlane-Output": {
+        "additionalProperties": false,
+        "properties": {
+          "ex": {
+            "default": [
+              1.0,
+              0.0,
+              0.0
+            ],
+            "maxItems": 3,
+            "minItems": 3,
+            "prefixItems": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "number"
+              },
+              {
+                "type": "number"
+              }
+            ],
+            "title": "Ex",
+            "type": "array"
+          },
+          "ey": {
+            "default": [
+              0.0,
+              1.0,
+              0.0
+            ],
+            "maxItems": 3,
+            "minItems": 3,
+            "prefixItems": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "number"
+              },
+              {
+                "type": "number"
+              }
+            ],
+            "title": "Ey",
+            "type": "array"
+          },
+          "origin": {
+            "default": [
+              0.0,
+              0.0,
+              0.0
+            ],
+            "maxItems": 3,
+            "minItems": 3,
+            "prefixItems": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "number"
+              },
+              {
+                "type": "number"
+              }
+            ],
+            "title": "Origin",
+            "type": "array"
+          }
+        },
+        "required": [
+          "origin",
+          "ex",
+          "ey"
+        ],
+        "title": "PlatePlane",
+        "type": "object"
+      },
+      "PlatePointResult": {
+        "additionalProperties": false,
+        "properties": {
+          "curvature": {
+            "maxItems": 3,
+            "minItems": 3,
+            "prefixItems": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "number"
+              },
+              {
+                "type": "number"
+              }
+            ],
+            "title": "Curvature",
+            "type": "array"
+          },
+          "det_j": {
+            "title": "Det J",
+            "type": "number"
+          },
+          "moment": {
+            "maxItems": 3,
+            "minItems": 3,
+            "prefixItems": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "number"
+              },
+              {
+                "type": "number"
+              }
+            ],
+            "title": "Moment",
+            "type": "array"
+          },
+          "natural": {
+            "maxItems": 2,
+            "minItems": 2,
+            "prefixItems": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "number"
+              }
+            ],
+            "title": "Natural",
+            "type": "array"
+          },
+          "position": {
+            "maxItems": 3,
+            "minItems": 3,
+            "prefixItems": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "number"
+              },
+              {
+                "type": "number"
+              }
+            ],
+            "title": "Position",
+            "type": "array"
+          },
+          "shear": {
+            "maxItems": 2,
+            "minItems": 2,
+            "prefixItems": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "number"
+              }
+            ],
+            "title": "Shear",
+            "type": "array"
+          },
+          "shear_strain": {
+            "maxItems": 2,
+            "minItems": 2,
+            "prefixItems": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "number"
+              }
+            ],
+            "title": "Shear Strain",
+            "type": "array"
+          },
+          "stress_bottom": {
+            "maxItems": 3,
+            "minItems": 3,
+            "prefixItems": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "number"
+              },
+              {
+                "type": "number"
+              }
+            ],
+            "title": "Stress Bottom",
+            "type": "array"
+          },
+          "stress_top": {
+            "maxItems": 3,
+            "minItems": 3,
+            "prefixItems": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "number"
+              },
+              {
+                "type": "number"
+              }
+            ],
+            "title": "Stress Top",
+            "type": "array"
+          }
+        },
+        "required": [
+          "natural",
+          "position",
+          "curvature",
+          "shear_strain",
+          "moment",
+          "shear",
+          "stress_top",
+          "stress_bottom",
+          "det_j"
+        ],
+        "title": "PlatePointResult",
+        "type": "object"
+      },
+      "PlatePressure": {
+        "additionalProperties": false,
+        "properties": {
+          "element_id": {
+            "exclusiveMinimum": 0.0,
+            "title": "Element Id",
+            "type": "integer"
+          },
+          "value": {
+            "title": "Value",
+            "type": "number"
+          }
+        },
+        "required": [
+          "element_id",
+          "value"
+        ],
+        "title": "PlatePressure",
+        "type": "object"
+      },
+      "PlateResult": {
+        "additionalProperties": false,
+        "properties": {
+          "analysis": {
+            "const": "linear-static",
+            "default": "linear-static",
+            "title": "Analysis",
+            "type": "string"
+          },
+          "bending_energy": {
+            "title": "Bending Energy",
+            "type": "number"
+          },
+          "dof_count": {
+            "title": "Dof Count",
+            "type": "integer"
+          },
+          "elements": {
+            "items": {
+              "$ref": "#/components/schemas/PlateElementResult"
+            },
+            "title": "Elements",
+            "type": "array"
+          },
+          "formulation": {
+            "const": "MITC4",
+            "default": "MITC4",
+            "title": "Formulation",
+            "type": "string"
+          },
+          "free_dof_count": {
+            "title": "Free Dof Count",
+            "type": "integer"
+          },
+          "max_w_over_t": {
+            "title": "Max W Over T",
+            "type": "number"
+          },
+          "nodes": {
+            "items": {
+              "$ref": "#/components/schemas/PlateNodalResult"
+            },
+            "title": "Nodes",
+            "type": "array"
+          },
+          "shear_energy": {
+            "title": "Shear Energy",
+            "type": "number"
+          },
+          "strain_energy": {
+            "title": "Strain Energy",
+            "type": "number"
+          },
+          "units": {
+            "const": "m-N-Pa-rad",
+            "default": "m-N-Pa-rad",
+            "title": "Units",
+            "type": "string"
+          },
+          "validation": {
+            "$ref": "#/components/schemas/EquilibriumChecks"
+          },
+          "warnings": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Warnings",
+            "type": "array"
+          }
+        },
+        "required": [
+          "analysis",
+          "formulation",
+          "units",
+          "dof_count",
+          "free_dof_count",
+          "nodes",
+          "elements",
+          "strain_energy",
+          "bending_energy",
+          "shear_energy",
+          "max_w_over_t",
+          "validation",
+          "warnings"
+        ],
+        "title": "PlateResult",
+        "type": "object"
+      },
+      "PlotOutput": {
+        "additionalProperties": false,
+        "properties": {
+          "data_uri": {
+            "title": "Data Uri",
+            "type": "string"
+          },
+          "filename": {
+            "title": "Filename",
+            "type": "string"
+          },
+          "media_type": {
+            "title": "Media Type",
+            "type": "string"
+          }
+        },
+        "required": [
+          "filename",
+          "media_type",
+          "data_uri"
+        ],
+        "title": "PlotOutput",
+        "type": "object"
+      },
+      "PointResult": {
+        "additionalProperties": false,
+        "properties": {
+          "det_j": {
+            "title": "Det J",
+            "type": "number"
+          },
+          "natural": {
+            "maxItems": 3,
+            "minItems": 3,
+            "prefixItems": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "number"
+              },
+              {
+                "type": "number"
+              }
+            ],
+            "title": "Natural",
+            "type": "array"
+          },
+          "position": {
+            "maxItems": 3,
+            "minItems": 3,
+            "prefixItems": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "number"
+              },
+              {
+                "type": "number"
+              }
+            ],
+            "title": "Position",
+            "type": "array"
+          },
+          "principal": {
+            "maxItems": 3,
+            "minItems": 3,
+            "prefixItems": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "number"
+              },
+              {
+                "type": "number"
+              }
+            ],
+            "title": "Principal",
+            "type": "array"
+          },
+          "strain": {
+            "items": {
+              "type": "number"
+            },
+            "maxItems": 6,
+            "minItems": 6,
+            "title": "Strain",
+            "type": "array"
+          },
+          "stress": {
+            "items": {
+              "type": "number"
+            },
+            "maxItems": 6,
+            "minItems": 6,
+            "title": "Stress",
+            "type": "array"
+          },
+          "von_mises": {
+            "title": "Von Mises",
+            "type": "number"
+          }
+        },
+        "required": [
+          "natural",
+          "position",
+          "strain",
+          "stress",
+          "von_mises",
+          "principal",
+          "det_j"
+        ],
+        "title": "PointResult",
         "type": "object"
       },
       "PostResult": {
@@ -1904,6 +3778,25 @@
         "title": "SavedModelCreate",
         "type": "object"
       },
+      "SectionPointInput": {
+        "additionalProperties": false,
+        "properties": {
+          "y": {
+            "title": "Y",
+            "type": "number"
+          },
+          "z": {
+            "title": "Z",
+            "type": "number"
+          }
+        },
+        "required": [
+          "y",
+          "z"
+        ],
+        "title": "SectionPointInput",
+        "type": "object"
+      },
       "SessionResponse": {
         "additionalProperties": false,
         "properties": {
@@ -1926,6 +3819,1729 @@
           "authenticated"
         ],
         "title": "SessionResponse",
+        "type": "object"
+      },
+      "ShellCapabilities": {
+        "additionalProperties": false,
+        "properties": {
+          "analysis": {
+            "const": "linear-static",
+            "title": "Analysis",
+            "type": "string"
+          },
+          "dofs": {
+            "items": {
+              "enum": [
+                "ux",
+                "uy",
+                "uz",
+                "rx",
+                "ry",
+                "rz"
+              ],
+              "type": "string"
+            },
+            "title": "Dofs",
+            "type": "array"
+          },
+          "formulation": {
+            "const": "Q4-QLLL-flat-shell",
+            "title": "Formulation",
+            "type": "string"
+          },
+          "integration": {
+            "const": "2x2",
+            "title": "Integration",
+            "type": "string"
+          },
+          "max_elements": {
+            "title": "Max Elements",
+            "type": "integer"
+          },
+          "max_nodes": {
+            "title": "Max Nodes",
+            "type": "integer"
+          },
+          "scope": {
+            "title": "Scope",
+            "type": "string"
+          },
+          "units": {
+            "const": "m-N-Pa-rad",
+            "title": "Units",
+            "type": "string"
+          }
+        },
+        "required": [
+          "analysis",
+          "max_nodes",
+          "max_elements",
+          "scope",
+          "formulation",
+          "units",
+          "dofs",
+          "integration"
+        ],
+        "title": "ShellCapabilities",
+        "type": "object"
+      },
+      "ShellConstraint-Input": {
+        "additionalProperties": false,
+        "properties": {
+          "dof": {
+            "enum": [
+              "ux",
+              "uy",
+              "uz",
+              "rx",
+              "ry",
+              "rz"
+            ],
+            "title": "Dof",
+            "type": "string"
+          },
+          "node_id": {
+            "exclusiveMinimum": 0.0,
+            "title": "Node Id",
+            "type": "integer"
+          },
+          "value": {
+            "default": 0,
+            "title": "Value",
+            "type": "number"
+          }
+        },
+        "required": [
+          "node_id",
+          "dof"
+        ],
+        "title": "ShellConstraint",
+        "type": "object"
+      },
+      "ShellConstraint-Output": {
+        "additionalProperties": false,
+        "properties": {
+          "dof": {
+            "enum": [
+              "ux",
+              "uy",
+              "uz",
+              "rx",
+              "ry",
+              "rz"
+            ],
+            "title": "Dof",
+            "type": "string"
+          },
+          "node_id": {
+            "exclusiveMinimum": 0.0,
+            "title": "Node Id",
+            "type": "integer"
+          },
+          "value": {
+            "default": 0,
+            "title": "Value",
+            "type": "number"
+          }
+        },
+        "required": [
+          "node_id",
+          "dof",
+          "value"
+        ],
+        "title": "ShellConstraint",
+        "type": "object"
+      },
+      "ShellElement": {
+        "additionalProperties": false,
+        "properties": {
+          "id": {
+            "exclusiveMinimum": 0.0,
+            "title": "Id",
+            "type": "integer"
+          },
+          "nodes": {
+            "maxItems": 4,
+            "minItems": 4,
+            "prefixItems": [
+              {
+                "exclusiveMinimum": 0.0,
+                "type": "integer"
+              },
+              {
+                "exclusiveMinimum": 0.0,
+                "type": "integer"
+              },
+              {
+                "exclusiveMinimum": 0.0,
+                "type": "integer"
+              },
+              {
+                "exclusiveMinimum": 0.0,
+                "type": "integer"
+              }
+            ],
+            "title": "Nodes",
+            "type": "array"
+          }
+        },
+        "required": [
+          "id",
+          "nodes"
+        ],
+        "title": "ShellElement",
+        "type": "object"
+      },
+      "ShellElementResult": {
+        "additionalProperties": false,
+        "properties": {
+          "area": {
+            "title": "Area",
+            "type": "number"
+          },
+          "element_id": {
+            "exclusiveMinimum": 0.0,
+            "title": "Element Id",
+            "type": "integer"
+          },
+          "energy": {
+            "$ref": "#/components/schemas/ShellEnergy"
+          },
+          "local_basis": {
+            "maxItems": 3,
+            "minItems": 3,
+            "prefixItems": [
+              {
+                "maxItems": 3,
+                "minItems": 3,
+                "prefixItems": [
+                  {
+                    "type": "number"
+                  },
+                  {
+                    "type": "number"
+                  },
+                  {
+                    "type": "number"
+                  }
+                ],
+                "type": "array"
+              },
+              {
+                "maxItems": 3,
+                "minItems": 3,
+                "prefixItems": [
+                  {
+                    "type": "number"
+                  },
+                  {
+                    "type": "number"
+                  },
+                  {
+                    "type": "number"
+                  }
+                ],
+                "type": "array"
+              },
+              {
+                "maxItems": 3,
+                "minItems": 3,
+                "prefixItems": [
+                  {
+                    "type": "number"
+                  },
+                  {
+                    "type": "number"
+                  },
+                  {
+                    "type": "number"
+                  }
+                ],
+                "type": "array"
+              }
+            ],
+            "title": "Local Basis",
+            "type": "array"
+          },
+          "points": {
+            "items": {
+              "$ref": "#/components/schemas/ShellPoint"
+            },
+            "title": "Points",
+            "type": "array"
+          }
+        },
+        "required": [
+          "element_id",
+          "area",
+          "local_basis",
+          "points",
+          "energy"
+        ],
+        "title": "ShellElementResult",
+        "type": "object"
+      },
+      "ShellEnergy": {
+        "additionalProperties": false,
+        "properties": {
+          "bending": {
+            "title": "Bending",
+            "type": "number"
+          },
+          "drilling": {
+            "title": "Drilling",
+            "type": "number"
+          },
+          "membrane": {
+            "title": "Membrane",
+            "type": "number"
+          },
+          "shear": {
+            "title": "Shear",
+            "type": "number"
+          },
+          "total": {
+            "title": "Total",
+            "type": "number"
+          }
+        },
+        "required": [
+          "membrane",
+          "bending",
+          "shear",
+          "drilling",
+          "total"
+        ],
+        "title": "ShellEnergy",
+        "type": "object"
+      },
+      "ShellLoad-Input": {
+        "additionalProperties": false,
+        "properties": {
+          "force": {
+            "maxItems": 3,
+            "minItems": 3,
+            "prefixItems": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "number"
+              },
+              {
+                "type": "number"
+              }
+            ],
+            "title": "Force",
+            "type": "array"
+          },
+          "moment": {
+            "default": [
+              0,
+              0,
+              0
+            ],
+            "maxItems": 3,
+            "minItems": 3,
+            "prefixItems": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "number"
+              },
+              {
+                "type": "number"
+              }
+            ],
+            "title": "Moment",
+            "type": "array"
+          },
+          "node_id": {
+            "exclusiveMinimum": 0.0,
+            "title": "Node Id",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "node_id",
+          "force"
+        ],
+        "title": "ShellLoad",
+        "type": "object"
+      },
+      "ShellLoad-Output": {
+        "additionalProperties": false,
+        "properties": {
+          "force": {
+            "maxItems": 3,
+            "minItems": 3,
+            "prefixItems": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "number"
+              },
+              {
+                "type": "number"
+              }
+            ],
+            "title": "Force",
+            "type": "array"
+          },
+          "moment": {
+            "default": [
+              0,
+              0,
+              0
+            ],
+            "maxItems": 3,
+            "minItems": 3,
+            "prefixItems": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "number"
+              },
+              {
+                "type": "number"
+              }
+            ],
+            "title": "Moment",
+            "type": "array"
+          },
+          "node_id": {
+            "exclusiveMinimum": 0.0,
+            "title": "Node Id",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "node_id",
+          "force",
+          "moment"
+        ],
+        "title": "ShellLoad",
+        "type": "object"
+      },
+      "ShellMaterial-Input": {
+        "additionalProperties": false,
+        "properties": {
+          "E": {
+            "default": 210000000000.0,
+            "exclusiveMinimum": 0.0,
+            "title": "E",
+            "type": "number"
+          },
+          "alpha_d": {
+            "default": 0.0001,
+            "maximum": 0.01,
+            "minimum": 1e-06,
+            "title": "Alpha D",
+            "type": "number"
+          },
+          "nu": {
+            "default": 0.3,
+            "exclusiveMaximum": 0.5,
+            "exclusiveMinimum": -1.0,
+            "title": "Nu",
+            "type": "number"
+          },
+          "shear_factor": {
+            "default": 0.8333333333333334,
+            "exclusiveMinimum": 0.0,
+            "title": "Shear Factor",
+            "type": "number"
+          },
+          "thickness": {
+            "default": 0.02,
+            "exclusiveMinimum": 0.0,
+            "title": "Thickness",
+            "type": "number"
+          }
+        },
+        "title": "ShellMaterial",
+        "type": "object"
+      },
+      "ShellMaterial-Output": {
+        "additionalProperties": false,
+        "properties": {
+          "E": {
+            "default": 210000000000.0,
+            "exclusiveMinimum": 0.0,
+            "title": "E",
+            "type": "number"
+          },
+          "alpha_d": {
+            "default": 0.0001,
+            "maximum": 0.01,
+            "minimum": 1e-06,
+            "title": "Alpha D",
+            "type": "number"
+          },
+          "nu": {
+            "default": 0.3,
+            "exclusiveMaximum": 0.5,
+            "exclusiveMinimum": -1.0,
+            "title": "Nu",
+            "type": "number"
+          },
+          "shear_factor": {
+            "default": 0.8333333333333334,
+            "exclusiveMinimum": 0.0,
+            "title": "Shear Factor",
+            "type": "number"
+          },
+          "thickness": {
+            "default": 0.02,
+            "exclusiveMinimum": 0.0,
+            "title": "Thickness",
+            "type": "number"
+          }
+        },
+        "required": [
+          "E",
+          "nu",
+          "thickness",
+          "shear_factor",
+          "alpha_d"
+        ],
+        "title": "ShellMaterial",
+        "type": "object"
+      },
+      "ShellModel-Input": {
+        "additionalProperties": false,
+        "properties": {
+          "constraints": {
+            "items": {
+              "$ref": "#/components/schemas/ShellConstraint-Input"
+            },
+            "maxItems": 600,
+            "title": "Constraints",
+            "type": "array"
+          },
+          "elements": {
+            "items": {
+              "$ref": "#/components/schemas/ShellElement"
+            },
+            "maxItems": 200,
+            "minItems": 1,
+            "title": "Elements",
+            "type": "array"
+          },
+          "material": {
+            "$ref": "#/components/schemas/ShellMaterial-Input"
+          },
+          "name": {
+            "maxLength": 120,
+            "minLength": 1,
+            "title": "Name",
+            "type": "string"
+          },
+          "nodal_loads": {
+            "items": {
+              "$ref": "#/components/schemas/ShellLoad-Input"
+            },
+            "maxItems": 1200,
+            "title": "Nodal Loads",
+            "type": "array"
+          },
+          "nodes": {
+            "items": {
+              "$ref": "#/components/schemas/SpatialNode"
+            },
+            "maxItems": 100,
+            "minItems": 4,
+            "title": "Nodes",
+            "type": "array"
+          },
+          "pressures": {
+            "items": {
+              "$ref": "#/components/schemas/ShellPressure"
+            },
+            "maxItems": 600,
+            "title": "Pressures",
+            "type": "array"
+          },
+          "schema_version": {
+            "const": "shell3d-1",
+            "default": "shell3d-1",
+            "title": "Schema Version",
+            "type": "string"
+          }
+        },
+        "required": [
+          "name",
+          "material",
+          "nodes",
+          "elements"
+        ],
+        "title": "ShellModel",
+        "type": "object"
+      },
+      "ShellModel-Output": {
+        "additionalProperties": false,
+        "properties": {
+          "constraints": {
+            "items": {
+              "$ref": "#/components/schemas/ShellConstraint-Output"
+            },
+            "maxItems": 600,
+            "title": "Constraints",
+            "type": "array"
+          },
+          "elements": {
+            "items": {
+              "$ref": "#/components/schemas/ShellElement"
+            },
+            "maxItems": 200,
+            "minItems": 1,
+            "title": "Elements",
+            "type": "array"
+          },
+          "material": {
+            "$ref": "#/components/schemas/ShellMaterial-Output"
+          },
+          "name": {
+            "maxLength": 120,
+            "minLength": 1,
+            "title": "Name",
+            "type": "string"
+          },
+          "nodal_loads": {
+            "items": {
+              "$ref": "#/components/schemas/ShellLoad-Output"
+            },
+            "maxItems": 1200,
+            "title": "Nodal Loads",
+            "type": "array"
+          },
+          "nodes": {
+            "items": {
+              "$ref": "#/components/schemas/SpatialNode"
+            },
+            "maxItems": 100,
+            "minItems": 4,
+            "title": "Nodes",
+            "type": "array"
+          },
+          "pressures": {
+            "items": {
+              "$ref": "#/components/schemas/ShellPressure"
+            },
+            "maxItems": 600,
+            "title": "Pressures",
+            "type": "array"
+          },
+          "schema_version": {
+            "const": "shell3d-1",
+            "default": "shell3d-1",
+            "title": "Schema Version",
+            "type": "string"
+          }
+        },
+        "required": [
+          "schema_version",
+          "name",
+          "material",
+          "nodes",
+          "elements",
+          "constraints",
+          "nodal_loads",
+          "pressures"
+        ],
+        "title": "ShellModel",
+        "type": "object"
+      },
+      "ShellNodeResult": {
+        "additionalProperties": false,
+        "properties": {
+          "displacement": {
+            "maxItems": 3,
+            "minItems": 3,
+            "prefixItems": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "number"
+              },
+              {
+                "type": "number"
+              }
+            ],
+            "title": "Displacement",
+            "type": "array"
+          },
+          "force": {
+            "maxItems": 3,
+            "minItems": 3,
+            "prefixItems": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "number"
+              },
+              {
+                "type": "number"
+              }
+            ],
+            "title": "Force",
+            "type": "array"
+          },
+          "moment": {
+            "maxItems": 3,
+            "minItems": 3,
+            "prefixItems": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "number"
+              },
+              {
+                "type": "number"
+              }
+            ],
+            "title": "Moment",
+            "type": "array"
+          },
+          "node_id": {
+            "exclusiveMinimum": 0.0,
+            "title": "Node Id",
+            "type": "integer"
+          },
+          "rotation": {
+            "maxItems": 3,
+            "minItems": 3,
+            "prefixItems": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "number"
+              },
+              {
+                "type": "number"
+              }
+            ],
+            "title": "Rotation",
+            "type": "array"
+          }
+        },
+        "required": [
+          "node_id",
+          "displacement",
+          "rotation",
+          "force",
+          "moment"
+        ],
+        "title": "ShellNodeResult",
+        "type": "object"
+      },
+      "ShellPoint": {
+        "additionalProperties": false,
+        "properties": {
+          "curvature": {
+            "maxItems": 3,
+            "minItems": 3,
+            "prefixItems": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "number"
+              },
+              {
+                "type": "number"
+              }
+            ],
+            "title": "Curvature",
+            "type": "array"
+          },
+          "det_j": {
+            "title": "Det J",
+            "type": "number"
+          },
+          "membrane": {
+            "maxItems": 3,
+            "minItems": 3,
+            "prefixItems": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "number"
+              },
+              {
+                "type": "number"
+              }
+            ],
+            "title": "Membrane",
+            "type": "array"
+          },
+          "membrane_strain": {
+            "maxItems": 3,
+            "minItems": 3,
+            "prefixItems": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "number"
+              },
+              {
+                "type": "number"
+              }
+            ],
+            "title": "Membrane Strain",
+            "type": "array"
+          },
+          "moment": {
+            "maxItems": 3,
+            "minItems": 3,
+            "prefixItems": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "number"
+              },
+              {
+                "type": "number"
+              }
+            ],
+            "title": "Moment",
+            "type": "array"
+          },
+          "natural": {
+            "maxItems": 2,
+            "minItems": 2,
+            "prefixItems": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "number"
+              }
+            ],
+            "title": "Natural",
+            "type": "array"
+          },
+          "shear": {
+            "maxItems": 2,
+            "minItems": 2,
+            "prefixItems": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "number"
+              }
+            ],
+            "title": "Shear",
+            "type": "array"
+          },
+          "shear_strain": {
+            "maxItems": 2,
+            "minItems": 2,
+            "prefixItems": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "number"
+              }
+            ],
+            "title": "Shear Strain",
+            "type": "array"
+          },
+          "stress_bottom": {
+            "maxItems": 3,
+            "minItems": 3,
+            "prefixItems": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "number"
+              },
+              {
+                "type": "number"
+              }
+            ],
+            "title": "Stress Bottom",
+            "type": "array"
+          },
+          "stress_top": {
+            "maxItems": 3,
+            "minItems": 3,
+            "prefixItems": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "number"
+              },
+              {
+                "type": "number"
+              }
+            ],
+            "title": "Stress Top",
+            "type": "array"
+          }
+        },
+        "required": [
+          "natural",
+          "membrane_strain",
+          "curvature",
+          "shear_strain",
+          "membrane",
+          "moment",
+          "shear",
+          "stress_top",
+          "stress_bottom",
+          "det_j"
+        ],
+        "title": "ShellPoint",
+        "type": "object"
+      },
+      "ShellPressure": {
+        "additionalProperties": false,
+        "properties": {
+          "element_id": {
+            "exclusiveMinimum": 0.0,
+            "title": "Element Id",
+            "type": "integer"
+          },
+          "value": {
+            "title": "Value",
+            "type": "number"
+          }
+        },
+        "required": [
+          "element_id",
+          "value"
+        ],
+        "title": "ShellPressure",
+        "type": "object"
+      },
+      "ShellResult": {
+        "additionalProperties": false,
+        "properties": {
+          "analysis": {
+            "const": "linear-static",
+            "default": "linear-static",
+            "title": "Analysis",
+            "type": "string"
+          },
+          "dof_count": {
+            "title": "Dof Count",
+            "type": "integer"
+          },
+          "drilling_fraction": {
+            "title": "Drilling Fraction",
+            "type": "number"
+          },
+          "elements": {
+            "items": {
+              "$ref": "#/components/schemas/ShellElementResult"
+            },
+            "title": "Elements",
+            "type": "array"
+          },
+          "energy": {
+            "$ref": "#/components/schemas/ShellEnergy"
+          },
+          "formulation": {
+            "const": "Q4-QLLL-flat-shell",
+            "default": "Q4-QLLL-flat-shell",
+            "title": "Formulation",
+            "type": "string"
+          },
+          "free_dof_count": {
+            "title": "Free Dof Count",
+            "type": "integer"
+          },
+          "max_displacement_over_t": {
+            "title": "Max Displacement Over T",
+            "type": "number"
+          },
+          "nodes": {
+            "items": {
+              "$ref": "#/components/schemas/ShellNodeResult"
+            },
+            "title": "Nodes",
+            "type": "array"
+          },
+          "strain_energy": {
+            "title": "Strain Energy",
+            "type": "number"
+          },
+          "validation": {
+            "$ref": "#/components/schemas/EquilibriumChecks"
+          },
+          "warnings": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Warnings",
+            "type": "array"
+          }
+        },
+        "required": [
+          "analysis",
+          "formulation",
+          "dof_count",
+          "free_dof_count",
+          "nodes",
+          "elements",
+          "energy",
+          "strain_energy",
+          "drilling_fraction",
+          "max_displacement_over_t",
+          "validation",
+          "warnings"
+        ],
+        "title": "ShellResult",
+        "type": "object"
+      },
+      "SolidCapabilities": {
+        "additionalProperties": false,
+        "properties": {
+          "analysis": {
+            "const": "linear-static",
+            "title": "Analysis",
+            "type": "string"
+          },
+          "dofs": {
+            "items": {
+              "enum": [
+                "ux",
+                "uy",
+                "uz"
+              ],
+              "type": "string"
+            },
+            "title": "Dofs",
+            "type": "array"
+          },
+          "elements": {
+            "items": {
+              "enum": [
+                "tet4",
+                "hex8"
+              ],
+              "type": "string"
+            },
+            "title": "Elements",
+            "type": "array"
+          },
+          "hex8_integration": {
+            "const": "2x2x2",
+            "title": "Hex8 Integration",
+            "type": "string"
+          },
+          "max_elements": {
+            "title": "Max Elements",
+            "type": "integer"
+          },
+          "max_nodes": {
+            "title": "Max Nodes",
+            "type": "integer"
+          },
+          "scope": {
+            "title": "Scope",
+            "type": "string"
+          },
+          "units": {
+            "const": "m-N-Pa",
+            "title": "Units",
+            "type": "string"
+          }
+        },
+        "required": [
+          "analysis",
+          "max_nodes",
+          "max_elements",
+          "scope",
+          "elements",
+          "dofs",
+          "units",
+          "hex8_integration"
+        ],
+        "title": "SolidCapabilities",
+        "type": "object"
+      },
+      "SolidConstraint-Input": {
+        "additionalProperties": false,
+        "properties": {
+          "dof": {
+            "enum": [
+              "ux",
+              "uy",
+              "uz"
+            ],
+            "title": "Dof",
+            "type": "string"
+          },
+          "node_id": {
+            "exclusiveMinimum": 0.0,
+            "title": "Node Id",
+            "type": "integer"
+          },
+          "value": {
+            "default": 0.0,
+            "title": "Value",
+            "type": "number"
+          }
+        },
+        "required": [
+          "node_id",
+          "dof"
+        ],
+        "title": "SolidConstraint",
+        "type": "object"
+      },
+      "SolidConstraint-Output": {
+        "additionalProperties": false,
+        "properties": {
+          "dof": {
+            "enum": [
+              "ux",
+              "uy",
+              "uz"
+            ],
+            "title": "Dof",
+            "type": "string"
+          },
+          "node_id": {
+            "exclusiveMinimum": 0.0,
+            "title": "Node Id",
+            "type": "integer"
+          },
+          "value": {
+            "default": 0.0,
+            "title": "Value",
+            "type": "number"
+          }
+        },
+        "required": [
+          "node_id",
+          "dof",
+          "value"
+        ],
+        "title": "SolidConstraint",
+        "type": "object"
+      },
+      "SolidElement": {
+        "additionalProperties": false,
+        "properties": {
+          "id": {
+            "exclusiveMinimum": 0.0,
+            "title": "Id",
+            "type": "integer"
+          },
+          "kind": {
+            "enum": [
+              "tet4",
+              "hex8"
+            ],
+            "title": "Kind",
+            "type": "string"
+          },
+          "material_id": {
+            "exclusiveMinimum": 0.0,
+            "title": "Material Id",
+            "type": "integer"
+          },
+          "nodes": {
+            "items": {
+              "exclusiveMinimum": 0.0,
+              "type": "integer"
+            },
+            "maxItems": 8,
+            "minItems": 4,
+            "title": "Nodes",
+            "type": "array"
+          }
+        },
+        "required": [
+          "id",
+          "kind",
+          "nodes",
+          "material_id"
+        ],
+        "title": "SolidElement",
+        "type": "object"
+      },
+      "SolidLoad": {
+        "additionalProperties": false,
+        "properties": {
+          "force": {
+            "maxItems": 3,
+            "minItems": 3,
+            "prefixItems": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "number"
+              },
+              {
+                "type": "number"
+              }
+            ],
+            "title": "Force",
+            "type": "array"
+          },
+          "node_id": {
+            "exclusiveMinimum": 0.0,
+            "title": "Node Id",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "node_id",
+          "force"
+        ],
+        "title": "SolidLoad",
+        "type": "object"
+      },
+      "SolidMaterial": {
+        "additionalProperties": false,
+        "properties": {
+          "E": {
+            "exclusiveMinimum": 0.0,
+            "title": "E",
+            "type": "number"
+          },
+          "id": {
+            "exclusiveMinimum": 0.0,
+            "title": "Id",
+            "type": "integer"
+          },
+          "nu": {
+            "exclusiveMaximum": 0.5,
+            "exclusiveMinimum": -1.0,
+            "title": "Nu",
+            "type": "number"
+          }
+        },
+        "required": [
+          "id",
+          "E",
+          "nu"
+        ],
+        "title": "SolidMaterial",
+        "type": "object"
+      },
+      "SolidModel-Input": {
+        "additionalProperties": false,
+        "properties": {
+          "body_force": {
+            "default": [
+              0.0,
+              0.0,
+              0.0
+            ],
+            "maxItems": 3,
+            "minItems": 3,
+            "prefixItems": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "number"
+              },
+              {
+                "type": "number"
+              }
+            ],
+            "title": "Body Force",
+            "type": "array"
+          },
+          "constraints": {
+            "items": {
+              "$ref": "#/components/schemas/SolidConstraint-Input"
+            },
+            "maxItems": 600,
+            "title": "Constraints",
+            "type": "array"
+          },
+          "elements": {
+            "items": {
+              "$ref": "#/components/schemas/SolidElement"
+            },
+            "maxItems": 1200,
+            "minItems": 1,
+            "title": "Elements",
+            "type": "array"
+          },
+          "materials": {
+            "items": {
+              "$ref": "#/components/schemas/SolidMaterial"
+            },
+            "maxItems": 1200,
+            "minItems": 1,
+            "title": "Materials",
+            "type": "array"
+          },
+          "name": {
+            "default": "Solid model",
+            "maxLength": 120,
+            "minLength": 1,
+            "title": "Name",
+            "type": "string"
+          },
+          "nodal_loads": {
+            "items": {
+              "$ref": "#/components/schemas/SolidLoad"
+            },
+            "maxItems": 1200,
+            "title": "Nodal Loads",
+            "type": "array"
+          },
+          "nodes": {
+            "items": {
+              "$ref": "#/components/schemas/SpatialNode"
+            },
+            "maxItems": 200,
+            "minItems": 4,
+            "title": "Nodes",
+            "type": "array"
+          },
+          "schema_version": {
+            "const": "continuum3d-1",
+            "default": "continuum3d-1",
+            "title": "Schema Version",
+            "type": "string"
+          },
+          "tractions": {
+            "items": {
+              "$ref": "#/components/schemas/SolidTraction"
+            },
+            "maxItems": 7200,
+            "title": "Tractions",
+            "type": "array"
+          }
+        },
+        "required": [
+          "nodes",
+          "elements",
+          "materials"
+        ],
+        "title": "SolidModel",
+        "type": "object"
+      },
+      "SolidModel-Output": {
+        "additionalProperties": false,
+        "properties": {
+          "body_force": {
+            "default": [
+              0.0,
+              0.0,
+              0.0
+            ],
+            "maxItems": 3,
+            "minItems": 3,
+            "prefixItems": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "number"
+              },
+              {
+                "type": "number"
+              }
+            ],
+            "title": "Body Force",
+            "type": "array"
+          },
+          "constraints": {
+            "items": {
+              "$ref": "#/components/schemas/SolidConstraint-Output"
+            },
+            "maxItems": 600,
+            "title": "Constraints",
+            "type": "array"
+          },
+          "elements": {
+            "items": {
+              "$ref": "#/components/schemas/SolidElement"
+            },
+            "maxItems": 1200,
+            "minItems": 1,
+            "title": "Elements",
+            "type": "array"
+          },
+          "materials": {
+            "items": {
+              "$ref": "#/components/schemas/SolidMaterial"
+            },
+            "maxItems": 1200,
+            "minItems": 1,
+            "title": "Materials",
+            "type": "array"
+          },
+          "name": {
+            "default": "Solid model",
+            "maxLength": 120,
+            "minLength": 1,
+            "title": "Name",
+            "type": "string"
+          },
+          "nodal_loads": {
+            "items": {
+              "$ref": "#/components/schemas/SolidLoad"
+            },
+            "maxItems": 1200,
+            "title": "Nodal Loads",
+            "type": "array"
+          },
+          "nodes": {
+            "items": {
+              "$ref": "#/components/schemas/SpatialNode"
+            },
+            "maxItems": 200,
+            "minItems": 4,
+            "title": "Nodes",
+            "type": "array"
+          },
+          "schema_version": {
+            "const": "continuum3d-1",
+            "default": "continuum3d-1",
+            "title": "Schema Version",
+            "type": "string"
+          },
+          "tractions": {
+            "items": {
+              "$ref": "#/components/schemas/SolidTraction"
+            },
+            "maxItems": 7200,
+            "title": "Tractions",
+            "type": "array"
+          }
+        },
+        "required": [
+          "schema_version",
+          "name",
+          "nodes",
+          "elements",
+          "materials",
+          "constraints",
+          "nodal_loads",
+          "tractions",
+          "body_force"
+        ],
+        "title": "SolidModel",
+        "type": "object"
+      },
+      "SolidResult": {
+        "additionalProperties": false,
+        "properties": {
+          "analysis": {
+            "const": "linear-static",
+            "title": "Analysis",
+            "type": "string"
+          },
+          "dof_count": {
+            "title": "Dof Count",
+            "type": "integer"
+          },
+          "elements": {
+            "items": {
+              "$ref": "#/components/schemas/ElementResult"
+            },
+            "title": "Elements",
+            "type": "array"
+          },
+          "free_dof_count": {
+            "title": "Free Dof Count",
+            "type": "integer"
+          },
+          "nodal_displacements": {
+            "items": {
+              "$ref": "#/components/schemas/NodalResult"
+            },
+            "title": "Nodal Displacements",
+            "type": "array"
+          },
+          "nodal_reactions": {
+            "items": {
+              "$ref": "#/components/schemas/NodalResult"
+            },
+            "title": "Nodal Reactions",
+            "type": "array"
+          },
+          "strain_energy": {
+            "title": "Strain Energy",
+            "type": "number"
+          },
+          "units": {
+            "const": "m-N-Pa",
+            "title": "Units",
+            "type": "string"
+          },
+          "validation": {
+            "$ref": "#/components/schemas/EquilibriumChecks"
+          },
+          "warnings": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Warnings",
+            "type": "array"
+          }
+        },
+        "required": [
+          "analysis",
+          "units",
+          "dof_count",
+          "free_dof_count",
+          "nodal_displacements",
+          "nodal_reactions",
+          "elements",
+          "strain_energy",
+          "validation",
+          "warnings"
+        ],
+        "title": "SolidResult",
+        "type": "object"
+      },
+      "SolidTraction": {
+        "additionalProperties": false,
+        "properties": {
+          "element_id": {
+            "exclusiveMinimum": 0.0,
+            "title": "Element Id",
+            "type": "integer"
+          },
+          "face": {
+            "maximum": 5.0,
+            "minimum": 0.0,
+            "title": "Face",
+            "type": "integer"
+          },
+          "traction": {
+            "maxItems": 3,
+            "minItems": 3,
+            "prefixItems": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "number"
+              },
+              {
+                "type": "number"
+              }
+            ],
+            "title": "Traction",
+            "type": "array"
+          }
+        },
+        "required": [
+          "element_id",
+          "face",
+          "traction"
+        ],
+        "title": "SolidTraction",
+        "type": "object"
+      },
+      "SolveRequest": {
+        "additionalProperties": false,
+        "properties": {
+          "deformation_scale": {
+            "default": 1.0,
+            "title": "Deformation Scale",
+            "type": "number"
+          },
+          "distributed_loads": {
+            "items": {
+              "$ref": "#/components/schemas/DistributedLoadInput"
+            },
+            "title": "Distributed Loads",
+            "type": "array"
+          },
+          "elements": {
+            "items": {
+              "$ref": "#/components/schemas/reused_cores__frame3d_linear__api__ElementInput"
+            },
+            "minItems": 1,
+            "title": "Elements",
+            "type": "array"
+          },
+          "include_plots": {
+            "default": true,
+            "title": "Include Plots",
+            "type": "boolean"
+          },
+          "nodal_loads": {
+            "items": {
+              "$ref": "#/components/schemas/NodalLoadInput"
+            },
+            "title": "Nodal Loads",
+            "type": "array"
+          },
+          "nodes": {
+            "items": {
+              "$ref": "#/components/schemas/reused_cores__frame3d_linear__api__NodeInput"
+            },
+            "minItems": 1,
+            "title": "Nodes",
+            "type": "array"
+          },
+          "number_of_points": {
+            "default": 101,
+            "maximum": 2001.0,
+            "minimum": 2.0,
+            "title": "Number Of Points",
+            "type": "integer"
+          },
+          "plot_dpi": {
+            "default": 140,
+            "maximum": 300.0,
+            "minimum": 72.0,
+            "title": "Plot Dpi",
+            "type": "integer"
+          },
+          "section_points": {
+            "items": {
+              "$ref": "#/components/schemas/SectionPointInput"
+            },
+            "title": "Section Points",
+            "type": "array"
+          },
+          "supports": {
+            "items": {
+              "$ref": "#/components/schemas/SupportInput"
+            },
+            "title": "Supports",
+            "type": "array"
+          }
+        },
+        "required": [
+          "nodes",
+          "elements"
+        ],
+        "title": "SolveRequest",
+        "type": "object"
+      },
+      "SolveResponse": {
+        "additionalProperties": false,
+        "properties": {
+          "active_dof_count": {
+            "title": "Active Dof Count",
+            "type": "integer"
+          },
+          "displacement_dof_order": {
+            "title": "Displacement Dof Order",
+            "type": "string"
+          },
+          "elements": {
+            "items": {
+              "$ref": "#/components/schemas/ElementResultOutput"
+            },
+            "title": "Elements",
+            "type": "array"
+          },
+          "field_recovery": {
+            "title": "Field Recovery",
+            "type": "string"
+          },
+          "force_dof_order": {
+            "title": "Force Dof Order",
+            "type": "string"
+          },
+          "free_dofs": {
+            "items": {
+              "type": "integer"
+            },
+            "title": "Free Dofs",
+            "type": "array"
+          },
+          "inactive_dof_vectors": {
+            "items": {
+              "items": {
+                "type": "number"
+              },
+              "type": "array"
+            },
+            "title": "Inactive Dof Vectors",
+            "type": "array"
+          },
+          "nodal_displacements": {
+            "items": {
+              "$ref": "#/components/schemas/NodalDisplacementOutput"
+            },
+            "title": "Nodal Displacements",
+            "type": "array"
+          },
+          "nodal_reactions": {
+            "items": {
+              "$ref": "#/components/schemas/NodalReactionOutput"
+            },
+            "title": "Nodal Reactions",
+            "type": "array"
+          },
+          "plots": {
+            "anyOf": [
+              {
+                "additionalProperties": {
+                  "$ref": "#/components/schemas/PlotOutput"
+                },
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Plots"
+          },
+          "restrained_dofs": {
+            "items": {
+              "type": "integer"
+            },
+            "title": "Restrained Dofs",
+            "type": "array"
+          },
+          "section_force_convention": {
+            "title": "Section Force Convention",
+            "type": "string"
+          },
+          "section_points": {
+            "items": {
+              "$ref": "#/components/schemas/SectionPointInput"
+            },
+            "title": "Section Points",
+            "type": "array"
+          },
+          "validation": {
+            "$ref": "#/components/schemas/GlobalValidationOutput"
+          }
+        },
+        "required": [
+          "displacement_dof_order",
+          "force_dof_order",
+          "section_force_convention",
+          "field_recovery",
+          "free_dofs",
+          "restrained_dofs",
+          "inactive_dof_vectors",
+          "active_dof_count",
+          "nodal_displacements",
+          "nodal_reactions",
+          "section_points",
+          "elements",
+          "validation",
+          "plots"
+        ],
+        "title": "SolveResponse",
         "type": "object"
       },
       "SolveResult": {
@@ -2007,6 +5623,36 @@
         ],
         "title": "SolveStatus",
         "type": "string"
+      },
+      "SpatialNode": {
+        "additionalProperties": false,
+        "properties": {
+          "id": {
+            "exclusiveMinimum": 0.0,
+            "title": "Id",
+            "type": "integer"
+          },
+          "x": {
+            "title": "X",
+            "type": "number"
+          },
+          "y": {
+            "title": "Y",
+            "type": "number"
+          },
+          "z": {
+            "title": "Z",
+            "type": "number"
+          }
+        },
+        "required": [
+          "id",
+          "x",
+          "y",
+          "z"
+        ],
+        "title": "SpatialNode",
+        "type": "object"
       },
       "StepControlOptions": {
         "additionalProperties": false,
@@ -2156,6 +5802,144 @@
         "title": "StepStatus",
         "type": "string"
       },
+      "SupportInput": {
+        "additionalProperties": false,
+        "properties": {
+          "axes": {
+            "anyOf": [
+              {
+                "maxItems": 3,
+                "minItems": 3,
+                "prefixItems": [
+                  {
+                    "maxItems": 3,
+                    "minItems": 3,
+                    "prefixItems": [
+                      {
+                        "type": "number"
+                      },
+                      {
+                        "type": "number"
+                      },
+                      {
+                        "type": "number"
+                      }
+                    ],
+                    "type": "array"
+                  },
+                  {
+                    "maxItems": 3,
+                    "minItems": 3,
+                    "prefixItems": [
+                      {
+                        "type": "number"
+                      },
+                      {
+                        "type": "number"
+                      },
+                      {
+                        "type": "number"
+                      }
+                    ],
+                    "type": "array"
+                  },
+                  {
+                    "maxItems": 3,
+                    "minItems": 3,
+                    "prefixItems": [
+                      {
+                        "type": "number"
+                      },
+                      {
+                        "type": "number"
+                      },
+                      {
+                        "type": "number"
+                      }
+                    ],
+                    "type": "array"
+                  }
+                ],
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Axes"
+          },
+          "node_id": {
+            "exclusiveMinimum": 0.0,
+            "title": "Node Id",
+            "type": "integer"
+          },
+          "rx": {
+            "default": false,
+            "title": "Rx",
+            "type": "boolean"
+          },
+          "rx_value": {
+            "default": 0.0,
+            "title": "Rx Value",
+            "type": "number"
+          },
+          "ry": {
+            "default": false,
+            "title": "Ry",
+            "type": "boolean"
+          },
+          "ry_value": {
+            "default": 0.0,
+            "title": "Ry Value",
+            "type": "number"
+          },
+          "rz": {
+            "default": false,
+            "title": "Rz",
+            "type": "boolean"
+          },
+          "rz_value": {
+            "default": 0.0,
+            "title": "Rz Value",
+            "type": "number"
+          },
+          "u": {
+            "default": false,
+            "title": "U",
+            "type": "boolean"
+          },
+          "u_value": {
+            "default": 0.0,
+            "title": "U Value",
+            "type": "number"
+          },
+          "v": {
+            "default": false,
+            "title": "V",
+            "type": "boolean"
+          },
+          "v_value": {
+            "default": 0.0,
+            "title": "V Value",
+            "type": "number"
+          },
+          "w": {
+            "default": false,
+            "title": "W",
+            "type": "boolean"
+          },
+          "w_value": {
+            "default": 0.0,
+            "title": "W Value",
+            "type": "number"
+          }
+        },
+        "required": [
+          "node_id"
+        ],
+        "title": "SupportInput",
+        "type": "object"
+      },
       "SurfaceMeshRequest": {
         "additionalProperties": false,
         "properties": {
@@ -2187,7 +5971,7 @@
           },
           "elements": {
             "items": {
-              "$ref": "#/components/schemas/ElementInput"
+              "$ref": "#/components/schemas/ElementInput-Output"
             },
             "title": "Elements",
             "type": "array"
@@ -2215,7 +5999,7 @@
           },
           "nodes": {
             "items": {
-              "$ref": "#/components/schemas/NodeInput"
+              "$ref": "#/components/schemas/NodeInput-Output"
             },
             "title": "Nodes",
             "type": "array"
@@ -2446,6 +6230,250 @@
         ],
         "title": "WorkspaceArchive",
         "type": "object"
+      },
+      "nonlinear_core__model__ElementInput": {
+        "additionalProperties": false,
+        "properties": {
+          "extensions": {
+            "additionalProperties": {
+              "$ref": "#/components/schemas/JsonValue"
+            },
+            "title": "Extensions",
+            "type": "object"
+          },
+          "formulation": {
+            "maxLength": 256,
+            "minLength": 1,
+            "title": "Formulation",
+            "type": "string"
+          },
+          "id": {
+            "maxLength": 128,
+            "minLength": 1,
+            "title": "Id",
+            "type": "string"
+          },
+          "material_id": {
+            "maxLength": 128,
+            "minLength": 1,
+            "title": "Material Id",
+            "type": "string"
+          },
+          "node_ids": {
+            "items": {
+              "maxLength": 128,
+              "minLength": 1,
+              "type": "string"
+            },
+            "minItems": 2,
+            "title": "Node Ids",
+            "type": "array"
+          },
+          "properties": {
+            "additionalProperties": {
+              "$ref": "#/components/schemas/JsonValue"
+            },
+            "title": "Properties",
+            "type": "object"
+          }
+        },
+        "required": [
+          "id",
+          "formulation",
+          "node_ids",
+          "material_id"
+        ],
+        "title": "ElementInput",
+        "type": "object"
+      },
+      "nonlinear_core__model__NodeInput": {
+        "additionalProperties": false,
+        "properties": {
+          "coordinates": {
+            "items": {
+              "type": "number"
+            },
+            "maxItems": 3,
+            "minItems": 2,
+            "title": "Coordinates",
+            "type": "array"
+          },
+          "extensions": {
+            "additionalProperties": {
+              "$ref": "#/components/schemas/JsonValue"
+            },
+            "title": "Extensions",
+            "type": "object"
+          },
+          "id": {
+            "maxLength": 128,
+            "minLength": 1,
+            "title": "Id",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "coordinates"
+        ],
+        "title": "NodeInput",
+        "type": "object"
+      },
+      "reused_cores__frame3d_linear__api__ElementInput": {
+        "additionalProperties": false,
+        "properties": {
+          "A": {
+            "exclusiveMinimum": 0.0,
+            "title": "A",
+            "type": "number"
+          },
+          "Asy": {
+            "anyOf": [
+              {
+                "exclusiveMinimum": 0.0,
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Asy"
+          },
+          "Asz": {
+            "anyOf": [
+              {
+                "exclusiveMinimum": 0.0,
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Asz"
+          },
+          "E": {
+            "exclusiveMinimum": 0.0,
+            "title": "E",
+            "type": "number"
+          },
+          "G": {
+            "exclusiveMinimum": 0.0,
+            "title": "G",
+            "type": "number"
+          },
+          "Iy": {
+            "exclusiveMinimum": 0.0,
+            "title": "Iy",
+            "type": "number"
+          },
+          "Iz": {
+            "exclusiveMinimum": 0.0,
+            "title": "Iz",
+            "type": "number"
+          },
+          "J": {
+            "exclusiveMinimum": 0.0,
+            "title": "J",
+            "type": "number"
+          },
+          "id": {
+            "exclusiveMinimum": 0.0,
+            "title": "Id",
+            "type": "integer"
+          },
+          "node_i": {
+            "exclusiveMinimum": 0.0,
+            "title": "Node I",
+            "type": "integer"
+          },
+          "node_j": {
+            "exclusiveMinimum": 0.0,
+            "title": "Node J",
+            "type": "integer"
+          },
+          "reference_vector": {
+            "maxItems": 3,
+            "minItems": 3,
+            "prefixItems": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "number"
+              },
+              {
+                "type": "number"
+              }
+            ],
+            "title": "Reference Vector",
+            "type": "array"
+          },
+          "releases": {
+            "items": {
+              "type": "integer"
+            },
+            "title": "Releases",
+            "type": "array"
+          },
+          "roll_angle": {
+            "default": 0.0,
+            "title": "Roll Angle",
+            "type": "number"
+          },
+          "theory": {
+            "default": "euler_bernoulli",
+            "enum": [
+              "euler_bernoulli",
+              "timoshenko"
+            ],
+            "title": "Theory",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "node_i",
+          "node_j",
+          "E",
+          "G",
+          "A",
+          "Iy",
+          "Iz",
+          "J",
+          "reference_vector"
+        ],
+        "title": "ElementInput",
+        "type": "object"
+      },
+      "reused_cores__frame3d_linear__api__NodeInput": {
+        "additionalProperties": false,
+        "properties": {
+          "id": {
+            "exclusiveMinimum": 0.0,
+            "title": "Id",
+            "type": "integer"
+          },
+          "x": {
+            "title": "X",
+            "type": "number"
+          },
+          "y": {
+            "title": "Y",
+            "type": "number"
+          },
+          "z": {
+            "title": "Z",
+            "type": "number"
+          }
+        },
+        "required": [
+          "id",
+          "x",
+          "y",
+          "z"
+        ],
+        "title": "NodeInput",
+        "type": "object"
       }
     }
   },
@@ -2456,6 +6484,224 @@
   },
   "openapi": "3.1.0",
   "paths": {
+    "/api/v1/3d/capabilities": {
+      "get": {
+        "operationId": "capabilities_api_v1_3d_capabilities_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FrameCapabilities"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "413": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorResponse"
+                }
+              }
+            },
+            "description": "Request Entity Too Large"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorResponse"
+                }
+              }
+            },
+            "description": "Unprocessable Entity"
+          },
+          "429": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorResponse"
+                }
+              }
+            },
+            "description": "Too Many Requests"
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorResponse"
+                }
+              }
+            },
+            "description": "Internal Server Error"
+          }
+        },
+        "summary": "Capabilities",
+        "tags": [
+          "Linear space frame"
+        ]
+      }
+    },
+    "/api/v1/3d/plots/{component}": {
+      "post": {
+        "operationId": "plot_space_frame_api_v1_3d_plots__component__post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "component",
+            "required": true,
+            "schema": {
+              "enum": [
+                "axial_force",
+                "shear_force_y",
+                "shear_force_z",
+                "torsional_moment",
+                "bending_moment_y",
+                "bending_moment_z"
+              ],
+              "title": "Component",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SolveRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "image/png": {}
+            },
+            "description": "Successful Response"
+          },
+          "413": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorResponse"
+                }
+              }
+            },
+            "description": "Request Entity Too Large"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorResponse"
+                }
+              }
+            },
+            "description": "Unprocessable Entity"
+          },
+          "429": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorResponse"
+                }
+              }
+            },
+            "description": "Too Many Requests"
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorResponse"
+                }
+              }
+            },
+            "description": "Internal Server Error"
+          }
+        },
+        "summary": "Plot Space Frame",
+        "tags": [
+          "Linear space frame"
+        ]
+      }
+    },
+    "/api/v1/3d/solve": {
+      "post": {
+        "operationId": "solve_space_frame_api_v1_3d_solve_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SolveRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SolveResponse"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "413": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorResponse"
+                }
+              }
+            },
+            "description": "Request Entity Too Large"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorResponse"
+                }
+              }
+            },
+            "description": "Unprocessable Entity"
+          },
+          "429": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorResponse"
+                }
+              }
+            },
+            "description": "Too Many Requests"
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorResponse"
+                }
+              }
+            },
+            "description": "Internal Server Error"
+          }
+        },
+        "summary": "Solve Space Frame",
+        "tags": [
+          "Linear space frame"
+        ]
+      }
+    },
     "/api/v1/analyses": {
       "post": {
         "operationId": "create_analysis_api_v1_analyses_post",
@@ -2815,6 +7061,209 @@
         "summary": "Current Session",
         "tags": [
           "iam"
+        ]
+      }
+    },
+    "/api/v1/continuum3d/capabilities": {
+      "get": {
+        "operationId": "capabilities_api_v1_continuum3d_capabilities_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SolidCapabilities"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "413": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorResponse"
+                }
+              }
+            },
+            "description": "Request Entity Too Large"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorResponse"
+                }
+              }
+            },
+            "description": "Unprocessable Entity"
+          },
+          "429": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorResponse"
+                }
+              }
+            },
+            "description": "Too Many Requests"
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorResponse"
+                }
+              }
+            },
+            "description": "Internal Server Error"
+          }
+        },
+        "summary": "Capabilities",
+        "tags": [
+          "Linear 3D continuum"
+        ]
+      }
+    },
+    "/api/v1/continuum3d/solve": {
+      "post": {
+        "operationId": "solve_api_v1_continuum3d_solve_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SolidModel-Input"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SolidResult"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "413": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorResponse"
+                }
+              }
+            },
+            "description": "Request Entity Too Large"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorResponse"
+                }
+              }
+            },
+            "description": "Unprocessable Entity"
+          },
+          "429": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorResponse"
+                }
+              }
+            },
+            "description": "Too Many Requests"
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorResponse"
+                }
+              }
+            },
+            "description": "Internal Server Error"
+          }
+        },
+        "summary": "Solve",
+        "tags": [
+          "Linear 3D continuum"
+        ]
+      }
+    },
+    "/api/v1/continuum3d/validate": {
+      "post": {
+        "operationId": "validate_model_api_v1_continuum3d_validate_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SolidModel-Input"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SolidModel-Output"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "413": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorResponse"
+                }
+              }
+            },
+            "description": "Request Entity Too Large"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorResponse"
+                }
+              }
+            },
+            "description": "Unprocessable Entity"
+          },
+          "429": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorResponse"
+                }
+              }
+            },
+            "description": "Too Many Requests"
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorResponse"
+                }
+              }
+            },
+            "description": "Internal Server Error"
+          }
+        },
+        "summary": "Validate Model",
+        "tags": [
+          "Linear 3D continuum"
         ]
       }
     },
@@ -3345,6 +7794,209 @@
         ]
       }
     },
+    "/api/v1/plate3d/capabilities": {
+      "get": {
+        "operationId": "capabilities_api_v1_plate3d_capabilities_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlateCapabilities"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "413": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorResponse"
+                }
+              }
+            },
+            "description": "Request Entity Too Large"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorResponse"
+                }
+              }
+            },
+            "description": "Unprocessable Entity"
+          },
+          "429": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorResponse"
+                }
+              }
+            },
+            "description": "Too Many Requests"
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorResponse"
+                }
+              }
+            },
+            "description": "Internal Server Error"
+          }
+        },
+        "summary": "Capabilities",
+        "tags": [
+          "Linear spatial plate"
+        ]
+      }
+    },
+    "/api/v1/plate3d/solve": {
+      "post": {
+        "operationId": "solve_api_v1_plate3d_solve_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PlateModel-Input"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlateResult"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "413": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorResponse"
+                }
+              }
+            },
+            "description": "Request Entity Too Large"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorResponse"
+                }
+              }
+            },
+            "description": "Unprocessable Entity"
+          },
+          "429": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorResponse"
+                }
+              }
+            },
+            "description": "Too Many Requests"
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorResponse"
+                }
+              }
+            },
+            "description": "Internal Server Error"
+          }
+        },
+        "summary": "Solve",
+        "tags": [
+          "Linear spatial plate"
+        ]
+      }
+    },
+    "/api/v1/plate3d/validate": {
+      "post": {
+        "operationId": "validate_model_api_v1_plate3d_validate_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PlateModel-Input"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlateModel-Output"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "413": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorResponse"
+                }
+              }
+            },
+            "description": "Request Entity Too Large"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorResponse"
+                }
+              }
+            },
+            "description": "Unprocessable Entity"
+          },
+          "429": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorResponse"
+                }
+              }
+            },
+            "description": "Too Many Requests"
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorResponse"
+                }
+              }
+            },
+            "description": "Internal Server Error"
+          }
+        },
+        "summary": "Validate Model",
+        "tags": [
+          "Linear spatial plate"
+        ]
+      }
+    },
     "/api/v1/projects/validate": {
       "post": {
         "description": "Validate a portable model/result snapshot before restoring the workbench.",
@@ -3404,6 +8056,209 @@
         "summary": "Validate Project",
         "tags": [
           "model history"
+        ]
+      }
+    },
+    "/api/v1/shell3d/capabilities": {
+      "get": {
+        "operationId": "capabilities_api_v1_shell3d_capabilities_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ShellCapabilities"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "413": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorResponse"
+                }
+              }
+            },
+            "description": "Request Entity Too Large"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorResponse"
+                }
+              }
+            },
+            "description": "Unprocessable Entity"
+          },
+          "429": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorResponse"
+                }
+              }
+            },
+            "description": "Too Many Requests"
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorResponse"
+                }
+              }
+            },
+            "description": "Internal Server Error"
+          }
+        },
+        "summary": "Capabilities",
+        "tags": [
+          "Linear spatial shell"
+        ]
+      }
+    },
+    "/api/v1/shell3d/solve": {
+      "post": {
+        "operationId": "solve_api_v1_shell3d_solve_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ShellModel-Input"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ShellResult"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "413": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorResponse"
+                }
+              }
+            },
+            "description": "Request Entity Too Large"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorResponse"
+                }
+              }
+            },
+            "description": "Unprocessable Entity"
+          },
+          "429": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorResponse"
+                }
+              }
+            },
+            "description": "Too Many Requests"
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorResponse"
+                }
+              }
+            },
+            "description": "Internal Server Error"
+          }
+        },
+        "summary": "Solve",
+        "tags": [
+          "Linear spatial shell"
+        ]
+      }
+    },
+    "/api/v1/shell3d/validate": {
+      "post": {
+        "operationId": "validate_model_api_v1_shell3d_validate_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ShellModel-Input"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ShellModel-Output"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "413": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorResponse"
+                }
+              }
+            },
+            "description": "Request Entity Too Large"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorResponse"
+                }
+              }
+            },
+            "description": "Unprocessable Entity"
+          },
+          "429": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorResponse"
+                }
+              }
+            },
+            "description": "Too Many Requests"
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorResponse"
+                }
+              }
+            },
+            "description": "Internal Server Error"
+          }
+        },
+        "summary": "Validate Model",
+        "tags": [
+          "Linear spatial shell"
         ]
       }
     },

@@ -15,6 +15,9 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse, JSONResponse
 from fastapi.staticfiles import StaticFiles
 
+from nonlinear_api.continuum3d import router as continuum3d_router
+from nonlinear_api.errors import ApiProblem
+from nonlinear_api.frame3d import router as frame3d_router
 from nonlinear_api.iam_store import (
     SESSION_TTL_DAYS,
     DuplicateEmailError,
@@ -31,6 +34,7 @@ from nonlinear_api.math_cores import (
 )
 from nonlinear_api.meshing import SurfaceMeshError, generate_surface_mesh
 from nonlinear_api.middleware import RequestSizeLimitMiddleware
+from nonlinear_api.plate3d import router as plate3d_router
 from nonlinear_api.schemas import (
     AnalysisRecord,
     AnalysisRequest,
@@ -55,7 +59,8 @@ from nonlinear_api.schemas import (
     SurfaceMeshRequest,
     SurfaceMeshResponse,
 )
-from nonlinear_api.service import AnalysisService, ApiProblem
+from nonlinear_api.service import AnalysisService
+from nonlinear_api.shell3d import router as shell3d_router
 from nonlinear_core import __version__
 
 
@@ -119,6 +124,10 @@ def create_app(
         ),
         lifespan=lifespan,
     )
+    app.include_router(frame3d_router)
+    app.include_router(continuum3d_router)
+    app.include_router(plate3d_router)
+    app.include_router(shell3d_router)
     app.state.analysis_service = actual_service
     app.state.api_limits = actual_limits
     app.add_middleware(

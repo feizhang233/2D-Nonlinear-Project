@@ -1,0 +1,127 @@
+{
+  "source": "2D-Shell-Project/src/shell_core",
+  "version": "1.0.0",
+  "transformation": "Only absolute shell_core imports are namespaced as reused_cores.shell3d_linear.",
+  "files": [
+    {
+      "path": "__init__.py",
+      "source_sha256": "4d4f731429618ba83d5c7814233bb10b12f956464959657c650ff5eee5269928",
+      "vendored_sha256": "60522e372c0ce212e36d860915dac0c020032ae7efa2bf818180c11cd333911a"
+    },
+    {
+      "path": "__main__.py",
+      "source_sha256": "d4588c8b7a970233454375477658dbffe5ccf7900e0367c9b5c1277dd7dcaf9b",
+      "vendored_sha256": "ac24c9c82790202f6741d49319bab2323baae434c5d8121eaf1321f60924d7ac"
+    },
+    {
+      "path": "assembly.py",
+      "source_sha256": "2aeaa046c5a56a88d158ac3f7baaf761141df9076d98b68f5fcfdce4b8eaa713",
+      "vendored_sha256": "8b8d3416bcbe1fa6b64aac30acf38736ef824961aa5066f8303b124469bbde42"
+    },
+    {
+      "path": "constants.py",
+      "source_sha256": "ef3784879b5c847d5780304ddf6c99b423fa41e11e09f1926c6c38e4d5e8f6d9",
+      "vendored_sha256": "ef3784879b5c847d5780304ddf6c99b423fa41e11e09f1926c6c38e4d5e8f6d9"
+    },
+    {
+      "path": "constitutive.py",
+      "source_sha256": "9bb65a873ca854b3ee33c371077823fe3c94fe178c5258a76bc5c97751c8f6be",
+      "vendored_sha256": "87a9a3ede6cd3c0462e62644d7ce535e4ba18f6c89c27d24cd4bcaf9b6653305"
+    },
+    {
+      "path": "data/__init__.py",
+      "source_sha256": "900ffba9fc49ce9f3e59c7b7ba8ac35ecff9ac87106564e7da0e5c8f7f9a7043",
+      "vendored_sha256": "900ffba9fc49ce9f3e59c7b7ba8ac35ecff9ac87106564e7da0e5c8f7f9a7043"
+    },
+    {
+      "path": "data/shell-core-contract.schema.json",
+      "source_sha256": "a8654d6072ba6dac4fb87868563a92e95bdea0423531b1cb47d554ce1d37551e",
+      "vendored_sha256": "a8654d6072ba6dac4fb87868563a92e95bdea0423531b1cb47d554ce1d37551e"
+    },
+    {
+      "path": "diagnostics.py",
+      "source_sha256": "2c89edc14d72ea39ffd613e5727ebd54639a08c40b311a3234cfdeec0da44e3a",
+      "vendored_sha256": "2c89edc14d72ea39ffd613e5727ebd54639a08c40b311a3234cfdeec0da44e3a"
+    },
+    {
+      "path": "drilling.py",
+      "source_sha256": "bb0a4d1717973a29303face962a3b42bc749964ac9911294c5db8e7f2f78dab1",
+      "vendored_sha256": "f1454e744b3578dd6bef9f003e2fc7bdeee3b0152669cc21b309ef1af52d3ca1"
+    },
+    {
+      "path": "geometry.py",
+      "source_sha256": "4b0575917937886d1c96e7818a23275e5e5ad46256ee8ee439b44c7f519fcc1e",
+      "vendored_sha256": "f9ba898ce67c0bf525a788b1d921e2ffc18a0111a18d38686e6851e22495b428"
+    },
+    {
+      "path": "kinematics.py",
+      "source_sha256": "6e525086dbdb3e46e6adaaead3e503830dfed7e22527cc8b2a5cdee26810f278",
+      "vendored_sha256": "c335291eb818243d58317681c2a2126d0f9d61d9d3b3f5d1703ee7f72945a39d"
+    },
+    {
+      "path": "loads.py",
+      "source_sha256": "6636300847cbc65bcc705e6f2d517ec8ee1669af6d7e5bc7f1d2959db8dbf722",
+      "vendored_sha256": "37d0831b842431c5ecf167557b781f6b5e7473e708b057b71e54eee722f3e6de"
+    },
+    {
+      "path": "membrane_bending.py",
+      "source_sha256": "1b31b3fc17af39fe2eaf72e8b2ed259089786de1cec60d75f3f822c882fc1a73",
+      "vendored_sha256": "deab41e1b99be38026f3d248b928623986f3dee4af67dba38adf2954279ff420"
+    },
+    {
+      "path": "post.py",
+      "source_sha256": "e4a5463c53e8e6ef7fe8f32c18297321499fbc36d970ee66e9e847262f0bd257",
+      "vendored_sha256": "5b17ee5cfba035d8d11baece23c8d6122906a707792fc2af0dab6d47152b5641"
+    },
+    {
+      "path": "q4.py",
+      "source_sha256": "6e4da1aafd06db4c778001da0b005df758b4ba97f39bb938a0dc04f20852a06b",
+      "vendored_sha256": "4bc70b2c106c1d3d58c2e9ab1edc97798ff11486e98cc6d37007f080837006d7"
+    },
+    {
+      "path": "recover.py",
+      "source_sha256": "bb95779122d3fa8ebbe277bb1c7a34253c9ea3b5623de6da9e4773aa17c26b1c",
+      "vendored_sha256": "45bdab99602417be6a451246c1ab9223e2ca7e80d282dbe30d36495a80d6a879"
+    },
+    {
+      "path": "schema.py",
+      "source_sha256": "21a1fcff129df639f2d01a15a6c6b29cacf3da11832a37afd52ca105656ff299",
+      "vendored_sha256": "b31ecac345357393fe9e330dae723b6113587f445b4cd4ce74c7d82b8152982b"
+    },
+    {
+      "path": "serialize.py",
+      "source_sha256": "78399def508f5c80b72155cf6d7ee8ac5d22901346b75b14266107a3c2fd9b9f",
+      "vendored_sha256": "f7d761b57f4514a1d2842145b3c5c2caedcfe8d8ce6a4626945aed68013ed85f"
+    },
+    {
+      "path": "shear.py",
+      "source_sha256": "91e571718639d57a534ef6d7e872b2cc2f9f5865c11a985e6b2b8c872f0f3de6",
+      "vendored_sha256": "b1718395e4cc6f636b77fc414c4fe60b8991cd758b3365eeeaf6b657c0e0b55d"
+    },
+    {
+      "path": "solve.py",
+      "source_sha256": "da1dd6bf9be0e703fdf3febe16fe53aec85f26f61f0a0de94b120e1bfc180991",
+      "vendored_sha256": "a4eca9a4d525a56b3eb60988a6e9c5c7cf431c1ca1fc9fad5b1e2f2c107d15e8"
+    },
+    {
+      "path": "sparse.py",
+      "source_sha256": "d0be03d120394db52fd006ac1c5439ab61b74c624caf8fd926b0b6afe3ae4dbc",
+      "vendored_sha256": "d0be03d120394db52fd006ac1c5439ab61b74c624caf8fd926b0b6afe3ae4dbc"
+    },
+    {
+      "path": "transformation.py",
+      "source_sha256": "ef9e9c8ae4eceda6ce95f25727cd335a3b41e6b1a83b22d7316e81d4fa7b8ad2",
+      "vendored_sha256": "f94a416e836dd26816b240e975dde9bd5c71dcde51fefbd4665fb9d1003156cb"
+    },
+    {
+      "path": "types.py",
+      "source_sha256": "a7ba54d0cbd94d06d9d9ef06692e595847a5faaf039ce73e95585d360b60815d",
+      "vendored_sha256": "66ff36a27151b81e77451cf1ea53dc2f507c16055bcf3460c7d16841a3dc00ea"
+    },
+    {
+      "path": "validate.py",
+      "source_sha256": "0c54bbeb64e56e42ce452c22a21e789f8d37e35cbd5b5b1df5fc36a4c5a5c086",
+      "vendored_sha256": "ee155974b2657688093dcc86cce9a78a3b89aa7a004531ef31f5d3d613795540"
+    }
+  ]
+}

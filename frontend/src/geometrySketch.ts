@@ -122,7 +122,7 @@ const uniqueOrdered = (ids: string[]) => {
   })
 }
 
-export function deriveSketch(model: ModelInput): SketchGeometry {
+function deriveSketch(model: ModelInput): SketchGeometry {
   if (!isSurfaceFamily(model)) {
     return {
       vertices: model.nodes.map((node) => ({
@@ -222,11 +222,11 @@ export function writeSketch(
   }
 }
 
-export function sketchSignature(sketch: SketchGeometry): string {
+function sketchSignature(sketch: SketchGeometry): string {
   return JSON.stringify(sketchJson(sketch))
 }
 
-export function geometryNeedsRemesh(model: ModelInput): boolean {
+function geometryNeedsRemesh(model: ModelInput): boolean {
   if (!isGeneratedMesh(model)) return false
   const stored =
     typeof model.extensions?.geometry_meshed_signature === 'string'
@@ -235,7 +235,7 @@ export function geometryNeedsRemesh(model: ModelInput): boolean {
   return stored !== sketchSignature(getSketch(model))
 }
 
-export function isConvexQuad(points: number[][]): boolean {
+function isConvexQuad(points: number[][]): boolean {
   if (points.length !== 4) return false
   const turns = points.map((a, i) => {
     const b = points[(i + 1) % 4],
@@ -346,7 +346,7 @@ export function nearestSketchVertex(
   })
 }
 
-export function nearestModelNode(
+function nearestModelNode(
   model: ModelInput,
   coordinates: number[],
 ): NodeInput | undefined {
@@ -379,7 +379,7 @@ export function nodeForSketchVertex(
     : undefined
 }
 
-export function addOuterVertex(
+function addOuterVertex(
   model: ModelInput,
   coordinates: number[],
   afterId?: string,

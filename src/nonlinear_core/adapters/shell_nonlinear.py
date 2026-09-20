@@ -9,7 +9,6 @@ from types import MappingProxyType
 
 import numpy as np
 from numpy.typing import ArrayLike, NDArray
-from shell_core import build_element_geometry, integrate_edge_traction, integrate_surface_traction
 
 from nonlinear_core.adapters._distributed import edge_targets, surface_element_ids
 from nonlinear_core.adapters._mapping import (
@@ -287,6 +286,13 @@ class CorotationalShellAdapter:
         )
 
     def _build_system(self, model: ModelInput) -> _ShellSystem:
+        # Keep this optional legacy core out of independent spatial workspace imports.
+        from shell_core import (
+            build_element_geometry,
+            integrate_edge_traction,
+            integrate_surface_traction,
+        )
+
         self._require_family(model)
         expected_units = {"length": "m", "force": "N", "stress": "Pa", "angle": "rad"}
         observed_units = {

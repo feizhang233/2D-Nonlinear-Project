@@ -21,7 +21,7 @@ export function SectionHeader({
           sx={{
             width: 20,
             height: 24,
-            borderRadius: 2.25,
+            borderRadius: 1,
             flexShrink: 0,
             display: 'grid',
             placeItems: 'center',
@@ -81,7 +81,7 @@ export function EmptyState({
         sx={{
           width: 52,
           height: 52,
-          borderRadius: 3,
+          borderRadius: 1,
           mb: 0.5,
           display: 'grid',
           placeItems: 'center',

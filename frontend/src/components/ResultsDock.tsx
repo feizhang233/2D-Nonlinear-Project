@@ -160,7 +160,7 @@ export function ResultsDock({ selection, onSelection, standalone = false, model,
                       <StatTile label="Iterations" value={String(step.iterations.length)} />
                     </Stack>
                   )}
-                  <TableContainer sx={{ maxHeight: standalone ? 440 : 118, borderRadius: 2, border: '1px solid', borderColor: 'divider' }}>
+                  <TableContainer sx={{ maxHeight: standalone ? 440 : 118, borderRadius: 1, border: '1px solid', borderColor: 'divider' }}>
                     <Table size="small" stickyHeader aria-label="Iteration records">
                       <TableHead>
                         <TableRow>
@@ -214,7 +214,7 @@ export function ResultsDock({ selection, onSelection, standalone = false, model,
             result ? (
               <Stack direction={standalone ? 'column' : 'row'} spacing={2}>
                 {model.model_family === 'frame' && <FrameSectionTable model={model} result={result} selection={selection} onSelection={onSelection} />}
-                <TableContainer sx={{ flex: 1, maxHeight: standalone ? 360 : 216, borderRadius: 2, border: '1px solid', borderColor: 'divider' }}>
+                <TableContainer sx={{ flex: 1, maxHeight: standalone ? 360 : 216, borderRadius: 1, border: '1px solid', borderColor: 'divider' }}>
                   <Table size="small" stickyHeader>
                     <TableHead>
                       <TableRow>
@@ -249,7 +249,7 @@ export function ResultsDock({ selection, onSelection, standalone = false, model,
                     </TableBody>
                   </Table>
                 </TableContainer>
-                <TableContainer sx={{ flex: 1, maxHeight: standalone ? 360 : 216, borderRadius: 2, border: '1px solid', borderColor: 'divider' }}>
+                <TableContainer sx={{ flex: 1, maxHeight: standalone ? 360 : 216, borderRadius: 1, border: '1px solid', borderColor: 'divider' }}>
                   <Table size="small" stickyHeader aria-label={`${family.label} element recovery results`}>
                     <TableHead>
                       <TableRow>

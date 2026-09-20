@@ -2,7 +2,30 @@
 
 A React, FastAPI, and Python finite-element workbench for Frame, Continuum, Plate, and Shell modeling, quasi-static nonlinear analysis, and independent mathematical reference calculations.
 
+See [Architecture and contract ownership](ARCHITECTURE.md) for module boundaries,
+generated frontend/API types, shared document lifecycle and verification gates.
+
 ### [🚀 Try Nonlinear Studio Online →](https://nonlinear.feizhang233.com)
+
+## Space frames
+
+The **Frame 3D** workspace now provides linked work-plane and 3D modeling, six-DOF
+linear-static beam analysis, independent material/section assignment, deformation and
+six member-force diagrams. It uses the same Nonlinear Studio theme and host API.
+See [Frame 3D integration](FRAME3D_INTEGRATION.md) for its workflow, limits and tests.
+The four existing nonlinear workspaces remain independent.
+
+## Three-dimensional solids
+
+Use the **2D / 3D** control to the left of Frame. In 3D, Frame, Continuum, Plate and Shell are
+available as independent linear-static workspaces. Each document retains its own model and state.
+Continuum 3D provides Tet4 and full-integration Hex8 small-strain linear elasticity,
+block meshing, material assignment, prescribed displacements, nodal/face/body loads,
+deformation and stress contours, and integration-point results. Frontend and backend
+are separate modules within the existing app and API; the shared visual theme is retained.
+See [Continuum 3D integration](CONTINUUM3D_INTEGRATION.md) for API routes, source
+provenance, verification and limitations. This solid module does not implement nonlinear
+materials, large deformation or contact. Inputs use m, N and Pa.
 
 ## Quick start
 
@@ -94,13 +117,17 @@ See [model types](src/nonlinear_core/model.py), [result types](src/nonlinear_cor
 frontend/src/             Workbench, canvas, editing state, and results
 src/nonlinear_api/        HTTP endpoints, meshing, jobs, and account storage
 src/nonlinear_core/       Contracts, adapters, elements, solvers, and state
-src/reused_cores/         Provenance-tracked linear Frame foundation
+src/reused_cores/         Provenance-tracked linear reference kernels
 Step 2 Math Core/        Reference implementations and unified interface
 tests/                   Unit, integration, and numerical verification
 schemas/ · scripts/       Public contracts, audit, and release tooling
 ```
 
-Study guides, reference books, generated reports, and local deliverables are excluded from Git. Runtime code, build/deployment configuration, API documentation, tests, and required fixtures remain versioned.
+The project keeps runtime code, build/deployment configuration, maintained documentation,
+tests and required fixtures. Standalone study packages, historical reports and unrelated
+deliverables were archived outside the project. `Step 2 Math Core` remains because the
+reference-operation API loads its implementations directly. Current reusable examples
+and release evidence live in `tests/fixtures/`.
 
 ```bash
 python -m pytest
@@ -108,3 +135,33 @@ python scripts/run_math_core_audit.py --check
 npm --prefix frontend test
 npm --prefix frontend run build
 ```
+
+
+### Spatial Plate (3D)
+
+Select **3D → Plate** for arbitrarily oriented coplanar MITC4 bending. Geometry
+creates a rectangular Q4 mesh with dimensions, origin, tilt and azimuth. Define
+constant thickness/material, clamped or soft/hard simple supports, normal pressure
+and nodal generalized loads. Open plate JSON for other valid coplanar Q4 meshes.
+Results include spatial displacement/rotation, generalized reactions, local bending
+moments, shear resultants, top/bottom stresses and numerical checks.
+
+Frontend: `frontend/src/plate3d/`. Backend: `src/nonlinear_core/plate3d.py` and
+`src/nonlinear_api/plate3d.py`; endpoints `/api/v1/plate3d/{validate,solve,capabilities}`.
+Runtime uses a provenance-pinned kernel under `src/reused_cores/plate3d_linear/`.
+The shared theme and SurfaceCanvas keep solid and plate workspaces consistent.
+See [Plate integration and limits](PLATE3D_INTEGRATION.md) for scope and verification.
+
+### Spatial Shell (3D)
+
+Select **3D → Shell** for planar Q4 facets connected in space, including folded
+plates. The workspace combines membrane, bending, QLLL assumed shear and consistent
+drilling stabilization with six global degrees of freedom per node. It includes
+a flat/folded mesh generator, supports, normal pressure, nodal forces/moments,
+raw N/M/Q and surface stresses, deformation and energy/equilibrium checks.
+
+Frontend: `frontend/src/shell3d/`. Backend: `src/nonlinear_core/shell3d.py` and
+`src/nonlinear_api/shell3d.py`. The frozen core is packaged locally with provenance.
+Limit: 100 nodes / 600 DOFs; linear static and planar facets only. General curved
+shells, finite rotations, nonlinear materials and buckling are not enabled here.
+See [Shell integration and verification](SHELL3D_INTEGRATION.md).

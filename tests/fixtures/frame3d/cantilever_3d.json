@@ -1,0 +1,12 @@
+{
+  "nodes": [{"id": 1, "x": 0, "y": 0, "z": 0}, {"id": 2, "x": 2, "y": 0, "z": 0}],
+  "elements": [{"id": 1, "node_i": 1, "node_j": 2, "E": 200000000000, "G": 80000000000,
+    "A": 0.01, "Iy": 0.000008, "Iz": 0.000005, "J": 0.00001, "reference_vector": [0, 1, 0]}],
+  "supports": [{"node_id": 1, "u": true, "v": true, "w": true, "rx": true, "ry": true, "rz": true}],
+  "nodal_loads": [{"node_id": 2, "fx": 10000, "fy": 1000, "fz": 1000, "mx": 2000}],
+  "distributed_loads": [{"element_id": 1, "qy_i": 1000, "qy_j": 1000}],
+  "section_points": [{"y": 0.05, "z": 0}, {"y": 0, "z": 0.05}],
+  "number_of_points": 101,
+  "deformation_scale": 10,
+  "include_plots": false
+}

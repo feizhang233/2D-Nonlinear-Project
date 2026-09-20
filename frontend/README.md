@@ -63,8 +63,8 @@ validates the model with the backend before replacing the current document.
 Requests distinguish schema/limit failures, invalid responses, timeouts, and
 cancellation; uncertain server completion is never automatically retried.
 
-See [the September 2026 audit](../FRONTEND_AUDIT_2026-09-05.md) for findings,
-fixes, verification, and remaining platform boundaries.
+See [the architecture review](../ARCHITECTURE.md) for module ownership,
+verification and remaining platform boundaries.
 
 ## Project editing and persistence
 
@@ -86,7 +86,7 @@ After solving, choose Moment M, Shear V, or Axial N. Click a diagram to show its
 or use Result tables → Member section forces for station values. Diagram and table selection
 stay synchronized. Recovery belongs to the last accepted state; earlier steps offer a return action.
 Distributed member-load correction uses reference axes and is approximate for large rotations.
-See [Frame workflow acceptance](../FRAME_WORKFLOW_UPDATE_2026-09-06.md) for conventions and checks.
+See [the UX contract](../UX-CONTRACT.md) for conventions and checks.
 
 ## Simplified workspace
 
@@ -96,7 +96,7 @@ large lists include search. Properties occupies no space when closed and retains
 The canvas toolbar owns drawing and placement; Sections and Split member stay in their contextual
 locations. Successful analyses foreground the result canvas; Results & tables opens the evidence
 panel, which appears automatically for progress and failures. See
-[the UI redesign acceptance](../SIMPLE_UI_REDESIGN_2026-09-06.md).
+[the UX contract](../UX-CONTRACT.md).
 
 ### CAD and load placement
 

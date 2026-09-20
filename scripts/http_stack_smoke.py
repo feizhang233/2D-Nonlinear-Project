@@ -17,6 +17,13 @@ FAMILY_CASES = {
     "shell": ("tests/fixtures/p14/corotational-flat-shell.json", 1.0, 24),
 }
 
+SPATIAL_CASES = {
+    "frame3d": ("3d", "frame3d/cantilever_3d.json", 6),
+    "continuum3d": ("continuum3d", "continuum3d/hex8.json", 3),
+    "plate3d": ("plate3d", "plate3d/cantilever.json", 3),
+    "shell3d": ("shell3d", "shell3d/cantilever.json", 6),
+}
+
 FAMILY_RECOVERY_KEYS = {
     "frame": ("local_end_forces",),
     "continuum": ("gauss_points",),
@@ -56,6 +63,12 @@ def main() -> None:
         choices=tuple(FAMILY_CASES),
         default=tuple(FAMILY_CASES),
     )
+    parser.add_argument(
+        "--spatial-families",
+        nargs="*",
+        choices=tuple(SPATIAL_CASES),
+        default=tuple(SPATIAL_CASES),
+    )
     args = parser.parse_args()
     base = args.frontend_url.rstrip("/")
 
@@ -78,9 +91,7 @@ def main() -> None:
     for family in args.families:
         example, target, expected_dofs = FAMILY_CASES[family]
         model = json.loads((args.project_root / example).read_text())
-        validation = _request(
-            f"{base}/api/v1/models/validate", method="POST", document=model
-        )
+        validation = _request(f"{base}/api/v1/models/validate", method="POST", document=model)
         if not validation["execution_eligible"] or validation["dof_count"] != expected_dofs:
             raise SystemExit(f"live {family} model validation failed")
         record = _request(
@@ -101,10 +112,7 @@ def main() -> None:
             record = _request(f"{base}/api/v1/analyses/{analysis_id}")
         if record["status"] != "succeeded" or record["progress"]["accepted_steps"] < 1:
             raise SystemExit(f"live {family} asynchronous analysis did not succeed")
-        fields = {
-            field["name"]: field
-            for field in record["result"]["post_result"]["raw_fields"]
-        }
+        fields = {field["name"]: field for field in record["result"]["post_result"]["raw_fields"]}
         element_records = fields["element_response"]["records"]
         if not element_records or any(
             key not in element_records[0] for key in FAMILY_RECOVERY_KEYS[family]
@@ -124,11 +132,37 @@ def main() -> None:
             }
         )
 
+    spatial_summaries = []
+    for family in args.spatial_families:
+        route, fixture, dofs = SPATIAL_CASES[family]
+        model = json.loads((args.project_root / "tests/fixtures" / fixture).read_text())
+        capabilities = _request(f"{base}/api/v1/{route}/capabilities")
+        if capabilities["analysis"] != "linear-static":
+            raise SystemExit(f"live {family} capability contract changed")
+        if family != "frame3d":
+            checked = _request(f"{base}/api/v1/{route}/validate", method="POST", document=model)
+            if checked != model:
+                raise SystemExit(f"live {family} model round trip changed")
+        result = _request(f"{base}/api/v1/{route}/solve", method="POST", document=model)
+        if not result["validation"]["passed"] or not result["elements"]:
+            raise SystemExit(f"live {family} numerical checks failed")
+        nodal_key = "nodal_displacements" if family in {"frame3d", "continuum3d"} else "nodes"
+        if len(result[nodal_key]) != len(model["nodes"]):
+            raise SystemExit(f"live {family} nodal recovery is incomplete")
+        spatial_summaries.append(
+            {
+                "family": family,
+                "checks_passed": True,
+                "dof_count": len(model["nodes"]) * dofs,
+            }
+        )
+
     print(
         json.dumps(
             {
                 "frontend_url": base,
                 "analyses": summaries,
+                "spatial_analyses": spatial_summaries,
             },
             indent=2,
             sort_keys=True,

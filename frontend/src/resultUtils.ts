@@ -8,7 +8,7 @@ export const formatNumber = (value: unknown, digits = 4): string => {
   return value.toLocaleString('en-US', { maximumFractionDigits: digits })
 }
 
-export const getRawField = (result: SolveResult | null | undefined, name: string): ResultField | undefined =>
+const getRawField = (result: SolveResult | null | undefined, name: string): ResultField | undefined =>
   result?.post_result?.raw_fields.find((field) => field.name === name)
 
 export type DofValues = Partial<Record<Dof, number>>
@@ -53,7 +53,7 @@ export function reactionByNode(result: SolveResult | null | undefined) {
 export const elementRecords = (result: SolveResult | null | undefined) =>
   getRawField(result, 'element_response')?.records ?? []
 
-export function monitoredDofIndex(model: ModelInput): number {
+function monitoredDofIndex(model: ModelInput): number {
   const dofs = dofsForModel(model)
   const target = model.analysis.displacement_control?.target
   if (target) {

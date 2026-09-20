@@ -1,0 +1,1206 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://2d-shell-project.local/schema/shell-core-contract-1.0.0.json",
+  "title": "2D-Shell-Project Math Core Contract 1.0.0",
+  "description": "External ModelInput and AnalysisResult contract for the P04 Linear Flat Shell MVP.",
+  "oneOf": [
+    {
+      "$ref": "#/$defs/ModelInput"
+    },
+    {
+      "$ref": "#/$defs/AnalysisResult"
+    }
+  ],
+  "$defs": {
+    "Id": {
+      "type": "string",
+      "pattern": "^[A-Za-z][A-Za-z0-9_.:-]{0,63}$"
+    },
+    "Version": {
+      "const": "1.0.0"
+    },
+    "FiniteNumber": {
+      "type": "number"
+    },
+    "PositiveNumber": {
+      "type": "number",
+      "exclusiveMinimum": 0
+    },
+    "NonNegativeNumber": {
+      "type": "number",
+      "minimum": 0
+    },
+    "Vector2": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/FiniteNumber"
+      },
+      "minItems": 2,
+      "maxItems": 2
+    },
+    "Vector3": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/FiniteNumber"
+      },
+      "minItems": 3,
+      "maxItems": 3
+    },
+    "Vector5": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/FiniteNumber"
+      },
+      "minItems": 5,
+      "maxItems": 5
+    },
+    "Vector6": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/FiniteNumber"
+      },
+      "minItems": 6,
+      "maxItems": 6
+    },
+    "Vector20": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/FiniteNumber"
+      },
+      "minItems": 20,
+      "maxItems": 20
+    },
+    "Matrix3": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/Vector3"
+      },
+      "minItems": 3,
+      "maxItems": 3
+    },
+    "Units": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "system",
+        "length",
+        "angle",
+        "force",
+        "moment",
+        "bending_resultant",
+        "stress",
+        "line_load",
+        "surface_load",
+        "body_force",
+        "energy"
+      ],
+      "properties": {
+        "system": {
+          "const": "SI"
+        },
+        "length": {
+          "const": "m"
+        },
+        "angle": {
+          "const": "rad"
+        },
+        "force": {
+          "const": "N"
+        },
+        "moment": {
+          "const": "N*m"
+        },
+        "bending_resultant": {
+          "const": "N"
+        },
+        "stress": {
+          "const": "Pa"
+        },
+        "line_load": {
+          "const": "N/m"
+        },
+        "surface_load": {
+          "const": "N/m^2"
+        },
+        "body_force": {
+          "const": "N/m^3"
+        },
+        "energy": {
+          "const": "J"
+        }
+      }
+    },
+    "Node": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "coordinates"
+      ],
+      "properties": {
+        "id": {
+          "$ref": "#/$defs/Id"
+        },
+        "coordinates": {
+          "$ref": "#/$defs/Vector3"
+        }
+      }
+    },
+    "Material": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "type",
+        "young_modulus",
+        "poisson_ratio"
+      ],
+      "properties": {
+        "id": {
+          "$ref": "#/$defs/Id"
+        },
+        "type": {
+          "const": "linear_elastic_isotropic"
+        },
+        "young_modulus": {
+          "$ref": "#/$defs/PositiveNumber"
+        },
+        "poisson_ratio": {
+          "type": "number",
+          "exclusiveMinimum": -1,
+          "exclusiveMaximum": 0.5
+        }
+      }
+    },
+    "Section": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "type",
+        "material_id",
+        "thickness",
+        "shear_correction_factor"
+      ],
+      "properties": {
+        "id": {
+          "$ref": "#/$defs/Id"
+        },
+        "type": {
+          "const": "homogeneous_constant_thickness"
+        },
+        "material_id": {
+          "$ref": "#/$defs/Id"
+        },
+        "thickness": {
+          "$ref": "#/$defs/PositiveNumber"
+        },
+        "shear_correction_factor": {
+          "$ref": "#/$defs/PositiveNumber"
+        }
+      }
+    },
+    "Element": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "type",
+        "node_ids",
+        "section_id"
+      ],
+      "properties": {
+        "id": {
+          "$ref": "#/$defs/Id"
+        },
+        "type": {
+          "const": "Q4_FLAT_SHELL_RM"
+        },
+        "node_ids": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/Id"
+          },
+          "minItems": 4,
+          "maxItems": 4,
+          "uniqueItems": true
+        },
+        "section_id": {
+          "$ref": "#/$defs/Id"
+        }
+      }
+    },
+    "NodalLoad": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "type",
+        "node_id",
+        "force_global",
+        "moment_global"
+      ],
+      "properties": {
+        "id": {
+          "$ref": "#/$defs/Id"
+        },
+        "type": {
+          "const": "nodal_load"
+        },
+        "node_id": {
+          "$ref": "#/$defs/Id"
+        },
+        "force_global": {
+          "$ref": "#/$defs/Vector3"
+        },
+        "moment_global": {
+          "$ref": "#/$defs/Vector3"
+        }
+      }
+    },
+    "SurfaceTraction": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "type",
+        "element_ids",
+        "traction_global"
+      ],
+      "properties": {
+        "id": {
+          "$ref": "#/$defs/Id"
+        },
+        "type": {
+          "const": "surface_traction"
+        },
+        "element_ids": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/Id"
+          },
+          "minItems": 1,
+          "uniqueItems": true
+        },
+        "traction_global": {
+          "$ref": "#/$defs/Vector3"
+        }
+      }
+    },
+    "EdgeTraction": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "type",
+        "element_id",
+        "local_edge",
+        "traction_global"
+      ],
+      "properties": {
+        "id": {
+          "$ref": "#/$defs/Id"
+        },
+        "type": {
+          "const": "edge_traction"
+        },
+        "element_id": {
+          "$ref": "#/$defs/Id"
+        },
+        "local_edge": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 4
+        },
+        "traction_global": {
+          "$ref": "#/$defs/Vector3"
+        }
+      }
+    },
+    "BodyForce": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "type",
+        "element_ids",
+        "force_density_global"
+      ],
+      "properties": {
+        "id": {
+          "$ref": "#/$defs/Id"
+        },
+        "type": {
+          "const": "body_force"
+        },
+        "element_ids": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/Id"
+          },
+          "minItems": 1,
+          "uniqueItems": true
+        },
+        "force_density_global": {
+          "$ref": "#/$defs/Vector3"
+        }
+      }
+    },
+    "Load": {
+      "oneOf": [
+        {
+          "$ref": "#/$defs/NodalLoad"
+        },
+        {
+          "$ref": "#/$defs/SurfaceTraction"
+        },
+        {
+          "$ref": "#/$defs/EdgeTraction"
+        },
+        {
+          "$ref": "#/$defs/BodyForce"
+        }
+      ]
+    },
+    "LoadCase": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "loads"
+      ],
+      "properties": {
+        "id": {
+          "$ref": "#/$defs/Id"
+        },
+        "loads": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/Load"
+          }
+        }
+      }
+    },
+    "Constraint": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "node_id",
+        "dof",
+        "value"
+      ],
+      "properties": {
+        "id": {
+          "$ref": "#/$defs/Id"
+        },
+        "node_id": {
+          "$ref": "#/$defs/Id"
+        },
+        "dof": {
+          "enum": [
+            "UX",
+            "UY",
+            "UZ",
+            "RX",
+            "RY",
+            "RZ"
+          ]
+        },
+        "value": {
+          "$ref": "#/$defs/FiniteNumber"
+        }
+      }
+    },
+    "DrillingOn": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "formulation",
+        "alpha_d"
+      ],
+      "properties": {
+        "formulation": {
+          "const": "continuum_consistent"
+        },
+        "alpha_d": {
+          "$ref": "#/$defs/PositiveNumber"
+        }
+      }
+    },
+    "DrillingOff": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "formulation"
+      ],
+      "properties": {
+        "formulation": {
+          "const": "none"
+        }
+      }
+    },
+    "SolverOptions": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "method",
+        "scaling",
+        "relative_backward_error_tolerance",
+        "condition_warning_threshold"
+      ],
+      "properties": {
+        "method": {
+          "const": "symmetric_direct"
+        },
+        "scaling": {
+          "const": "characteristic_length"
+        },
+        "relative_backward_error_tolerance": {
+          "const": 1e-10
+        },
+        "condition_warning_threshold": {
+          "const": 1e12
+        }
+      }
+    },
+    "AnalysisOptions": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "run_purpose",
+        "kinematics",
+        "element_formulation",
+        "shear_formulation",
+        "integration_rule",
+        "drilling",
+        "geometry_policy",
+        "solver",
+        "precision"
+      ],
+      "properties": {
+        "run_purpose": {
+          "enum": [
+            "production",
+            "verification"
+          ]
+        },
+        "kinematics": {
+          "const": "linear_small_rotation"
+        },
+        "element_formulation": {
+          "const": "q4_reissner_mindlin_flat_shell"
+        },
+        "shear_formulation": {
+          "enum": [
+            "qlll_assumed_strain",
+            "raw_q4_full"
+          ]
+        },
+        "integration_rule": {
+          "const": "gauss_2x2"
+        },
+        "drilling": {
+          "oneOf": [
+            {
+              "$ref": "#/$defs/DrillingOn"
+            },
+            {
+              "$ref": "#/$defs/DrillingOff"
+            }
+          ]
+        },
+        "geometry_policy": {
+          "const": "strict_flat_q4_v1"
+        },
+        "solver": {
+          "$ref": "#/$defs/SolverOptions"
+        },
+        "precision": {
+          "const": "float64"
+        }
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "run_purpose": {
+                "const": "production"
+              }
+            },
+            "required": [
+              "run_purpose"
+            ]
+          },
+          "then": {
+            "properties": {
+              "shear_formulation": {
+                "const": "qlll_assumed_strain"
+              },
+              "drilling": {
+                "$ref": "#/$defs/DrillingOn"
+              }
+            }
+          }
+        }
+      ]
+    },
+    "ModelInput": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "document_type",
+        "schema_version",
+        "model_id",
+        "title",
+        "units",
+        "nodes",
+        "materials",
+        "sections",
+        "elements",
+        "load_case",
+        "constraints",
+        "analysis_options"
+      ],
+      "properties": {
+        "document_type": {
+          "const": "model_input"
+        },
+        "schema_version": {
+          "$ref": "#/$defs/Version"
+        },
+        "model_id": {
+          "$ref": "#/$defs/Id"
+        },
+        "title": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 256
+        },
+        "units": {
+          "$ref": "#/$defs/Units"
+        },
+        "nodes": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/Node"
+          },
+          "minItems": 4
+        },
+        "materials": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/Material"
+          },
+          "minItems": 1
+        },
+        "sections": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/Section"
+          },
+          "minItems": 1
+        },
+        "elements": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/Element"
+          },
+          "minItems": 1
+        },
+        "load_case": {
+          "$ref": "#/$defs/LoadCase"
+        },
+        "constraints": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/Constraint"
+          }
+        },
+        "analysis_options": {
+          "$ref": "#/$defs/AnalysisOptions"
+        }
+      }
+    },
+    "DiagnosticLocation": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "entity_type",
+        "entity_id",
+        "json_path"
+      ],
+      "properties": {
+        "entity_type": {
+          "enum": [
+            "document",
+            "node",
+            "material",
+            "section",
+            "element",
+            "load",
+            "constraint",
+            "analysis_options",
+            "solver",
+            "postprocess"
+          ]
+        },
+        "entity_id": {
+          "oneOf": [
+            {
+              "$ref": "#/$defs/Id"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "json_path": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    },
+    "DiagnosticLooseValue": {
+      "type": [
+        "number",
+        "string",
+        "boolean",
+        "array",
+        "null"
+      ]
+    },
+    "Diagnostic": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "code",
+        "severity",
+        "message",
+        "location",
+        "observed",
+        "threshold",
+        "unit",
+        "suggested_action"
+      ],
+      "properties": {
+        "code": {
+          "type": "string",
+          "pattern": "^SHELL-[A-Z]+-[EWI][0-9]{3}$"
+        },
+        "severity": {
+          "enum": [
+            "error",
+            "warning",
+            "info"
+          ]
+        },
+        "message": {
+          "type": "string",
+          "minLength": 1
+        },
+        "location": {
+          "$ref": "#/$defs/DiagnosticLocation"
+        },
+        "observed": {
+          "$ref": "#/$defs/DiagnosticLooseValue"
+        },
+        "threshold": {
+          "$ref": "#/$defs/DiagnosticLooseValue"
+        },
+        "unit": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "suggested_action": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    },
+    "ResultSource": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "model_id",
+        "load_case_id",
+        "model_sha256",
+        "core_version"
+      ],
+      "properties": {
+        "model_id": {
+          "$ref": "#/$defs/Id"
+        },
+        "load_case_id": {
+          "$ref": "#/$defs/Id"
+        },
+        "model_sha256": {
+          "type": "string",
+          "pattern": "^[a-f0-9]{64}$"
+        },
+        "core_version": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 64
+        }
+      }
+    },
+    "NodalDisplacement": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "node_id",
+        "translation_global",
+        "rotation_global"
+      ],
+      "properties": {
+        "node_id": {
+          "$ref": "#/$defs/Id"
+        },
+        "translation_global": {
+          "$ref": "#/$defs/Vector3"
+        },
+        "rotation_global": {
+          "$ref": "#/$defs/Vector3"
+        }
+      }
+    },
+    "NodalReaction": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "node_id",
+        "force_global",
+        "moment_global"
+      ],
+      "properties": {
+        "node_id": {
+          "$ref": "#/$defs/Id"
+        },
+        "force_global": {
+          "$ref": "#/$defs/Vector3"
+        },
+        "moment_global": {
+          "$ref": "#/$defs/Vector3"
+        }
+      }
+    },
+    "ResidualReport": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "scaled_relative_backward_error",
+        "force_equilibrium_relative_error",
+        "moment_equilibrium_relative_error",
+        "condition_estimate"
+      ],
+      "properties": {
+        "scaled_relative_backward_error": {
+          "$ref": "#/$defs/NonNegativeNumber"
+        },
+        "force_equilibrium_relative_error": {
+          "$ref": "#/$defs/NonNegativeNumber"
+        },
+        "moment_equilibrium_relative_error": {
+          "$ref": "#/$defs/NonNegativeNumber"
+        },
+        "condition_estimate": {
+          "oneOf": [
+            {
+              "$ref": "#/$defs/PositiveNumber"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      }
+    },
+    "SolveResult": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "solver_status",
+        "method",
+        "scaling",
+        "precision",
+        "dof_order_global",
+        "displacements",
+        "reactions",
+        "residual"
+      ],
+      "properties": {
+        "solver_status": {
+          "const": "succeeded"
+        },
+        "method": {
+          "const": "symmetric_direct"
+        },
+        "scaling": {
+          "const": "characteristic_length"
+        },
+        "precision": {
+          "const": "float64"
+        },
+        "dof_order_global": {
+          "const": [
+            "UX",
+            "UY",
+            "UZ",
+            "RX",
+            "RY",
+            "RZ"
+          ]
+        },
+        "displacements": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/NodalDisplacement"
+          },
+          "minItems": 1
+        },
+        "reactions": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/NodalReaction"
+          }
+        },
+        "residual": {
+          "$ref": "#/$defs/ResidualReport"
+        }
+      }
+    },
+    "GaussPointResult": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "point_id",
+        "natural_coordinates",
+        "local_coordinates",
+        "weight",
+        "det_jacobian",
+        "membrane_strain",
+        "curvature",
+        "assumed_shear_strain",
+        "membrane_resultant",
+        "bending_resultant",
+        "shear_resultant",
+        "stress_top",
+        "stress_bottom"
+      ],
+      "properties": {
+        "point_id": {
+          "enum": [
+            "G1",
+            "G2",
+            "G3",
+            "G4"
+          ]
+        },
+        "natural_coordinates": {
+          "$ref": "#/$defs/Vector2"
+        },
+        "local_coordinates": {
+          "$ref": "#/$defs/Vector2"
+        },
+        "weight": {
+          "$ref": "#/$defs/PositiveNumber"
+        },
+        "det_jacobian": {
+          "$ref": "#/$defs/PositiveNumber"
+        },
+        "membrane_strain": {
+          "$ref": "#/$defs/Vector3"
+        },
+        "curvature": {
+          "$ref": "#/$defs/Vector3"
+        },
+        "assumed_shear_strain": {
+          "$ref": "#/$defs/Vector2"
+        },
+        "membrane_resultant": {
+          "$ref": "#/$defs/Vector3"
+        },
+        "bending_resultant": {
+          "$ref": "#/$defs/Vector3"
+        },
+        "shear_resultant": {
+          "$ref": "#/$defs/Vector2"
+        },
+        "stress_top": {
+          "$ref": "#/$defs/Vector3"
+        },
+        "stress_bottom": {
+          "$ref": "#/$defs/Vector3"
+        }
+      }
+    },
+    "ElementEnergy": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "membrane",
+        "bending",
+        "shear",
+        "drilling",
+        "total"
+      ],
+      "properties": {
+        "membrane": {
+          "$ref": "#/$defs/FiniteNumber"
+        },
+        "bending": {
+          "$ref": "#/$defs/FiniteNumber"
+        },
+        "shear": {
+          "$ref": "#/$defs/FiniteNumber"
+        },
+        "drilling": {
+          "$ref": "#/$defs/FiniteNumber"
+        },
+        "total": {
+          "$ref": "#/$defs/FiniteNumber"
+        }
+      }
+    },
+    "ElementResult": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "element_id",
+        "coordinate_system",
+        "local_basis",
+        "local_dofs",
+        "gauss_points",
+        "energy"
+      ],
+      "properties": {
+        "element_id": {
+          "$ref": "#/$defs/Id"
+        },
+        "coordinate_system": {
+          "const": "element_local"
+        },
+        "local_basis": {
+          "$ref": "#/$defs/Matrix3"
+        },
+        "local_dofs": {
+          "$ref": "#/$defs/Vector20"
+        },
+        "gauss_points": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/GaussPointResult"
+          },
+          "minItems": 4,
+          "maxItems": 4
+        },
+        "energy": {
+          "$ref": "#/$defs/ElementEnergy"
+        }
+      }
+    },
+    "BalanceReport": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "moment_reference_point_global",
+        "applied_force_global",
+        "applied_moment_global",
+        "reaction_force_global",
+        "reaction_moment_global",
+        "force_relative_error",
+        "moment_relative_error",
+        "total_strain_energy",
+        "external_work_u_dot_f",
+        "energy_identity_relative_error"
+      ],
+      "properties": {
+        "moment_reference_point_global": {
+          "$ref": "#/$defs/Vector3"
+        },
+        "applied_force_global": {
+          "$ref": "#/$defs/Vector3"
+        },
+        "applied_moment_global": {
+          "$ref": "#/$defs/Vector3"
+        },
+        "reaction_force_global": {
+          "$ref": "#/$defs/Vector3"
+        },
+        "reaction_moment_global": {
+          "$ref": "#/$defs/Vector3"
+        },
+        "force_relative_error": {
+          "$ref": "#/$defs/NonNegativeNumber"
+        },
+        "moment_relative_error": {
+          "$ref": "#/$defs/NonNegativeNumber"
+        },
+        "total_strain_energy": {
+          "$ref": "#/$defs/FiniteNumber"
+        },
+        "external_work_u_dot_f": {
+          "$ref": "#/$defs/FiniteNumber"
+        },
+        "energy_identity_relative_error": {
+          "$ref": "#/$defs/NonNegativeNumber"
+        }
+      }
+    },
+    "DerivedNodalResult": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "node_id",
+        "is_derived",
+        "method",
+        "source_element_ids",
+        "reference_basis",
+        "membrane_resultant",
+        "bending_resultant",
+        "shear_resultant",
+        "singularity_warning"
+      ],
+      "properties": {
+        "node_id": {
+          "$ref": "#/$defs/Id"
+        },
+        "is_derived": {
+          "const": true
+        },
+        "method": {
+          "const": "gauss_extrapolation_area_weighted_average"
+        },
+        "source_element_ids": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/Id"
+          },
+          "minItems": 1,
+          "uniqueItems": true
+        },
+        "reference_basis": {
+          "$ref": "#/$defs/Matrix3"
+        },
+        "membrane_resultant": {
+          "$ref": "#/$defs/Vector3"
+        },
+        "bending_resultant": {
+          "$ref": "#/$defs/Vector3"
+        },
+        "shear_resultant": {
+          "$ref": "#/$defs/Vector2"
+        },
+        "singularity_warning": {
+          "type": "boolean"
+        }
+      }
+    },
+    "PostResult": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "raw_element_results_ref",
+        "derived_nodal_results"
+      ],
+      "properties": {
+        "raw_element_results_ref": {
+          "const": "element_results"
+        },
+        "derived_nodal_results": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/DerivedNodalResult"
+          }
+        }
+      }
+    },
+    "AnalysisResult": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "document_type",
+        "schema_version",
+        "status",
+        "source",
+        "units",
+        "diagnostics"
+      ],
+      "properties": {
+        "document_type": {
+          "const": "analysis_result"
+        },
+        "schema_version": {
+          "$ref": "#/$defs/Version"
+        },
+        "status": {
+          "enum": [
+            "succeeded",
+            "failed"
+          ]
+        },
+        "source": {
+          "$ref": "#/$defs/ResultSource"
+        },
+        "units": {
+          "$ref": "#/$defs/Units"
+        },
+        "diagnostics": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/Diagnostic"
+          }
+        },
+        "solve_result": {
+          "$ref": "#/$defs/SolveResult"
+        },
+        "element_results": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/ElementResult"
+          },
+          "minItems": 1
+        },
+        "balance": {
+          "$ref": "#/$defs/BalanceReport"
+        },
+        "post_result": {
+          "$ref": "#/$defs/PostResult"
+        }
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "status": {
+                "const": "succeeded"
+              }
+            },
+            "required": [
+              "status"
+            ]
+          },
+          "then": {
+            "required": [
+              "solve_result",
+              "element_results",
+              "balance",
+              "post_result"
+            ]
+          },
+          "else": {
+            "properties": {
+              "solve_result": false,
+              "element_results": false,
+              "balance": false,
+              "post_result": false
+            }
+          }
+        }
+      ]
+    }
+  }
+}

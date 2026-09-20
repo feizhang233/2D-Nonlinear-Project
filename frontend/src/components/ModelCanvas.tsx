@@ -265,12 +265,6 @@ export function ModelCanvas({
     ...ys,
     ...Array.from(positions.values()).map((point) => point.y),
   ]
-  const minX = Math.min(...allX)
-  const maxX = Math.max(...allX)
-  const minY = Math.min(...allY)
-  const maxY = Math.max(...allY)
-  const spanX = Math.max(maxX - minX, 1e-6)
-  const spanY = Math.max(maxY - minY, 1e-6)
   const fitted = fitCamera(
     allX.map((x, index) => ({ x, y: allY[index] })),
     viewport,

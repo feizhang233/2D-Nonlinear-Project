@@ -1,3 +1,6 @@
+import { SpatialWorkspaces } from './components/SpatialWorkspaces'
+import { useSpatialNavigation } from './hooks/useSpatialNavigation'
+import { spatialWorkspace } from './workspaces'
 import { SaveProjectDialog } from './components/SaveProjectDialog'
 import { ModelTools } from './components/ModelTools'
 import { deleteSelection } from './modelOperations'
@@ -72,7 +75,7 @@ import { ModelNavigator } from './components/ModelNavigator'
 import { PropertyPanel } from './components/PropertyPanel'
 import { ResultsWorkspace } from './components/ResultsWorkspace'
 import { UnsavedChangesDialog } from './components/UnsavedChangesDialog'
-import { type WorkflowStep } from './components/WorkflowBar'
+import type { WorkflowStep } from './domain'
 import { WorkspaceSwitcher } from './components/WorkspaceSwitcher'
 import type {
   AnalysisRestart,
@@ -153,6 +156,8 @@ const isRestartBundle = (value: unknown): value is RestartBundle => {
 }
 
 export default function App() {
+  const spatial = useSpatialNavigation()
+  const spatialActive = spatial.active
   const [state, dispatch] = useReducer(
     studioReducer,
     undefined,
@@ -792,6 +797,7 @@ export default function App() {
 
   useEffect(() => {
     const onKeyDown = (event: KeyboardEvent) => {
+      if (spatialActive) return
       if (event.defaultPrevented || event.isComposing || event.repeat) return
       if (
         analysisSettingsOpen ||
@@ -839,6 +845,7 @@ export default function App() {
     window.addEventListener('keydown', onKeyDown)
     return () => window.removeEventListener('keydown', onKeyDown)
   }, [
+    spatialActive,
     analysisSettingsOpen,
     hasDraft,
     applyDraft,
@@ -1093,11 +1100,12 @@ export default function App() {
   }
 
   return (
+    <>
     <Box
       sx={{
         height: '100dvh',
         minWidth: 1120,
-        display: 'flex',
+        display: spatialActive ? 'none' : 'flex',
         flexDirection: 'column',
         bgcolor: 'background.default',
       }}
@@ -1264,7 +1272,7 @@ export default function App() {
                 : 'Guest · sign in'
             }
           >
-            <IconButton
+            <span><IconButton
               disabled={identity.loading}
               aria-label={
                 identity.currentUser
@@ -1282,7 +1290,7 @@ export default function App() {
               ) : (
                 <AccountCircleRoundedIcon />
               )}
-            </IconButton>
+            </IconButton></span>
           </Tooltip>
           <Menu
             anchorEl={accountAnchor}
@@ -1380,6 +1388,14 @@ export default function App() {
             draftFamilies={draftFamilies}
             resultFamilies={resultFamilies}
             onChange={openWorkspace}
+            onSpatial={() => requestNavigation('3D workspace', () => {
+              spatial.open('frame3d'); setGuideOpen(false)
+            })}
+            onDimensionChange={dimension => {
+              if (dimension === '3d') requestNavigation('3D workspace', () => {
+                spatial.open(spatialWorkspace(state.activeFamily)); setGuideOpen(false)
+              })
+            }}
           />
           <Divider orientation="vertical" flexItem sx={{ mx: 2, my: 1 }} />
           <Typography
@@ -1658,7 +1674,7 @@ export default function App() {
             severity={toast.severity}
             variant="filled"
             onClose={() => setToast(null)}
-            sx={{ borderRadius: 3 }}
+            sx={{ borderRadius: 1 }}
           >
             {toast.message}
           </Alert>
@@ -1789,5 +1805,13 @@ export default function App() {
         />
       )}
     </Box>
+    <SpatialWorkspaces active={spatial.active} visited={spatial.visited} onOpen={spatial.open}
+      draftFamilies={draftFamilies} resultFamilies={resultFamilies}
+      on2D={family => {
+        spatial.close()
+        if (family !== state.activeFamily) openWorkspace(family)
+        document.title = `${MODEL_FAMILIES[family].label} workspace — Nonlinear Studio`
+      }} />
+    </>
   )
 }

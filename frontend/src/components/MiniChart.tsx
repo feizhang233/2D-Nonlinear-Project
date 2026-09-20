@@ -59,7 +59,7 @@ export function MiniChart({ title, xLabel, yLabel, series, logY = false, emptyTe
         <Stack direction="row" spacing={1}>
           {series.map((item) => (
             <Stack direction="row" spacing={0.5} sx={{ alignItems: 'center' }} key={item.name}>
-              <Box sx={{ width: 12, height: 3, borderRadius: 2, bgcolor: item.color }} />
+              <Box sx={{ width: 12, height: 3, borderRadius: 1, bgcolor: item.color }} />
               <Typography variant="caption" color="text.secondary">{item.name}</Typography>
             </Stack>
           ))}
@@ -78,7 +78,7 @@ export function MiniChart({ title, xLabel, yLabel, series, logY = false, emptyTe
           <text transform="translate(10 70) rotate(-90)" textAnchor="middle" fontSize="9" fill={axis}>{yLabel}</text>
         </svg>
       ) : (
-        <Box sx={{ height: 150, display: 'grid', placeItems: 'center', bgcolor: 'background.containerLow', borderRadius: 2 }}>
+        <Box sx={{ height: 150, display: 'grid', placeItems: 'center', bgcolor: 'background.containerLow', borderRadius: 1 }}>
           <Typography variant="caption" color="text.secondary">{emptyText}</Typography>
         </Box>
       )}

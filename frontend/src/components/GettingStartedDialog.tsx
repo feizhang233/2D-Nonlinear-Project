@@ -15,7 +15,7 @@ import Typography from '@mui/material/Typography'
 import { useState } from 'react'
 import type { ModelFamily } from '../domain'
 import { MODEL_FAMILIES, MODEL_FAMILY_ORDER } from '../modelFamilies'
-import type { WorkflowStep } from './WorkflowBar'
+import type { WorkflowStep } from '../domain'
 
 interface GettingStartedDialogProps {
   open: boolean

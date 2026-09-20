@@ -32,6 +32,33 @@ Application shell
     └── Expandable Results & tables evidence panel
 ```
 
+## Dimension navigation and solid workflow
+
+- WorkspaceSwitcher owns the 2D/3D control, immediately left of Frame. In 3D, Frame,
+  Continuum, Plate and Shell route to their independent linear-static documents.
+  Shell is enabled with an explicit planar-facet/small-motion scope.
+- Changing dimension selects the independent document in the same family (for example,
+  Continuum 3D → 2D Continuum). Existing 2D draft navigation uses
+  the shared unsaved-changes guard. Each mounted spatial workspace retains document,
+  results, camera and partial property text across navigation.
+- Solid numeric drafts use ScientificField. While a draft exists, Run, Save, Results
+  and other property categories are unavailable; Apply validates the active form,
+  Cancel restores committed values. Closing Properties preserves its fields.
+- Solid model changes invalidate numerical evidence and autosave locally; Undo/Redo
+  recover complete models. Mesh replacement explicitly clears topology-bound loads
+  and supports, and has Undo. JSON import passes the backend schema before replacement;
+  an error or cancelled/stale import never replaces the current document.
+- Solid solves use one pending controller and revision guard. Cancellation or leaving
+  the workspace aborts the browser wait; late results cannot appear. The UI explains
+  that server factorization may still finish. Errors remain visible and Run allows retry.
+- Results expose numerical checks, raw integration-point stresses, displacement and
+  reaction tables; stress contours are labelled element means. Geometry is read-only
+  in Results. Scope and units follow CONTINUUM3D_INTEGRATION.md and the API capability
+  contract, not inferred compatibility with nonlinear frame/plate/shell features.
+- Canonical owners remain MUI TextField/select, ScientificField, spatial DataTable,
+  MUI Alert/Snackbar/Dialog, and theme.ts scrollbars. DataTable owns 20-row pagination
+  and accessible selection; canvas orbit has keyboard controls and node/element tables.
+
 ## Workspace and navigation contract
 
 - Frame, Continuum, Plate, and Shell are independent workspaces. Each preserves its own committed model, staged model, selection, form state, analysis options, result, and result view.
@@ -244,3 +271,100 @@ repeated permanent toolbars or information cards.
   conservative response evidence absent from the current structural adapters, so the UI disables
   it and the API rejects enabled requests before queueing. Direct-core conservative callers retain
   the original orthogonality algorithm.
+
+## Linear space-frame document variant
+
+- `WorkspaceSwitcher` owns Frame in 3D mode and the shared dimension control.
+  `spatial/SpatialWorkbench.tsx` owns its independent typed document and result state;
+  `nonlinear_api/frame3d.py` owns its bounded API and standard host error envelope.
+- MUI TextField/Select and `ScientificField` own all spatial numeric and authored-select
+  behavior. `NumericForm` is the spatial complete-assignment adapter, with field errors,
+  first-error focus and atomic Apply. Material assignments preserve section properties
+  and section assignments preserve material, orientation, theory and releases.
+- `SpatialNavigator` owns the 68 px category rail and collapsible 220 px object explorer.
+  Browsing a geometry category does not start creation. New node/member clears selection;
+  assignment rows select their object and open the matching Properties editor, including
+  the compact-screen drawer. Rail and row selection are exposed with `aria-pressed`.
+  Per-category search survives switching categories and collapsing; clearing restores
+  input focus. Empty and no-match states provide a recovery action or next step.
+  Lists reveal 60 rows at a time and also retain selected matching rows beyond that page.
+  `DataTable`
+  uses 20-row paging. Filters are transient document state, not URL state. Selection is
+  shared by both views and tables. The host limits the dense core to 600 DOFs/400 members,
+  or a smaller configured DOF budget, with a bounded result sampling budget.
+- `ConfirmProvider` uses an owned MUI dialog for replacing/deleting the spatial document;
+  Cancel gets initial focus and Undo restores edits. It never calls native dialogs.
+- The shared API transport owns credentials, timeout and errors. Aborting a request or
+  changing a model prevents late responses from becoming current. Cancelling the client
+  does not stop an already executing dense factorization; persistent copy states this.
+- Browser storage failures remain visible. JSON import validates before replacement;
+  export saves the strict 3D solver request. Frame 3D does not claim nonlinear archive,
+  account-history, restart or nonlinear-control compatibility.
+- The reference numerical scope remains linear elastic small-displacement space beams.
+  The UI does not offer Newton, arc length, plasticity, buckling or dynamics for Frame 3D.
+
+## Shared border ownership
+
+`theme.ts` owns neutral border color, control radius, and normal/focus widths across
+2D and 3D. MUI primitives inherit those tokens; spatial CSS consumes the same theme
+variables. Docked panels are square; bounded controls and menus use the shared radius.
+Focus, selection and error boundaries remain distinct states with consistent rules,
+not screen-specific styles. Verify both workspace dimensions and an open select menu
+after border-token changes.
+
+
+## Spatial plate workflow and ownership
+
+Source: PLATE3D_INTEGRATION.md, nonlinear_core/plate3d.py and the supplied Plate
+A00–A05 mathematical conventions. Plate is an independent coplanar bending document.
+The existing spatial exception to 2D navigation guards applies: dimension/family
+switching preserves its mounted draft and does not convert documents. Plate → 2D
+opens the independent 2D Plate document. Uncommitted text is protected on page unload.
+
+| Capability | Canonical owner | Plate variant | Evidence |
+| --- | --- | --- | --- |
+| Form | ScientificField + backend PlateModel | Finite staged geometry/material/support/load form; header Apply; Cancel restores committed values | PlateWorkbench.test.tsx |
+| Select/Listbox | MUI TextField select / Menu | Authored target, support, load and result choices | Browser keyboard/popup |
+| Table Selection | spatial/DataTable | 20-row paged node/element selection, raw result evidence | PlateWorkbench.test.tsx |
+| Scrollbar | theme.ts CssBaseline | Properties/result internal scrollers; document horizontal floor 1120 px | Browser |
+| Toast | MUI Snackbar / Alert | Success acknowledgement; persistent input/solver error | Component/browser |
+| CRUD | PlateWorkbench + api.ts + browserStorage | Local model JSON, bounded Undo/Redo; server validation before import commit | Component/API |
+| Direct manipulation | spatial/SurfaceCanvas | Shared solid/plate camera; table-backed picks; read-only result geometry | Browser + solid regression |
+
+Apply commits a complete revision and invalidates results. Regenerating a rectangle
+clears topology-bound loads/supports and retains material; Undo restores the entire
+previous model. Applying supports replaces constraints on the chosen edge/node;
+all-edge hard support deduplicates corner DOFs. Pressure is positive along ex × ey;
+nodal generalized moments are conjugate to director tilts, not same-axis rotations.
+The backend preserves original K/F, supports nonzero prescribed values, and never
+regularizes missing physical modes with arbitrary diagonal stiffness.
+
+Import/solve each retain a controller and revision. Duplicate submissions are
+blocked; changing family or cancelling suppresses late completion. A cancelled
+browser wait does not terminate server factorization. Failures preserve the
+committed document and allow retry. JSON export contains models only; results are
+session-local. No account storage contract changes are introduced.
+
+## Spatial Shell capability delta
+
+Source: SHELL3D_INTEGRATION.md, nonlinear_core/shell3d.py and the supplied Shell L
+conventions. N/I reference chapters do not enable nonlinear or instability analysis.
+
+| Capability | Canonical owner | Shell variant | Evidence |
+| --- | --- | --- | --- |
+| Form | ScientificField + ShellModel | Staged finite values; even fold mesh divisions; six global DOFs; explicit drilling parameter | ShellWorkbench/model tests |
+| Table | spatial/DataTable | 20-row paging; keyboard node/facet selection; raw Gauss evidence | Component and browser |
+| Navigation | WorkspaceSwitcher + App | Four active spatial documents; mounted draft/camera state; Shell → 2D Shell | Component and browser |
+| CRUD | spatial/useSpatialDocument + api.ts | 50-change history; local/portable committed JSON; atomic host-validated import | Component/API tests |
+| Async | useSpatialDocument | Duplicate prevention, cancellation, stale suppression, error/retry, selection locks | Component/API tests |
+| Canvas | spatial/SurfaceCanvas + ShellCanvas | Six global DOFs, facet-local N/M/Q, normals and nodal couples; keyboard orbit | Browser/API tests |
+| Result | ShellWorkbench | Seven evidence views; unsmoothed integration points; energy including drilling | Actual solve tests |
+
+Global-X target names describe their actual coordinate system. Boundary nodes are
+computed from exposed topological edges, including boundaries of imported meshes.
+Pinned clamps all translations; drilling may require additional physically
+appropriate restraints depending on geometry. Prescribed single DOF retains other
+constraints. Other support presets replace all constraints on their target.
+Geometry replacement and support/load clear operations are recoverable by Undo.
+No fake Save/Run success is shown on storage/API failure. Cancel only stops waiting
+for a result and explicitly says the server may finish processing.

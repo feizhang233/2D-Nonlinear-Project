@@ -1,10 +1,16 @@
 # Mathematical core and frontend interface alignment
 
-Audit date: 2026-09-15.
+Original audit: 2026-09-15. Whole-project follow-up: 2026-09-20.
+
+The [architecture review](ARCHITECTURE.md) extends this alignment to all four
+spatial workspaces. Python/OpenAPI now generates frontend wire contracts, spatial
+capabilities and error envelopes are explicit, shared execution/document lifecycle
+code has neutral ownership, and CI rejects contract drift. The 2D nonlinear and
+reference-operation conventions below remain in force.
 
 ## Scope
 
-The four structural workspaces (Frame, Continuum, Plate, Shell) use the existing
+The four **2D nonlinear** structural workspaces (Frame, Continuum, Plate, Shell) use the existing
 `/api/v1/analyses` API. The four independent Step 2 reference cores expose 18 operations
 through `/api/v1/math-cores`. These remain separate workflows with their original
 numerical conventions and state ownership.

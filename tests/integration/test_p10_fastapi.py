@@ -44,6 +44,18 @@ def test_health_and_openapi_publish_only_the_planned_p10_paths():
     assert openapi.json() == checked_in
     assert set(openapi.json()["paths"]) == {
         "/health",
+        "/api/v1/3d/solve",
+        "/api/v1/3d/plots/{component}",
+        "/api/v1/3d/capabilities",
+        "/api/v1/continuum3d/solve",
+        "/api/v1/continuum3d/validate",
+        "/api/v1/continuum3d/capabilities",
+        "/api/v1/plate3d/solve",
+        "/api/v1/plate3d/validate",
+        "/api/v1/plate3d/capabilities",
+        "/api/v1/shell3d/capabilities",
+        "/api/v1/shell3d/validate",
+        "/api/v1/shell3d/solve",
         "/api/v1/auth/session",
         "/api/v1/auth/register",
         "/api/v1/auth/login",

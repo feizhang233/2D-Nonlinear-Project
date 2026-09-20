@@ -34,7 +34,7 @@ const analysisOptions = (overrides: AnalysisOverrides = {}): AnalysisOptions => 
   }
 }
 
-export const shallowArchModel: ModelInput = {
+const shallowArchModel: ModelInput = {
   schema_version: '1.0.0', model_id: 'p11-shallow-arch', name: 'Shallow arch limit-point demo', model_family: 'frame',
   units: { length: 'm', force: 'N', stress: 'Pa', angle: 'rad', system_label: 'SI' },
   nodes: [
@@ -56,7 +56,7 @@ export const shallowArchModel: ModelInput = {
   extensions: { purpose: 'Frame nonlinear workbench acceptance', expected_first_limit_load_factor: 0.296 },
 }
 
-export const continuumModel: ModelInput = {
+const continuumModel: ModelInput = {
   schema_version: '1.0.0', model_id: 'p12-q4-plane-strain-tension', name: 'Q4 plane-strain tension', model_family: 'continuum',
   units: { length: 'm', force: 'N', stress: 'Pa', angle: 'rad', system_label: 'SI' },
   nodes: [
@@ -85,7 +85,7 @@ export const continuumModel: ModelInput = {
   },
 }
 
-export const plateModel: ModelInput = {
+const plateModel: ModelInput = {
   schema_version: '1.0.0', model_id: 'p13-von-karman-mitc4-cantilever', name: 'von Kármán MITC4 plate cantilever', model_family: 'plate',
   units: { length: 'm', force: 'N', stress: 'Pa', angle: 'rad', system_label: 'SI' },
   nodes: [
@@ -119,7 +119,7 @@ export const plateModel: ModelInput = {
   extensions: { scope: 'von Karman moderate rotations; not arbitrary finite rotations', gmsh: { mesh_size: 0.25 } },
 }
 
-export const shellModel: ModelInput = {
+const shellModel: ModelInput = {
   schema_version: '1.0.0', model_id: 'p14-corotational-flat-shell-cantilever', name: 'Corotational Q4 flat-shell cantilever', model_family: 'shell',
   units: { length: 'm', force: 'N', stress: 'Pa', angle: 'rad', system_label: 'SI' },
   nodes: [
@@ -151,7 +151,7 @@ export const shellModel: ModelInput = {
   extensions: { scope: 'large rigid-body rotation with small local flat-shell strain', gmsh: { mesh_size: 0.25 } },
 }
 
-export const sampleModels: Record<ModelFamily, ModelInput> = {
+const sampleModels: Record<ModelFamily, ModelInput> = {
   frame: shallowArchModel,
   continuum: continuumModel,
   plate: plateModel,

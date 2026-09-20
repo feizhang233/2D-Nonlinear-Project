@@ -212,16 +212,6 @@ def _surface_boundary(model: SurfaceMeshRequest) -> list[tuple[str, np.ndarray]]
     return list(zip(ordered, points, strict=True))
 
 
-def _edge_distance(point: np.ndarray, start: np.ndarray, end: np.ndarray) -> tuple[float, float]:
-    vector = end - start
-    denominator = float(vector @ vector)
-    if denominator <= 0.0:
-        return float("inf"), 0.0
-    parameter = float((point - start) @ vector / denominator)
-    projection = start + min(1.0, max(0.0, parameter)) * vector
-    return float(np.linalg.norm(point - projection)), parameter
-
-
 def _generate_surface_mesh_serialized(request: SurfaceMeshRequest) -> SurfaceMeshResponse:
     """Generate one first-order all-Q4 mesh on the dedicated Gmsh thread."""
 

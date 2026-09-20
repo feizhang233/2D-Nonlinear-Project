@@ -12,6 +12,7 @@ dependencies = [
     "fastapi>=0.115,<1",
     "gmsh>=4.15,<4.16",
     "numpy>=1.26,<3",
+    "matplotlib>=3.9,<4",
     "pydantic>=2.9,<3",
     "scipy>=1.13,<2",
     "uvicorn>=0.30,<1",
@@ -45,6 +46,11 @@ where = ["src"]
 
 [tool.setuptools.package-data]
 "reused_cores.frame2d_linear" = ["PROVENANCE.md"]
+"reused_cores.frame3d_linear" = ["PROVENANCE.md", "SOURCE_MANIFEST.json"]
+"reused_cores.plate3d_linear" = ["PROVENANCE.md", "SOURCE_MANIFEST.json"]
+"reused_cores.continuum3d_linear" = ["PROVENANCE.md", "SOURCE_MANIFEST.json"]
+
+"reused_cores.shell3d_linear" = ["PROVENANCE.md", "SOURCE_MANIFEST.json", "data/*.json"]
 
 [tool.pytest.ini_options]
 addopts = "-q --strict-markers"
@@ -58,3 +64,12 @@ src = ["src", "tests"]
 
 [tool.ruff.lint]
 select = ["E", "F", "I", "UP", "B"]
+
+[tool.ruff.lint.per-file-ignores]
+# Byte-identical teaching kernel; SOURCE_MANIFEST.json pins its provenance.
+"src/reused_cores/continuum3d_linear/reference.py" = ["E501", "E701", "E702", "I001"]
+
+"src/reused_cores/plate3d_linear/reference.py" = ["E501", "E701", "E702", "E741", "I001", "B905"]
+
+# Namespaced frozen shell core; source and packaged hashes are pinned.
+"src/reused_cores/shell3d_linear/*.py" = ["E501", "I001"]

@@ -1,46 +1,15 @@
+import type { ApiSchemas } from './generated/api'
 import type { JsonValue } from './domain'
 import { hasNonFiniteNumber } from './inputValidation'
 export type { JsonValue } from './domain'
 
-export interface MathCoreOperationSpec {
-  name: string
-  summary: string
-  required_parameters: string[]
-  optional_parameters: string[]
-  example_parameters: Record<string, JsonValue>
-}
+export type MathCoreOperationSpec = Required<ApiSchemas['MathCoreOperationSpec']>
 
-export interface MathCoreMetadata {
-  core_id: string
-  title: string
-  version: string
-  source_path: string
-  scope: string
-  residual_convention: string
-  state_protocol: string
-  verification_ids: string[]
-  verification_meaning: string
-  limitations: string[]
-  operations: MathCoreOperationSpec[]
-}
+export type MathCoreMetadata = Omit<ApiSchemas['MathCoreMetadata'], 'operations'> & { operations: MathCoreOperationSpec[] }
 
-export interface MathCoreCatalog {
-  schema_version: '1.0.0'
-  adapter_version: string
-  limits: {
-    max_parameter_values: number
-    max_parameter_depth: number
-  }
-  cores: MathCoreMetadata[]
-}
+export type MathCoreCatalog = Omit<Required<ApiSchemas['MathCoreCatalog']>, 'cores' | 'limits'> & { cores: MathCoreMetadata[]; limits: Required<ApiSchemas['MathCoreLimits']> }
 
-export interface MathCoreRequest {
-  schema_version?: '1.0.0'
-  request_id?: string | null
-  core: string
-  operation: string
-  parameters?: Record<string, JsonValue>
-}
+export type MathCoreRequest = ApiSchemas['MathCoreRequest']
 
 /** Validate against the server catalog, including its published resource limits. */
 export function validateMathCoreParameters(
@@ -66,13 +35,4 @@ export function validateMathCoreParameters(
   return null
 }
 
-export interface MathCoreResponse {
-  schema_version: '1.0.0'
-  request_id: string | null
-  core: string
-  operation: string
-  status: 'ok' | 'error'
-  data: JsonValue | null
-  diagnostics: Record<string, JsonValue>
-  error: { code: string; message: string; details: Record<string, JsonValue> } | null
-}
+export type MathCoreResponse = Omit<Required<ApiSchemas['MathCoreResponse']>, 'error'> & { error: Required<ApiSchemas['MathCoreExecutionError']> | null }
