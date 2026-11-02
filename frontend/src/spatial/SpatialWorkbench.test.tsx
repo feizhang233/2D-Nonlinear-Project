@@ -23,12 +23,13 @@ beforeEach(() => {
   })
 })
 afterEach(() => { cleanup(); vi.restoreAllMocks(); vi.unstubAllGlobals() })
-function openSpatial() {
+async function openSpatial() {
   render(<ThemeProvider theme={studioTheme}><App /></ThemeProvider>)
   fireEvent.click(screen.getByRole('button', { name: '3D' }))
+  await screen.findByLabelText('3D model name')
 }
-it('retains independent workspaces, title, property draft and local model across switches', () => {
-  openSpatial()
+it('retains independent workspaces, title, property draft and local model across switches', async () => {
+  await openSpatial()
   fireEvent.change(screen.getByLabelText('3D model name'), { target: { value: 'My space frame' } })
   fireEvent.blur(screen.getByLabelText('3D model name'))
   fireEvent.click(screen.getByRole('button', { name: 'Materials' }))
@@ -41,8 +42,8 @@ it('retains independent workspaces, title, property draft and local model across
   expect(screen.getByLabelText('E (GPa)')).toHaveProperty('value', '2e-')
   expect(document.title).toBe('Frame 3D workspace — Nonlinear Studio')
 })
-it('rejects invalid material assignment and applies only material values with undo', () => {
-  openSpatial()
+it('rejects invalid material assignment and applies only material values with undo', async () => {
+  await openSpatial()
   fireEvent.click(screen.getByRole('button', { name: 'Materials' }))
   fireEvent.change(screen.getByLabelText('E (GPa)'), { target: { value: '-1' } })
   fireEvent.click(screen.getByRole('button', { name: 'Apply material to all elements' }))
@@ -55,7 +56,7 @@ it('rejects invalid material assignment and applies only material values with un
   expect(JSON.parse(values.get(key)!).elements[0].E).toBe(210e9)
 })
 it('solves through the host route, shows six result components and invalidates results on edit', async () => {
-  openSpatial()
+  await openSpatial()
   fireEvent.click(screen.getByRole('button', { name: 'Run analysis' }))
   await screen.findByText('Checks passed')
   const call = vi.mocked(fetch).mock.calls.find(([url]) => String(url).includes('/3d/solve'))!
@@ -73,7 +74,7 @@ it('solves through the host route, shows six result components and invalidates r
   expect(screen.queryByText('Checks passed')).toBeNull()
 })
 it('shows request failure and allows retry; cancellation prevents late results', async () => {
-  openSpatial()
+  await openSpatial()
   vi.mocked(fetch).mockResolvedValueOnce(Response.json({ error: { code: 'FRAME3D_INVALID_MODEL', message: 'Unrestrained mechanism' } }, { status: 422 }))
   fireEvent.click(screen.getByRole('button', { name: 'Run analysis' }))
   await screen.findByText('Unrestrained mechanism')

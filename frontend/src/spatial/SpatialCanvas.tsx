@@ -1,4 +1,4 @@
-import { useEffect, useId, useRef, useState } from 'react'
+import { forwardRef, useEffect, useId, useImperativeHandle, useRef, useState } from 'react'
 import { IconButton, Tooltip } from '@mui/material'
 import FitScreenIcon from '@mui/icons-material/FitScreen'
 import AddIcon from '@mui/icons-material/Add'
@@ -19,6 +19,13 @@ function bounds(model: Model3D): { center: Vec3; span: number } {
   const hi = [0, 1, 2].map(i => Math.max(...points.map(p => p[i])))
   return { center: lo.map((v, i) => (v + hi[i]) / 2) as Vec3, span: Math.max(3, Math.hypot(...lo.map((v, i) => hi[i] - v))) * 1.4 }
 }
+type CoordinateReadoutHandle = { update: (point: Vec3 | null) => void }
+// Coordinate tracking updates only this readout while the selection canvas stays idle.
+const CoordinateReadout = forwardRef<CoordinateReadoutHandle, { selectedCount: number }>(function CoordinateReadout({ selectedCount }, ref) {
+  const [point, setPoint] = useState<Vec3 | null>(null)
+  useImperativeHandle(ref, () => ({ update: setPoint }), [])
+  return <div className="canvas-coordinate-readout">{point ? point.map((v, i) => `${'XYZ'[i]} ${v.toFixed(3)}`).join('   ') : `${selectedCount} selected`} <span>m</span></div>
+})
 export function SpatialCanvas({ model, selection, tool, plane, offset, grid, snap, spatial, chain, fitKey, result, display, deformationScale, labels, onSelect, onPoint, onEnd, onMessage }: {
   model: Model3D; selection: Selection; tool: Tool; plane: Plane; offset: number; grid: number; snap: boolean; spatial: boolean; chain: number | null; fitKey: number
   result: Result3D | null; display: Display; deformationScale: number; labels: boolean
@@ -30,6 +37,7 @@ export function SpatialCanvas({ model, selection, tool, plane, offset, grid, sna
   const [camera, setCamera] = useState({ azimuth: -.63, elevation: .55 })
   const [frame, setFrame] = useState(() => bounds(model)); const [zoom, setZoom] = useState(1); const [pan, setPan] = useState([0, 0])
   const [cursor, setCursor] = useState<Vec3 | null>(null)
+  const readout = useRef<CoordinateReadoutHandle>(null)
   const drag = useRef<{ x: number; y: number; lastX: number; lastY: number; moved: boolean; button: number; target: Element | null } | null>(null)
   const marker = useId().replace(/:/g, '')
   const axes = basis(camera, spatial ? undefined : plane); const center = project(frame.center, axes)
@@ -43,6 +51,7 @@ export function SpatialCanvas({ model, selection, tool, plane, offset, grid, sna
     observer.observe(ref.current); return () => observer.disconnect()
   }, [])
   const drawing = tool === 'node' || tool === 'member'
+  useEffect(() => { if (!drawing) setCursor(null) }, [drawing])
   const onPlane = (p: Vec3) => Math.abs(planeCoords(plane, p)[2] - offset) < 1e-7
   const pointFromEvent = (clientX: number, clientY: number): Vec3 | null => {
     const box = svgRef.current!.getBoundingClientRect(); const sx = clientX - box.left; const sy = clientY - box.top
@@ -89,7 +98,11 @@ export function SpatialCanvas({ model, selection, tool, plane, offset, grid, sna
             if (spatial && d.button === 0 && !e.shiftKey && !drawing) setCamera(c => ({ azimuth: c.azimuth + dx * .008, elevation: Math.max(-1.45, Math.min(1.45, c.elevation + dy * .008)) }))
             else setPan(p => [p[0] + dx, p[1] + dy])
             d.lastX = e.clientX; d.lastY = e.clientY
-          } else setCursor(pointFromEvent(e.clientX, e.clientY))
+          } else {
+            const point = pointFromEvent(e.clientX, e.clientY)
+            readout.current?.update(point)
+            if (drawing) setCursor(point)
+          }
         }}
         onPointerUp={e => {
           const d = drag.current; drag.current = null
@@ -99,7 +112,7 @@ export function SpatialCanvas({ model, selection, tool, plane, offset, grid, sna
           if (target?.hasAttribute('data-node')) onSelect('nodes', Number(target.getAttribute('data-node')), e.shiftKey)
           else if (target?.hasAttribute('data-member')) onSelect('elements', Number(target.getAttribute('data-member')), e.shiftKey)
           else onSelect('nodes', null, false)
-        }} onPointerCancel={() => { drag.current = null }} onPointerLeave={() => setCursor(null)} onWheel={e => setZoom(z => Math.max(.15, Math.min(12, z * Math.exp(-e.deltaY * .001))))}>
+        }} onPointerCancel={() => { drag.current = null }} onPointerLeave={() => { setCursor(null); readout.current?.update(null) }} onWheel={e => setZoom(z => Math.max(.15, Math.min(12, z * Math.exp(-e.deltaY * .001))))}>
         <defs><marker id={`${marker}-load`} markerWidth="7" markerHeight="7" refX="6" refY="3.5" orient="auto"><path d="M0 0L7 3.5L0 7Z" className="load-fill" /></marker></defs>
         <g className="spatial-grid" pointerEvents="none">
           {Array.from({ length: Math.min(80, Math.ceil((ranges[0][1] - ranges[0][0]) / gridSpacing) + 1) }, (_, i) => { const a = ranges[0][0] + i * gridSpacing; return <path key={`a${i}`} d={path([planePoint(plane, a, ranges[1][0], offset), planePoint(plane, a, ranges[1][1], offset)])} className={Math.abs(a) < 1e-9 ? 'grid-origin' : ''} /> })}
@@ -143,7 +156,7 @@ export function SpatialCanvas({ model, selection, tool, plane, offset, grid, sna
       </div>
       {!model.nodes.length && <div className="spatial-empty"><strong>Your next structure starts here.</strong><span>Choose Draw member, or enter exact coordinates in the panel.</span></div>}
       {display !== 'model' && result && <div className="canvas-result-legend">{displayNames[display]} · {display === 'deformed' ? `× ${deformationScale}` : `peak |value| ${(diagramMax / 1000).toPrecision(4)} ${display.includes('moment') ? 'kN·m' : 'kN'}`}</div>}
-      <div className="canvas-coordinate-readout">{cursor ? cursor.map((v, i) => `${'XYZ'[i]} ${v.toFixed(3)}`).join('   ') : `${selectedCount} selected`} <span>m</span></div>
+      <CoordinateReadout ref={readout} selectedCount={selectedCount} />
     </div>
   </section>
 }

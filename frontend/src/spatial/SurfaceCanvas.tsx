@@ -1,5 +1,5 @@
 import { Box, Button, ButtonGroup, Typography, useTheme } from '@mui/material'
-import { useId, useRef, useState } from 'react'
+import { useId, useMemo, useRef, useState } from 'react'
 import { basis, project } from './projection'
 export type Vec = [number, number, number]
 export type SurfaceSelection = { kind: 'node' | 'element'; id: number } | null
@@ -61,6 +61,10 @@ export function SurfaceCanvas({
     moved: boolean
   } | null>(null)
   const suppressClick = useRef(false)
+  const nodeById = useMemo(
+    () => new Map(model.nodes.map((node) => [node.id, node])),
+    [model.nodes],
+  )
   const axes = basis(camera)
   const displacements = new Map(
     displacementRows.map((n) => [n.node_id, n.value]),
@@ -124,7 +128,7 @@ export function SurfaceCanvas({
   const reference = (ids: number[]) =>
     ids
       .map((id) => {
-        const n = model.nodes.find((v) => v.id === id)!
+        const n = nodeById.get(id)!
         return screen([n.x, n.y, n.z]).slice(0, 2).join(',')
       })
       .join(' ')

@@ -368,3 +368,15 @@ constraints. Other support presets replace all constraints on their target.
 Geometry replacement and support/load clear operations are recoverable by Undo.
 No fake Save/Run success is shown on storage/API failure. Cancel only stops waiting
 for a result and explicitly says the server may finish processing.
+
+## Workspace loading and canvas responsiveness
+
+`SpatialWorkspaces` loads each 3D family on its first visit. Loading and module
+failure keep `WorkspaceSwitcher` available, with an explicit retry after failure.
+Visited workbenches remain mounted across dimension and family changes so models,
+results, camera state and incomplete numeric fields survive navigation.
+`SpatialCanvas` updates the live coordinate readout independently of frame geometry
+while selecting; drawing still updates its pointer preview. `SurfaceCanvas` indexes
+reference nodes by ID for undeformed result overlays. Evidence lives in
+`SpatialWorkspaces.test.tsx`, `App.spatialNavigation.test.tsx` and
+`spatial/CanvasResponsiveness.test.tsx`.

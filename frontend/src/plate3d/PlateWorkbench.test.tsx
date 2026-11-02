@@ -51,7 +51,7 @@ afterEach(() => {
   vi.restoreAllMocks()
   vi.unstubAllGlobals()
 })
-function open() {
+async function open() {
   render(
     <ThemeProvider theme={studioTheme}>
       <App />
@@ -59,9 +59,10 @@ function open() {
   )
   fireEvent.click(screen.getByRole('button', { name: '3D' }))
   fireEvent.click(screen.getByRole('tab', { name: 'Plate 3D workspace' }))
+  await screen.findByLabelText('Plate model name')
 }
-it('preserves invalid drafts across properties close and spatial navigation', () => {
-  open()
+it('preserves invalid drafts across properties close and spatial navigation', async () => {
+  await open()
   expect(document.title).toBe('Plate 3D workspace — Nonlinear Studio')
   expect(screen.getByRole('tab', { name: 'Shell 3D workspace' })).toBeEnabled()
   fireEvent.click(screen.getByRole('button', { name: 'Material' }))
@@ -80,7 +81,7 @@ it('preserves invalid drafts across properties close and spatial navigation', ()
   expect(screen.getByLabelText('Young modulus')).toHaveValue('210000000000')
 })
 it('submits a real plate contract, displays raw results, invalidates on edit and undoes', async () => {
-  open()
+  await open()
   fireEvent.click(screen.getByRole('button', { name: 'Run analysis' }))
   await waitFor(() =>
     expect(
@@ -112,8 +113,8 @@ it('submits a real plate contract, displays raw results, invalidates on edit and
     examplePlate().material.thickness,
   )
 })
-it('creates hard perimeter supports including both rotations at corners and restores cleared mesh by Undo', () => {
-  open()
+it('creates hard perimeter supports including both rotations at corners and restores cleared mesh by Undo', async () => {
+  await open()
   fireEvent.click(screen.getByRole('button', { name: 'Support' }))
   fireEvent.mouseDown(screen.getByRole('combobox', { name: 'Support target' }))
   fireEvent.click(screen.getByRole('option', { name: 'All boundary edges' }))
@@ -135,7 +136,7 @@ it('creates hard perimeter supports including both rotations at corners and rest
   expect(JSON.parse(values.get(key)!)).toEqual(m)
 })
 it('blocks duplicates, ignores late cancelled results and allows retry after a failure', async () => {
-  open()
+  await open()
   let resolve: (r: Response) => void = () => {}
   vi.mocked(fetch).mockImplementation((input) =>
     String(input).includes('/auth/session')
@@ -172,8 +173,8 @@ it('blocks duplicates, ignores late cancelled results and allows retry after a f
     ).toBeVisible(),
   )
 })
-it('uses keyboard accessible paged selection and a separate 2D plate document', () => {
-  open()
+it('uses keyboard accessible paged selection and a separate 2D plate document', async () => {
+  await open()
   fireEvent.click(screen.getByRole('button', { name: /^Nodes/ }))
   const pane = screen.getByRole('complementary', { name: 'Plate properties' })
   fireEvent.click(
@@ -194,7 +195,7 @@ it('uses keyboard accessible paged selection and a separate 2D plate document', 
 })
 
 it('keeps the committed model on rejected import and validates before replacing it', async () => {
-  open()
+  await open()
   const original = values.get(key)!
   const candidate = { ...examplePlate(), name: 'Imported plate' }
   const file = new File(['{}'], 'import.plate3d.json', {
@@ -230,8 +231,8 @@ it('keeps the committed model on rejected import and validates before replacing 
   expect(values.get(key)).toBe(original)
 })
 
-it('reports local persistence failure without losing the edited model', () => {
-  open()
+it('reports local persistence failure without losing the edited model', async () => {
+  await open()
   Object.defineProperty(window, 'localStorage', {
     configurable: true,
     value: {

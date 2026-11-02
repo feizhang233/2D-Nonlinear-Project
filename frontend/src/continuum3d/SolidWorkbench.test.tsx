@@ -22,19 +22,21 @@ beforeEach(()=>{
   })
 })
 afterEach(()=>{cleanup();vi.restoreAllMocks();vi.unstubAllGlobals()})
-function open(){
+async function open(){
   render(<ThemeProvider theme={studioTheme}><App/></ThemeProvider>)
   fireEvent.click(screen.getByRole('button',{name:'3D'}))
   fireEvent.click(screen.getByRole('tab',{name:'Continuum 3D workspace'}))
+  await screen.findByLabelText('Solid model name')
 }
-it('places dimension before Frame; gates unsupported modules and preserves each draft',()=>{
-  open()
+it('places dimension before Frame; gates unsupported modules and preserves each draft',async ()=>{
+  await open()
   expect(screen.getByRole('tab',{name:'Plate 3D workspace'})).toBeEnabled()
   expect(screen.getByRole('tab',{name:'Shell 3D workspace'})).toBeEnabled()
   fireEvent.click(screen.getByRole('button',{name:/^Materials/}))
   fireEvent.change(screen.getByLabelText('Young’s modulus'),{target:{value:'2e-'}})
   expect(screen.getByRole('button',{name:'Run analysis'})).toBeDisabled()
   fireEvent.click(screen.getByRole('tab',{name:'Frame 3D workspace'}))
+  await screen.findByLabelText('3D model name')
   expect(document.title).toBe('Frame 3D workspace — Nonlinear Studio')
   fireEvent.click(screen.getByRole('tab',{name:'Continuum 3D workspace'}))
   expect(screen.getByLabelText('Young’s modulus')).toHaveValue('2e-')
@@ -47,7 +49,7 @@ it('places dimension before Frame; gates unsupported modules and preserves each 
   expect(screen.getByLabelText('Young’s modulus')).toHaveValue('200000000000')
 })
 it('runs a true solid payload, shows raw point results and invalidates edits with undo',async()=>{
-  open();fireEvent.click(screen.getByRole('button',{name:'Run analysis'}))
+  await open();fireEvent.click(screen.getByRole('button',{name:'Run analysis'}))
   await screen.findByText('Checks passed')
   const call=vi.mocked(fetch).mock.calls.find(([url])=>String(url).includes('/continuum3d/solve'))!
   expect(JSON.parse(String(call[1]?.body))).toEqual(exampleSolid())
@@ -63,7 +65,7 @@ it('runs a true solid payload, shows raw point results and invalidates edits wit
   expect(JSON.parse(values.get(key)!).materials[0].E).toBe(200e9)
 })
 it('reports failed solves, retries and discards a late cancelled response',async()=>{
-  open()
+  await open()
   vi.mocked(fetch).mockResolvedValueOnce(Response.json({error:{message:'Missing solid supports'}},{status:422}))
   fireEvent.click(screen.getByRole('button',{name:'Run analysis'}));await screen.findByText('Missing solid supports')
   let finish!:(response:Response)=>void
@@ -75,8 +77,8 @@ it('reports failed solves, retries and discards a late cancelled response',async
   await waitFor(()=>expect(screen.queryByText('Checks passed')).toBeNull())
   expect(screen.getByText(/server may still be finishing/)).toBeTruthy()
 })
-it('clears boundary data when remeshing and restores the complete model with undo',()=>{
-  open();fireEvent.click(screen.getByRole('button',{name:'Geometry & mesh'}))
+it('clears boundary data when remeshing and restores the complete model with undo',async ()=>{
+  await open();fireEvent.click(screen.getByRole('button',{name:'Geometry & mesh'}))
   fireEvent.change(screen.getByLabelText('X divisions'),{target:{value:'2'}})
   fireEvent.click(screen.getByRole('button',{name:'Generate mesh'}))
   const changed=JSON.parse(values.get(key)!)

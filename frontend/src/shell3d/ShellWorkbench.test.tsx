@@ -49,7 +49,7 @@ afterEach(() => {
   vi.restoreAllMocks()
   vi.unstubAllGlobals()
 })
-function open() {
+async function open() {
   render(
     <ThemeProvider theme={studioTheme}>
       <App />
@@ -57,9 +57,10 @@ function open() {
   )
   fireEvent.click(screen.getByRole('button', { name: '3D' }))
   fireEvent.click(screen.getByRole('tab', { name: 'Shell 3D workspace' }))
+  await screen.findByLabelText('Shell project name')
 }
-it('preserves incomplete scientific input across workspace switches and discards safely', () => {
-  open()
+it('preserves incomplete scientific input across workspace switches and discards safely', async () => {
+  await open()
   expect(document.title).toBe('Shell 3D workspace — Nonlinear Studio')
   fireEvent.click(screen.getByRole('button', { name: 'Material' }))
   fireEvent.change(screen.getByLabelText("Young's modulus"), {
@@ -77,7 +78,7 @@ it('preserves incomplete scientific input across workspace switches and discards
   expect(screen.getByLabelText("Young's modulus")).toHaveValue('210000000000')
 })
 it('submits the real shell contract and displays unsmoothed fields, then invalidates results on edit', async () => {
-  open()
+  await open()
   fireEvent.click(screen.getByRole('button', { name: 'Run analysis' }))
   await waitFor(() =>
     expect(screen.getByRole('table', { name: 'Shell results' })).toBeVisible(),
@@ -102,8 +103,8 @@ it('submits the real shell contract and displays unsmoothed fields, then invalid
   fireEvent.click(screen.getByRole('button', { name: 'Undo' }))
   expect(JSON.parse(values.get(key)!).material.thickness).toBe(0.02)
 })
-it('regenerates a flat mesh, clears dependent data, and restores all data with Undo', () => {
-  open()
+it('regenerates a flat mesh, clears dependent data, and restores all data with Undo', async () => {
+  await open()
   fireEvent.click(screen.getByRole('button', { name: 'Geometry' }))
   fireEvent.change(screen.getByLabelText('Fold angle'), {
     target: { value: '0' },
@@ -116,8 +117,8 @@ it('regenerates a flat mesh, clears dependent data, and restores all data with U
   fireEvent.click(screen.getByRole('button', { name: 'Undo' }))
   expect(JSON.parse(values.get(key)!)).toEqual(exampleShell())
 })
-it('assigns selected nodal moments and single-DOF supports without losing other restraints', () => {
-  open()
+it('assigns selected nodal moments and single-DOF supports without losing other restraints', async () => {
+  await open()
   fireEvent.click(screen.getByRole('button', { name: /^Nodes/ }))
   fireEvent.click(
     screen.getByRole('checkbox', { name: 'Select Shell nodes 1' }),
@@ -148,7 +149,7 @@ it('assigns selected nodal moments and single-DOF supports without losing other 
   expect(cs.find((c: { dof: string }) => c.dof === 'uz').value).toBe(0.001)
 })
 it('cancels late results and recovers from an actionable solver error', async () => {
-  open()
+  await open()
   let resolve: (r: Response) => void = () => {}
   vi.mocked(fetch).mockImplementation((input) =>
     String(input).includes('/auth/session')
@@ -182,7 +183,7 @@ it('cancels late results and recovers from an actionable solver error', async ()
   )
 })
 it('keeps the current document when imported geometry is rejected by the server', async () => {
-  open()
+  await open()
   const candidate = { ...exampleShell(), name: 'Rejected import' }
   vi.mocked(fetch).mockResolvedValueOnce(
     Response.json(
@@ -208,8 +209,8 @@ it('keeps the current document when imported geometry is rejected by the server'
   expect(JSON.parse(values.get(key)!)).toEqual(exampleShell())
 })
 
-it('restores generator fields when cancelling incomplete geometry edits', () => {
-  open()
+it('restores generator fields when cancelling incomplete geometry edits', async () => {
+  await open()
   fireEvent.click(screen.getByRole('button', { name: 'Geometry' }))
   fireEvent.change(screen.getByLabelText('Fold angle'), {
     target: { value: '2e-' },

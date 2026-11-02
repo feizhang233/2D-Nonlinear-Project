@@ -1,5 +1,6 @@
 // @vitest-environment jsdom
-import { cleanup, fireEvent, render, screen } from '@testing-library/react'
+import '@testing-library/jest-dom/vitest'
+import { cleanup, fireEvent, render, screen, waitFor } from '@testing-library/react'
 import { ThemeProvider } from '@mui/material/styles'
 import { afterEach, beforeEach, expect, it, vi } from 'vitest'
 import App from './App'
@@ -20,10 +21,12 @@ beforeEach(() => {
 afterEach(() => { cleanup(); vi.restoreAllMocks(); vi.unstubAllGlobals() })
 
 it.each(['Frame', 'Continuum', 'Plate', 'Shell'])(
-  'keeps the %s family selected across both dimension transitions', family => {
+  'keeps the %s family selected across both dimension transitions', async family => {
     render(<ThemeProvider theme={studioTheme}><App /></ThemeProvider>)
     fireEvent.click(screen.getByRole('button', { name: '3D' }))
+    await waitFor(() => expect(screen.queryByText(/^Loading .* 3D workspace/)).not.toBeInTheDocument())
     fireEvent.click(screen.getByRole('tab', { name: `${family} 3D workspace` }))
+    await waitFor(() => expect(screen.queryByText(/^Loading .* 3D workspace/)).not.toBeInTheDocument())
     fireEvent.click(screen.getByRole('button', { name: '2D' }))
     expect(screen.getByRole('tab', { name: `${family} workspace` })
       .getAttribute('aria-selected')).toBe('true')
